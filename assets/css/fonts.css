@@ -1,0 +1,251 @@
+/* ============================================================
+   Фирменная пара бренда (ТЗ8 §1, брендбук famiiily):
+   - Roslindale Cyrillic Display Condensed Medium (+Italic) —
+     акцентный сериф: заголовки, цитаты, манифесты, имена, цифры.
+   - Heading Now W05 64 Regular — наборный гротеск капсом:
+     eyebrow, плашки, кнопки, навигация, лейблы.
+   Файлы одного начертания; font-weight объявлен диапазоном,
+   чтобы браузер не рисовал синтетический жирный на 600/700.
+   Сабсеты cyrillic/latin — те же unicode-range, что были у Golos.
+   ============================================================ */
+
+/* ============================================================
+   Copperplate (Brut Dept, info/Шрифты/Шрифты для принтов) —
+   по правке заказчика 17.07: ЕДИНЫЙ шрифт всего сайта.
+   3 начертания из ttc: Light 300 / Regular 400 / Bold 700;
+   кириллица полная. Курсива у Copperplate нет — em рендерится
+   синтетическим наклоном браузера.
+   ============================================================ */
+/* Copperplate Light — cyrillic */
+@font-face {
+  font-family: 'Copperplate';
+  font-style: normal;
+  font-weight: 300;
+  font-display: swap;
+  src: url(../fonts/copperplate-300-cyrillic.woff2) format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+/* Copperplate Light — latin */
+@font-face {
+  font-family: 'Copperplate';
+  font-style: normal;
+  font-weight: 300;
+  font-display: swap;
+  src: url(../fonts/copperplate-300-latin.woff2) format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* Copperplate Regular — cyrillic */
+@font-face {
+  font-family: 'Copperplate';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url(../fonts/copperplate-400-cyrillic.woff2) format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+/* Copperplate Regular — latin */
+@font-face {
+  font-family: 'Copperplate';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url(../fonts/copperplate-400-latin.woff2) format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* Copperplate Bold — cyrillic */
+@font-face {
+  font-family: 'Copperplate';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url(../fonts/copperplate-700-cyrillic.woff2) format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+/* Copperplate Bold — latin */
+@font-face {
+  font-family: 'Copperplate';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url(../fonts/copperplate-700-latin.woff2) format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+/* ============================================================
+   Правка заказчика 26.07: новая шрифтовая система сайта —
+   - заголовки/крупные тексты: Roslindale Display Condensed Medium
+     ITALIC (курсивное начертание как ОСНОВНОЕ — семейство-алиас
+     «Roslindale Italic» ниже, зарегистрировано и для normal, и для
+     italic, чтобы <em> внутри заголовков не получал двойной наклон);
+   - основной текст: Apoc Regular (Trial) — кириллица полная,
+     сабсеты из info/Шрифты/Шрифты для принтов/Brut Dept;
+   - подзаголовки/служебные капс-надписи: Copperplate (как было).
+   ============================================================ */
+
+/* Apoc Regular (Trial) — основной текст. Только 400: жирные
+   акценты (strong, лейблы 600) рисуются синтетически — у триала
+   нет других начертаний. */
+@font-face {
+  font-family: 'Apoc';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url(../fonts/apoc-400-cyrillic.woff2) format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+@font-face {
+  font-family: 'Apoc';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url(../fonts/apoc-400-latin.woff2) format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+/* Roslindale Italic как САМОСТОЯТЕЛЬНОЕ семейство для заголовков:
+   те же i-файлы отдаются и на normal, и на italic — курсив везде,
+   без синтетического дополнительного наклона у <em> */
+@font-face {
+  font-family: 'Roslindale Italic';
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: swap;
+  src: url(../fonts/roslindale-i-cyrillic.woff2) format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+@font-face {
+  font-family: 'Roslindale Italic';
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: swap;
+  src: url(../fonts/roslindale-i-latin.woff2) format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Roslindale Italic';
+  font-style: italic;
+  font-weight: 400 700;
+  font-display: swap;
+  src: url(../fonts/roslindale-i-cyrillic.woff2) format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+@font-face {
+  font-family: 'Roslindale Italic';
+  font-style: italic;
+  font-weight: 400 700;
+  font-display: swap;
+  src: url(../fonts/roslindale-i-latin.woff2) format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+/* Roslindale — cyrillic */
+@font-face {
+  font-family: 'Roslindale Display Condensed';
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: swap;
+  src: url(../fonts/roslindale-cyrillic.woff2) format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+/* Roslindale — latin */
+@font-face {
+  font-family: 'Roslindale Display Condensed';
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: swap;
+  src: url(../fonts/roslindale-latin.woff2) format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* Roslindale Italic — cyrillic */
+@font-face {
+  font-family: 'Roslindale Display Condensed';
+  font-style: italic;
+  font-weight: 400 700;
+  font-display: swap;
+  src: url(../fonts/roslindale-i-cyrillic.woff2) format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+/* Roslindale Italic — latin */
+@font-face {
+  font-family: 'Roslindale Display Condensed';
+  font-style: italic;
+  font-weight: 400 700;
+  font-display: swap;
+  src: url(../fonts/roslindale-i-latin.woff2) format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+/* Heading Now 64 — cyrillic */
+@font-face {
+  font-family: 'Heading Now 64';
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: swap;
+  src: url(../fonts/headingnow64-cyrillic.woff2) format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+/* Heading Now 64 — latin */
+@font-face {
+  font-family: 'Heading Now 64';
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: swap;
+  src: url(../fonts/headingnow64-latin.woff2) format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+/* ---------- Golos Text — абзацы-носители (без изменений) ---------- */
+/* cyrillic */
+@font-face {
+  font-family: 'Golos Text';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url(../fonts/golos-400-cyrillic.woff2) format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+/* latin */
+@font-face {
+  font-family: 'Golos Text';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url(../fonts/golos-400-latin.woff2) format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* cyrillic */
+@font-face {
+  font-family: 'Golos Text';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url(../fonts/golos-500-cyrillic.woff2) format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+/* latin */
+@font-face {
+  font-family: 'Golos Text';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url(../fonts/golos-500-latin.woff2) format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* cyrillic */
+@font-face {
+  font-family: 'Golos Text';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url(../fonts/golos-600-cyrillic.woff2) format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+/* latin */
+@font-face {
+  font-family: 'Golos Text';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url(../fonts/golos-600-latin.woff2) format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}

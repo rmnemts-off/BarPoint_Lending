@@ -1,0 +1,859 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BARPOINT — ателье барных и кофейных концепций. Консалтинг HoReCa с 2016 года</title>
+  <meta name="description" content="BARPOINT создаёт бары, кофейни и напиточные бренды: от идеи и дизайна — до операционки, экономики и масштабирования. 80 000+ коктейлей в год, 11+ реализованных концепций, с 2016 года.">
+  <!-- ТЗ4 §8.8: знак BARPOINT (монограмма из презентаций) -->
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="icon" href="assets/img/favicon-32.png" sizes="32x32" type="image/png">
+  <link rel="apple-touch-icon" href="assets/img/apple-touch-icon.png">
+  <link rel="canonical" href="https://barpoint.ru/">
+
+  <!-- Open Graph / Twitter Card -->
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="ru_RU">
+  <meta property="og:title" content="BARPOINT — ателье барных и кофейных концепций">
+  <meta property="og:description" content="Бар становится культурным кодом. Бизнес становится системой. Проектирование, запуск, операционка и масштабирование баров и кофеен — с 2016 года.">
+  <meta property="og:url" content="https://barpoint.ru/">
+  <meta property="og:image" content="https://barpoint.ru/assets/img/og.jpg">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="BARPOINT — ателье барных и кофейных концепций">
+  <meta name="twitter:description" content="Бар становится культурным кодом. Бизнес становится системой.">
+  <meta name="twitter:image" content="https://barpoint.ru/assets/img/og.jpg">
+
+  <link rel="preload" href="assets/fonts/roslindale-i-cyrillic.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="assets/fonts/apoc-400-cyrillic.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="assets/fonts/copperplate-400-cyrillic.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="assets/img/hero-retro-mob-800.webp" as="image" media="(max-width: 767px)">
+  <link rel="preload" href="assets/img/hero-retro-1200.webp" as="image" media="(min-width: 768px) and (max-width: 1024px)">
+  <link rel="preload" href="assets/img/hero-retro-2000.webp" as="image" media="(min-width: 1025px)">
+  <link rel="stylesheet" href="assets/css/fonts.css">
+  <link rel="stylesheet" href="assets/css/style.css">
+
+  <!-- JSON-LD schema.org (9.4). TODO: подтвердить телефон/соцсети у заказчика (раздел 12 ТЗ) -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "ProfessionalService",
+    "name": "BARPOINT",
+    "description": "Ателье барных и кофейных концепций. Консалтинг HoReCa: проектирование, запуск, операционка, экономика и масштабирование баров и кофеен.",
+    "url": "https://barpoint.ru/",
+    "telephone": "+7 968-890-98-90",
+    "foundingDate": "2016",
+    "areaServed": "Москва — Восточная Европа",
+    "image": "https://barpoint.ru/assets/img/og.jpg"
+  }
+  </script>
+</head>
+<body>
+<a class="skip-link" href="#main">Перейти к содержанию</a>
+
+<!-- ============ 6.0 Шапка ============ -->
+<!-- ТЗ4 §3: раскладка как у PINEA — навигация слева, ячейка логотипа
+     по центру (посадочное место полёта), кнопка справа -->
+<header class="header" id="header">
+  <div class="header__inner">
+    <div class="header__left">
+      <!-- Правка 31.07: набор пунктов заменён на «Услуги · Кофейни · Бары ·
+           Кейсы · Команда». Порядок совпадает с порядком блоков на
+           странице: «Услуги» ведут на блок с тремя сценариями работы —
+           он открывает раздел услуг, дальше кофейный и барный блоки.
+           «Контакты» из строки убраны: на них ведёт кнопка справа. -->
+      <!-- data-ink: элемент сам подбирает цвет по фону под собой, см.
+           «чернила шапки» в main.js. -->
+      <nav class="header__nav" aria-label="Основная навигация">
+        <a href="#about" data-ink>Услуги</a>
+        <a href="#coffee" data-ink>Кофейни</a>
+        <a href="#services" data-ink>Бары</a>
+        <a href="#cases" data-ink>Кейсы</a>
+        <a href="#team" data-ink>Команда</a>
+      </nav>
+      <button class="burger" aria-label="Открыть меню" aria-expanded="false" aria-controls="mnav" data-ink>
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+    <div class="header__logoslot">
+      <!-- Знак — ВЕКТОР прямо в разметке (правка 31.07, вторая): пути
+           вынуты из фирменного Materials v3/Логотип/PDF/Logo_Barpoint.pdf.
+           Растр здесь не годился: в полёте знак увеличивается почти в 10 раз,
+           а исходный wordmark-light.png всего 800px по ширине — на первом
+           экране он расплывался. Вектор ещё и красится сам: fill=currentColor
+           подхватывает «чернила» из data-ink. Копия файла лежит рядом —
+           assets/img/wordmark.svg. Название несёт aria-label ссылки. -->
+      <a class="header__logo js-herologo" href="#top" aria-label="BARPOINT — на главную" data-ink>
+        <svg class="header__logo-mark" viewBox="0 0 1854.6 441.9" fill="currentColor" aria-hidden="true" focusable="false"><g transform="translate(-32.7,-23.8)"><path transform="matrix(1,0,0,-1,926.6321,127.4935)" d="M0 0C0 24.068-19.929 43.579-44.512 43.579H-53.672C-56.227 43.579-58.299 41.551-58.299 39.049V-118.84C-58.299-121.342-56.227-123.37-53.672-123.37H-35.105C-15.717-123.37 0-107.982 0-89.001ZM-30.092 97.589C45.141 97.589 84.011 43.579 84.011-27.621V-52.173C84.011-123.37 37.617-177.385-30.092-177.385H-53.672C-56.227-177.385-58.299-179.413-58.299-181.915V-327.527C-58.299-330.029-60.37-332.057-62.925-332.057H-133.918C-136.473-332.057-138.544-330.029-138.544-327.527V93.059C-138.544 95.561-136.473 97.589-133.918 97.589Z"/><path transform="matrix(1,0,0,-1,1116.5773,366.8689)" d="M0 0C0-25.165 9.404-43.579 30.092-43.579 50.78-43.579 60.184-25.165 60.184 0V244.286C60.184 269.45 50.78 287.862 30.092 287.862 9.404 287.862 0 269.45 0 244.286ZM-84.011 134.417C-84.011 274.361-47.021 343.104 30.092 343.104 107.199 343.104 144.189 274.361 144.189 134.417V109.866C144.189-30.075 107.199-98.818 30.092-98.818-47.021-98.818-84.011-30.075-84.011 109.866Z"/><path transform="matrix(1,0,0,-1,1381.7499,34.434694)" d="M0 0V-420.586C0-423.087-2.071-425.116-4.627-425.116H-75.619C-78.174-425.116-80.246-423.087-80.246-420.586V0C-80.246 2.502-78.174 4.53-75.619 4.53H-4.627C-2.071 4.53 0 2.502 0 0"/><path transform="matrix(1,0,0,-1,1815.1824,459.5502)" d="M0 0H-70.992C-73.547 0-75.619 2.028-75.619 4.53V369.877C-75.619 372.378-77.69 374.406-80.246 374.406H-139.129C-141.684 374.406-143.756 376.434-143.756 378.936V425.116C-143.756 427.617-141.684 429.645-139.129 429.645H67.504C70.059 429.645 72.131 427.617 72.131 425.116V378.936C72.131 376.434 70.059 374.406 67.504 374.406H9.254C6.698 374.406 4.627 372.378 4.627 369.877V4.53C4.627 2.028 2.555 0 0 0"/><path transform="matrix(1,0,0,-1,637.645,216.4938)" d="M0 0H-11.049C-13.604 0-15.676 2.028-15.676 4.53V126.824C-15.676 129.324-13.606 131.35-11.053 131.35H-9.245C15.248 131.35 35.104 111.91 35.104 87.929V34.369C35.104 15.387 19.388 0 0 0M60.309-33.17C54.805-31.775 49.1-31.301 43.414-31.302H35.104C33.027-31.302 31.343-29.653 31.343-27.62 31.343-25.585 33.027-23.936 35.104-23.936L42.963-23.937C48.574-23.937 54.219-23.574 59.662-22.24 90.143-14.768 119.116 14.4 119.116 72.427 119.116 146.081 72.721 186.589 5.012 186.589H-91.295C-93.85 186.589-95.922 184.561-95.922 182.06V-238.526C-95.922-241.028-93.85-243.056-91.295-243.056H-20.302C-17.747-243.056-15.676-241.028-15.676-238.526V-59.769C-15.676-57.268-13.604-55.24-11.049-55.24H-5.645C13.79-55.24 23.194-66.9 25.074-85.928L38.504-239.494C38.71-241.851 40.734-243.655 43.151-243.637L113.447-243.096C116.159-243.075 118.271-240.786 118.017-238.142L104.693-99.432C100.431-54.024 80.751-38.351 60.309-33.17"/><path transform="matrix(1,0,0,-1,173.1169,369.94129)" d="M0 0C0-18.981-15.717-34.369-35.105-34.369H-55.558C-58.113-34.369-60.184-32.341-60.184-29.839V103.499C-60.184 106-58.113 108.028-55.558 108.028H-44.512C-19.929 108.028 0 88.518 0 64.45ZM-60.184 280.268C-60.184 282.769-58.113 284.797-55.558 284.797H-50.777C-26.194 284.797-6.265 265.286-6.265 241.219V197.643C-6.265 178.658-21.985 163.268-41.376 163.268H-55.558C-58.113 163.268-60.184 165.296-60.184 167.798ZM59.877 104.512C44.519 123.048 20.949 133.193-3.43 133.193H-6.291C-8.369 133.193-10.053 134.842-10.053 136.877-10.053 138.91-8.369 140.56-6.291 140.56H-6.073C25.474 140.56 55.239 157.63 68.303 185.743 74.361 198.78 77.74 214.03 77.74 230.785 77.74 298.301 34.484 340.037-42.629 340.037H-135.803C-138.359 340.037-140.43 338.009-140.43 335.507V-85.079C-140.43-87.58-138.359-89.608-135.803-89.608H-33.225C34.484-89.608 84.011-48.486 84.011 26.397V34.375C84.011 61.23 75.01 86.25 59.877 104.512"/><path transform="matrix(1,0,0,-1,408.7026,311.0153)" d="M0 0H-33.603C-36.35 0-38.492 2.33-38.204 5.003L-29.965 81.634-20.6 200.11C-20.508 202.065-18.859 203.632-16.801 203.632-14.714 203.632-13.031 202.022-12.986 200.027L-3.638 81.634 4.602 5.003C4.889 2.33 2.747 0 0 0M37.09 277.271C36.742 279.48 34.8 281.111 32.517 281.111H-66.12C-68.403 281.111-70.345 279.48-70.693 277.271L-136.974-143.314C-137.407-146.059-135.238-148.534-132.401-148.534H-59.21C-56.842-148.534-54.857-146.785-54.609-144.479L-45.45-59.296C-45.202-56.99-43.217-55.24-40.849-55.24H7.246C9.614-55.24 11.599-56.99 11.847-59.296L21.005-144.479C21.254-146.785 23.239-148.534 25.607-148.534H98.798C101.635-148.534 103.803-146.059 103.371-143.314Z"/><path transform="matrix(1,0,0,-1,1639.7898,29.904297)" d="M0 0H-39.319-69.015C-71.663 0-73.77-2.171-73.635-4.76L-60.494-256.911C-60.361-259.137-62.168-261.013-64.446-261.013-66.246-261.013-67.82-259.824-68.275-258.12L-136.976-3.373C-137.513-1.385-139.349 0-141.45 0H-149.528-215.814C-218.37 0-220.441-2.028-220.441-4.53V-425.116C-220.441-427.617-218.37-429.645-215.814-429.645H-145.934C-143.28-429.645-141.17-427.464-141.314-424.87L-155.334-172.283C-155.467-170.057-153.66-168.181-151.382-168.181-149.582-168.181-148.009-169.37-147.553-171.074L-78.73-426.272C-78.194-428.26-76.357-429.645-74.257-429.645H-46.872 0C2.555-429.645 4.627-427.617 4.627-425.116V-4.53C4.627-2.028 2.555 0 0 0"/></g></svg>
+      </a>
+    </div>
+    <!-- Правка 30.07 (третья): наклон снят по просьбе заказчика — кнопка
+         снова прямая, и метка вернулась в ОДНУ строку (в две её ломал
+         только наклон: под 16° габарит по высоте не влезал в шапку). -->
+    <a class="btn btn--primary header__cta" href="#contact">Обсудить проект</a>
+  </div>
+</header>
+<nav class="mnav" id="mnav" aria-label="Мобильная навигация">
+  <a href="#about">Услуги</a>
+  <a href="#coffee">Кофейни</a>
+  <a href="#services">Бары</a>
+  <a href="#cases">Кейсы</a>
+  <a href="#team">Команда</a>
+  <a class="btn btn--primary" href="#contact">Обсудить проект</a>
+</nav>
+
+<main id="main">
+
+<!-- ============ 6.1 Hero ============
+     Медиа: по ТЗ — видео-луп 6–10 сек с постером-фолбэком (deck3 сл.1).
+     Видео пока нет (нужна съёмка/оригиналы от заказчика, раздел 10 ТЗ) —
+     стоит фолбэк-фото. Чтобы включить видео: раскомментировать <video>. -->
+<section class="hero" id="top">
+  <div class="hero__media" data-hero-media>
+    <!-- ТЗ8 §2 (возврат по просьбе заказчика 17.07): ретро-натюрморт —
+         негрони на зелёном бархате (слайд 81 брендбука, извлечён из PDF
+         2188×1213; заменить исходником полного разрешения, когда передаст
+         заказчик). Кадр горизонтальный; на мобильных — портретный кроп
+         вокруг стакана (art-direction через <picture>). -->
+    <picture>
+      <source media="(max-width: 767px)"
+              srcset="assets/img/hero-retro-mob-600.webp 600w, assets/img/hero-retro-mob-800.webp 800w"
+              sizes="100vw" width="800" height="1000">
+      <img src="assets/img/hero-retro-2000.webp"
+           srcset="assets/img/hero-retro-800.webp 800w, assets/img/hero-retro-1200.webp 1200w, assets/img/hero-retro-2000.webp 2000w"
+           sizes="100vw" width="2000" height="1109"
+           alt="Негрони в гранёном стакане на зелёном бархате — ретро-натюрморт с игральными костями, зажигалкой и долларом"
+           fetchpriority="high" decoding="async">
+    </picture>
+    <!-- <video autoplay muted loop playsinline poster="assets/img/hero-retro-2000.webp">
+           <source src="assets/video/hero-loop.mp4" type="video/mp4"></video> -->
+  </div>
+  <!-- Правка 30.07: янтарная строка-eyebrow «Консалтинг барных и кофейных
+       концепций · с 2016 года» УДАЛЕНА по просьбе заказчика — «с 2016 года»
+       ушло в сам заголовок.
+       Правка 30.07 (вторая): деление на два уровня снято — фраза идёт
+       сплошным текстом по центру, капсом, шрифтом навигации (Copperplate).
+       Капс задан в CSS (text-transform), в разметке текст живёт в обычном
+       регистре: так его читают поисковики и скринридеры.
+       ТЗ15: трастлайн с цифрами и амбер-линией удалён целиком (§4).
+       Против «сирот» в концах строк — группы <span class="nw"> (nowrap):
+       SplitText НЕ уважает nbsp (нормализует в пробел и режет по нему —
+       проверено), но сохраняет вложенные элементы, и nowrap-обёртка
+       запрещает перенос между словами группы.
+       Правка 26.07: «BARPOINT улучшает и создаёт» → «Мы улучшаем
+       и создаём»; янтарный акцент снят — весь заголовок одним цветом
+       (выбран вариант Б из ТЗ15 §3.4). -->
+  <div class="hero__content container">
+    <h1 class="hero__title js-lines"><span class="nw">С 2016 года</span> создаём и улучшаем кофейни, бары <span class="nw">и рестораны,</span> закрывая <span class="nw">полный цикл:</span> <span class="nw">от концепции</span> <span class="nw">до операционки</span></h1>
+  </div>
+</section>
+
+<!-- ============ 6.2 Полоса ключевых проектов ============
+     Правка 29.07: вместо наградных строк — шесть главных кейсов, каждый
+     в СВОЁМ фирменном начертании. Где есть настоящий знак — стоит он:
+     Зойка, АЙНА, Lúwo извлечены из презентации, а PIMS снят с вывески на
+     фото кейса (case-pims-1-1400: кадр фронтальный, буквы вырезаны по
+     маске яркости, отчищены от бликов и перекрашены в #17140F).
+     Где знака нет — воспроизведён его стиль:
+       Duran Bar — контрастная антиква смешанным регистром (стр. 23);
+       BURO. ЦУМ — тонкая разряжённая антиква в две строки (стр. 20). -->
+<section class="trust" aria-label="Ключевые проекты BARPOINT">
+  <div class="marquee">
+    <div class="marquee__track" data-marquee>
+      <span class="marquee__item mq mq--logo">
+        <img class="mq__img mq__img--pims" src="assets/img/logo-pims.png" width="359" height="108" alt="PIMS" loading="lazy" decoding="async">
+      </span>
+      <span class="marquee__item mq mq--duran">Duran Bar</span>
+      <span class="marquee__item mq mq--logo">
+        <img class="mq__img mq__img--zoyka" src="assets/img/logo-zoyka.png" width="900" height="601" alt="Зойка" loading="lazy" decoding="async">
+      </span>
+      <span class="marquee__item mq mq--logo">
+        <img class="mq__img mq__img--aina" src="assets/img/logo-aina.png" width="562" height="382" alt="АЙНА" loading="lazy" decoding="async">
+      </span>
+      <span class="marquee__item mq mq--logo">
+        <img class="mq__img mq__img--luwo" src="assets/img/logo-luwo.png" width="568" height="187" alt="Lúwo" loading="lazy" decoding="async">
+      </span>
+      <span class="marquee__item mq mq--buro">
+        <span class="mq__lockup">
+          <span class="mq__buro">Buro.</span>
+          <span class="mq__tsum">ЦУМ</span>
+        </span>
+      </span>
+    </div>
+  </div>
+</section>
+
+
+
+<!-- ============ 6.7 «Кому мы полезны» ============
+     Формат по референсу buckssauce.com/shop: три цветные карточки в ряд,
+     у каждой пунктирная рамка внутри; активная — насыщенная, с фото и
+     раскрытой подписью, соседние приглушены. Под карточками — тёмная
+     плашка с описанием активного сценария и кнопкой.
+     Взята только раскладка и логика; цвета/шрифты — барпоинтовские.
+     Пина здесь больше НЕТ (прежняя запиненная сцена с пилюлями снята).
+     Правка 29.07: наведение убрано целиком — карточки статичны, все три
+     всегда в насыщенном состоянии, описание видно без ховера. Поэтому
+     они больше не интерактивны: ни tabindex, ни aria-expanded. -->
+<section class="section section--black" id="about" data-bg="#1B1916">
+  <div class="container">
+    <div class="scn-head" data-reveal>
+      <h2 class="scn-head__title">Три сценария работы</h2>
+    </div>
+
+    <div class="scn" data-scn>
+      <article class="scn__card" data-scn-card data-scn-i="0">
+        <span class="scn__frame" aria-hidden="true"></span>
+        <h3 class="scn__title">Открываете<br>с нуля</h3>
+        <p class="scn__desc">Помогаем спроектировать концепцию, карту напитков и запустить точку без типичных ошибок старта.</p>
+        <figure class="scn__photo">
+          <img src="assets/img/scenario-1-900.webp" width="900" height="1125" alt="Напиток наливают в бокал — старт нового проекта" loading="lazy" decoding="async">
+        </figure>
+      </article>
+
+      <article class="scn__card" data-scn-card data-scn-i="1">
+        <span class="scn__frame" aria-hidden="true"></span>
+        <h3 class="scn__title">Упёрлись<br>в потолок</h3>
+        <p class="scn__desc">Разбираем, где теряются деньги и гости, и выстраиваем систему вместо ручного управления.</p>
+        <figure class="scn__photo">
+          <img src="assets/img/scenario-2-900.webp" width="900" height="1125" alt="Кофе с молоком — текстура вихря" loading="lazy" decoding="async">
+        </figure>
+      </article>
+
+      <article class="scn__card" data-scn-card data-scn-i="2">
+        <span class="scn__frame" aria-hidden="true"></span>
+        <h3 class="scn__title">Хотите<br>масштабироваться</h3>
+        <p class="scn__desc">Готовим бренд, стандарты и экономику так, чтобы формат можно было тиражировать.</p>
+        <figure class="scn__photo">
+          <img src="assets/img/scenario-3-900.webp" width="900" height="1125" alt="Гости с фирменными напитками PIMS" loading="lazy" decoding="async">
+        </figure>
+      </article>
+    </div>
+
+
+  </div>
+</section>
+
+<!-- Тихая зона стыка: пустая проставка, в которой фон перетекает из
+     цвета одной секции в цвет другой (сама анимация — в main.js). -->
+<div class="seam" aria-hidden="true"></div>
+
+<!-- ============ 6.5 Услуги — два блока-слайдера ============
+     Механика по референсу bonito-flakes-for-pets.com: секция пинится,
+     прокрутка перелистывает слайды, у края экрана — вертикальная полоска
+     с точками (линия + кружки, активный крупнее и залит, пройденные
+     закрашены), по ней можно перепрыгнуть к слайду. Полоска живёт ТОЛЬКО
+     внутри своего блока: у кофе справа, у бара слева.
+     Фото — по одному на слайд, все уникальные: кадры case-* убраны,
+     они уже стоят в галереях кейсов ниже.
+     ФОН: у кофейного блока НЕТ data-bg — он специально выведен из
+     механики bgflow и красит себя сам (.prs--coffee). Иначе цвет вёл бы
+     body, а он переключается за 495px до кромки блока — на входе и
+     выходе слайды успевали оказаться на тёмном. Барный блок остаётся в
+     bgflow: его data-bg совпадает и с его собственной темой, и с фоном
+     соседей, поэтому там разнобоя быть не может. -->
+<section class="prs prs--coffee" id="coffee" data-bg="#E8DCC2" data-prs data-prs-side="right">
+  <div class="prs__inner container">
+    <h2 class="prs__manifest">Coffee consulting</h2>
+
+    <nav class="prs__nav" aria-label="Разделы: Coffee consulting" data-prs-nav>
+      <span class="prs__line" aria-hidden="true"><span class="prs__fill" data-prs-fill></span></span>
+      <button type="button" class="prs__dot" data-prs-go="0" aria-label="Слайд 1: Работаем со всем циклом кофейного бизнеса"></button>
+      <button type="button" class="prs__dot" data-prs-go="1" aria-label="Слайд 2: Menu engineering"></button>
+      <button type="button" class="prs__dot" data-prs-go="2" aria-label="Слайд 3: Операционка. Экономика"></button>
+      <button type="button" class="prs__dot" data-prs-go="3" aria-label="Слайд 4: Прямые связи и честные условия"></button>
+    </nav>
+
+    <div class="prs__stage">
+      <article class="prs__slide" data-prs-slide>
+        <div class="prs__text">
+          <h3 class="prs__title">Работаем со всем циклом кофейного бизнеса</h3>
+          <ul class="prs__list">
+            <li>Концепция и бренд</li>
+            <li>Айдентика и визуальный язык</li>
+            <li>Проектирование пространства и рабочих зон</li>
+            <li>Кофейные карты и авторские напитки</li>
+            <li>Завтраки и десертные напитки</li>
+            <li>Обучение, база знаний, стандарты</li>
+            <li>Операционные процессы, регламенты, контроль</li>
+            <li>Экономика: себестоимость, маржинальность, фудкост</li>
+            <li>Оборудование, поставки, упаковка</li>
+            <li>Системы для масштабирования</li>
+          </ul>
+        </div>
+        <figure class="prs__media">
+          <img src="assets/img/approach-4-900.webp" width="900" height="1054" alt="Рабочая зона кофейни" loading="lazy" decoding="async">
+        </figure>
+      </article>
+
+      <article class="prs__slide" data-prs-slide>
+        <div class="prs__text">
+          <h3 class="prs__title">Menu engineering</h3>
+          <dl class="prs__defs">
+            <div><dt>Сенсорика</dt><dd>и тестирование ингредиентов</dd></div>
+            <div><dt>Точные рецептуры</dt><dd>которые легко повторить</dd></div>
+            <div><dt>Баланс</dt><dd>вкуса, скорости и себестоимости</dd></div>
+            <div><dt>Авторские позиции</dt><dd>которые становятся «героями» меню</dd></div>
+            <div><dt>Визуал</dt><dd>язык и подача</dd></div>
+          </dl>
+        </div>
+        <figure class="prs__media">
+          <img src="assets/img/svc-coffee-a-800.webp" width="800" height="1000" alt="Фирменный напиток навынос" loading="lazy" decoding="async">
+        </figure>
+      </article>
+
+      <article class="prs__slide" data-prs-slide>
+        <div class="prs__text">
+          <h3 class="prs__title">Операционка. Экономика</h3>
+          <ul class="prs__list prs__list--two">
+            <li>Себестоимость и маржинальность</li>
+            <li>Фудкост, списания, потери</li>
+            <li>Отчёты и инвентаризация</li>
+            <li>Закупки</li>
+            <li>Поставщики</li>
+            <li>Фонд оплаты труда</li>
+            <li>Загрузка смен</li>
+            <li>Прогнозирование спроса</li>
+          </ul>
+        </div>
+        <figure class="prs__media">
+          <img src="assets/img/svc-coffee-1-1000.webp" width="1000" height="1250" alt="Бариста заваривает кофе в воронке" loading="lazy" decoding="async">
+        </figure>
+      </article>
+
+      <article class="prs__slide" data-prs-slide>
+        <div class="prs__text">
+          <h3 class="prs__title">Прямые связи и честные условия</h3>
+          <div class="prs__pair">
+            <p>Подбираем оборудование не по каталогу, а под поток, формат и опыт гостя</p>
+            <p>Закрываем поставки: зерно, молоко, альтернативы, сиропы, упаковка, техника</p>
+          </div>
+        </div>
+        <figure class="prs__media">
+          <img src="assets/img/svc-coffee-2-1400.webp" width="1400" height="933" alt="Модульная кофейная точка PIMS" loading="lazy" decoding="async">
+        </figure>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- Тихая зона стыка: пустая проставка, в которой фон перетекает из
+     цвета одной секции в цвет другой (сама анимация — в main.js). -->
+<div class="seam" aria-hidden="true"></div>
+
+<section class="prs prs--bar" id="services" data-bg="#1B1916" data-prs data-prs-side="left">
+  <div class="prs__inner container">
+    <h2 class="prs__manifest">Bar consulting</h2>
+
+    <nav class="prs__nav" aria-label="Разделы: Bar consulting" data-prs-nav>
+      <span class="prs__line" aria-hidden="true"><span class="prs__fill" data-prs-fill></span></span>
+      <button type="button" class="prs__dot" data-prs-go="0" aria-label="Слайд 1: Проектирование и запуск. Управление и операционка"></button>
+      <button type="button" class="prs__dot" data-prs-go="1" aria-label="Слайд 2: Аналитика. Партнёрские преимущества"></button>
+      <button type="button" class="prs__dot" data-prs-go="2" aria-label="Слайд 3: Команда и кадровая экспертиза. Соответствие стандартам и безопасность"></button>
+    </nav>
+
+    <div class="prs__stage">
+      <article class="prs__slide" data-prs-slide>
+        <div class="prs__text">
+          <div class="prs__groups">
+            <div class="prs__group">
+              <h3 class="prs__title">Проектирование и запуск</h3>
+              <ul class="prs__facts">
+                <li>Проектируем бары и рестораны под задачи бренда и трафик.</li>
+                <li>Формируем функциональный бар, где дизайн работает на скорость и логику.</li>
+                <li>Сопровождаем проект до полного запуска.</li>
+              </ul>
+            </div>
+            <div class="prs__group">
+              <h3 class="prs__title">Управление и операционка</h3>
+              <ul class="prs__facts">
+                <li>Берём на себя операционку бара целиком: процессы, контроль, стандарты.</li>
+                <li>Строим систему управления, которая работает без ручного вмешательства.</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <figure class="prs__media">
+          <img src="assets/img/svc-bar-1-749.webp" width="749" height="999" alt="Руки в белых перчатках готовят коктейль" loading="lazy" decoding="async">
+        </figure>
+      </article>
+
+      <article class="prs__slide" data-prs-slide>
+        <div class="prs__text">
+          <div class="prs__groups">
+            <div class="prs__group">
+              <h3 class="prs__title">Аналитика</h3>
+              <ul class="prs__facts">
+                <li>Управляем себестоимостью и фудкостом.</li>
+                <li>Внедряем систему точной инвентаризации и контроля остатков.</li>
+                <li>Даём прогнозы, корректируем меню и процессы на основе данных.</li>
+              </ul>
+            </div>
+            <div class="prs__group">
+              <h3 class="prs__title">Партнёрские преимущества</h3>
+              <ul class="prs__facts">
+                <li>Даём доступ к эксклюзивным условиям от производителей и контрагентов.</li>
+                <li>Предоставляем скидки, спецбюджеты и маркетинговые интеграции.</li>
+                <li>Включаем проверенных партнёров, экономим ресурсы и время.</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <figure class="prs__media">
+          <img src="assets/img/svc-bar-2-1000.webp" width="1000" height="1136" alt="Красный коктейль в гранёном бокале" loading="lazy" decoding="async">
+        </figure>
+      </article>
+
+      <article class="prs__slide" data-prs-slide>
+        <div class="prs__text">
+          <div class="prs__groups">
+            <div class="prs__group">
+              <h3 class="prs__title">Команда и кадровая экспертиза</h3>
+              <ul class="prs__facts">
+                <li>Подбираем и обучаем профессиональный кадровый состав.</li>
+                <li>Проводим регулярные аттестации, оценки и усиление команды.</li>
+                <li>Разрабатываем механики продаж под формат и аудиторию проекта.</li>
+                <li>Полное отсутствие коррупционных практик — принципиальная политика.</li>
+              </ul>
+            </div>
+            <div class="prs__group">
+              <h3 class="prs__title">Соответствие стандартам и безопасность</h3>
+              <ul class="prs__facts">
+                <li>Контролируем выполнение требований Роспотребнадзора.</li>
+                <li>Создаём рабочую документацию и регламенты на каждый этап.</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <figure class="prs__media">
+          <img src="assets/img/ethics-735.webp" width="735" height="1362" alt="Рабочая документация и регламенты бара" loading="lazy" decoding="async">
+        </figure>
+      </article>
+    </div>
+  </div>
+</section>
+
+
+<!-- Тихая зона стыка: пустая проставка, в которой фон перетекает из
+     цвета одной секции в цвет другой (сама анимация — в main.js). -->
+<!-- Правка 31.07 (третья): обычная тихая зона, ровно как перед кофейным
+     блоком — переход «бары → кейсы» должен быть в точности таким же. -->
+<div class="seam" aria-hidden="true"></div>
+
+<!-- ============ 6.8 Портфолио / кейсы ============ -->
+<section class="section section--ivory" id="cases" data-bg="#E8DCC2">
+  <div class="container">
+    <!-- Правка 31.07: пилюля «Портфолио» и фильтр «Все / Бар / Кофе» убраны;
+         заголовок — капсом, прямым Roslindale, по центру. -->
+    <div class="sec-head cases-head" data-reveal>
+      <h2 class="h-serif h2">Наши проекты</h2>
+      <p class="lead">Собраны наиболее знаковые проекты, реализованные командой BARPOINT</p>
+    </div>
+    <!-- ТЗ2 §6: бесконечная лента карточек с drag; при reduced-motion
+         вместо ленты строится статичная сетка (fallback). Всё — из data.js -->
+    <div class="crail" data-crail hidden>
+      <div class="crail__track" data-crail-track></div>
+    </div>
+    <div class="cases-grid" data-cases-grid hidden></div>
+  </div>
+</section>
+
+<!-- ============ Разворот кейса (ТЗ «переработка разворота кейса
+     BARPOINT по структуре Bucks Sauce», эталон block_3.html) ============
+     Слева — галерея с вырезом под крестик в левом верхнем углу; кадры
+     меняются подменой двух слоёв-слотов. Справа — заголовок кейса,
+     подзаголовок и сетка 2×2: Описание / Что сделали / Факты / Действие.
+     Открытие и закрытие — прежний FLIP-зум из карточки ленты.
+     Фон разворота задан ТОЛЬКО на .cover, паттерн лежит отдельным
+     слоем внутри: у html/body фона этого слоя быть не должно. -->
+<div class="cover" data-cover role="dialog" aria-modal="true" aria-label="Кейс">
+  <div class="cover__pattern" data-cover-pattern aria-hidden="true"></div>
+  <!-- крестик вынесен из галереи: у неё clip-path, он обрезал бы и кнопку.
+       На десктопе кнопка садится ровно в вырез 146×68 левого верхнего угла. -->
+  <button class="cover__close" type="button" data-cover-close aria-label="Закрыть (Esc)">
+    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 6l12 12M18 6L6 18"/></svg>
+  </button>
+  <div class="cover__inner" data-cover-inner data-lenis-prevent>
+    <div class="cover__grid" data-cover-grid>
+
+      <!-- ---------- галерея кейса ---------- -->
+      <div class="cgal" data-cgal>
+        <!-- вырез под крестик: путь в пикселях контейнера, пересчитывается на resize -->
+        <svg class="cgal__clipsvg" aria-hidden="true" focusable="false">
+          <defs><clipPath id="coverClip" clipPathUnits="userSpaceOnUse"><path d="M0 0h1v1H0z" data-cover-clip/></clipPath></defs>
+        </svg>
+        <div class="cgal__stage" data-cgal-stage>
+          <div class="cgal__layer" data-slot="a"><img class="cgal__img" src="" alt="" draggable="false" decoding="async"></div>
+          <div class="cgal__layer" data-slot="b"><img class="cgal__img" src="" alt="" draggable="false" decoding="async"></div>
+          <div class="cgal__arrows">
+            <div class="cgal__slot" data-arrow-slot>
+              <button class="carrow carrow--prev" type="button" data-photo-prev aria-label="Предыдущее фото">
+                <span class="carrow__bg"></span>
+                <span class="carrow__ico"><svg viewBox="0 0 23 15" aria-hidden="true" focusable="false"><path d="M15.5 0 14.1 1.4l5.1 5.1H0v2h19.2l-5.1 5.1L15.5 15 23 7.5z"/></svg></span>
+              </button>
+            </div>
+            <div class="cgal__slot" data-arrow-slot>
+              <button class="carrow carrow--next" type="button" data-photo-next aria-label="Следующее фото">
+                <span class="carrow__bg"></span>
+                <span class="carrow__ico"><svg viewBox="0 0 23 15" aria-hidden="true" focusable="false"><path d="M15.5 0 14.1 1.4l5.1 5.1H0v2h19.2l-5.1 5.1L15.5 15 23 7.5z"/></svg></span>
+              </button>
+            </div>
+          </div>
+          <div class="cgal__preload" data-cgal-preload aria-hidden="true"></div>
+        </div>
+      </div>
+
+      <!-- ---------- правая колонка ---------- -->
+      <div class="cinfo">
+        <div class="cinfo__head">
+          <h2 class="cinfo__title" data-cover-title></h2>
+          <!-- на мобильном плавающий предмет стоит между заголовком и подзаголовком -->
+          <div class="cinfo__foodmob" data-cover-foodmob>
+            <div class="cfood" data-parallax-food data-parallax-speed="0.2" data-parallax-float-amplitude="0.1" data-parallax-mouse-force="0">
+              <div class="cfood__inner" data-parallax-food-inner><img src="" alt="" decoding="async"></div>
+            </div>
+          </div>
+          <div class="cinfo__subwrap"><p class="cinfo__sub" data-cover-sub></p></div>
+        </div>
+
+        <div class="cboxes">
+          <!-- 1. Описание -->
+          <div class="cbox" data-cover-box>
+            <p class="cbox__title">Описание</p>
+            <p class="cbox__text" data-cover-desc></p>
+          </div>
+
+          <!-- 2. Что сделали (+ плавающий предмет, выходящий за карточку) -->
+          <div class="cbox" data-cover-box data-cover-worksbox>
+            <p class="cbox__title">Что сделали</p>
+            <ul class="cworks" data-cover-works></ul>
+            <div class="cbox__food" data-cover-food>
+              <div class="cfood" data-parallax-food data-parallax-speed="0.3">
+                <div class="cfood__inner" data-parallax-food-inner><img src="" alt="" decoding="async"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 3. Факты -->
+          <div class="cbox" data-cover-box>
+            <p class="cbox__title">Факты</p>
+            <div class="cfacts" data-cover-facts></div>
+          </div>
+
+          <!-- 4. Действие: навигация по кейсам + главная кнопка -->
+          <div class="cact" data-cover-box>
+            <div class="cact__row">
+              <span class="cact__name" data-cover-name></span>
+              <div class="cact__nav">
+                <button class="cact__navbtn" type="button" data-case-prev aria-label="Предыдущий кейс">
+                  <svg viewBox="0 0 12 10" aria-hidden="true" focusable="false"><path d="M4.7 0 6 1.2 3 4h9v2H3l3 2.8L4.7 10 0 5z"/></svg>
+                </button>
+                <span class="cact__count" data-cover-count aria-live="polite">01 / 13</span>
+                <button class="cact__navbtn" type="button" data-case-next aria-label="Следующий кейс">
+                  <svg viewBox="0 0 12 10" aria-hidden="true" focusable="false"><path d="M7.3 0 6 1.2 9 4H0v2h9l-3 2.8L7.3 10 12 5z"/></svg>
+                </button>
+              </div>
+            </div>
+
+            <button class="cbtn" type="button" data-cover-cta data-btn>
+              <span class="cbtn__bg" data-button-bg></span>
+              <span class="cbtn__content">
+                <span class="clbl">
+                  <span class="clbl__ghost" aria-hidden="true">Обсудить проект</span>
+                  <span class="clbl__layer" data-text-first>Обсудить проект</span>
+                  <span class="clbl__layer" data-text-second aria-hidden="true">Обсудить проект</span>
+                </span>
+                <span class="clbl clbl--right">
+                  <span class="clbl__ghost" aria-hidden="true"><svg class="cbtn__arrow" viewBox="0 0 23 15" focusable="false"><path d="M15.5 0 14.1 1.4l5.1 5.1H0v2h19.2l-5.1 5.1L15.5 15 23 7.5z"/></svg></span>
+                  <span class="clbl__layer" data-right-icon-first aria-hidden="true"><svg class="cbtn__arrow" viewBox="0 0 23 15" focusable="false"><path d="M15.5 0 14.1 1.4l5.1 5.1H0v2h19.2l-5.1 5.1L15.5 15 23 7.5z"/></svg></span>
+                  <span class="clbl__layer" data-right-icon-second aria-hidden="true"><svg class="cbtn__arrow" viewBox="0 0 23 15" focusable="false"><path d="M15.5 0 14.1 1.4l5.1 5.1H0v2h19.2l-5.1 5.1L15.5 15 23 7.5z"/></svg></span>
+                </span>
+              </span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+
+<!-- Тихая зона стыка: пустая проставка, в которой фон перетекает из
+     цвета одной секции в цвет другой (сама анимация — в main.js).
+     Правка 31.07 (четвёртая): удлинённая зона .seam--long снята —
+     заказчик: расстояние «кейсы → команда» слишком большое. Теперь
+     проставка обычная, ровно такая же, как на всех прочих стыках,
+     поэтому и перетекание считается по той же геометрии (рампа 0.8
+     экрана, финиш за 0.12 экрана до верха секции) — плавность стыка
+     не изменилась, изменилась только длина паузы перед ним. -->
+<div class="seam" aria-hidden="true"></div>
+
+<!-- ============ 6.10 Команда (deck3 сл.4–8) ============
+     ТЗ2 §5: закреплённая горизонтальная прокрутка (десктоп ≥1024),
+     свайп-лента со scroll-snap (мобайл и reduced-motion).
+     Все 5 человек, порядок: Шустериовас, Бегляров, Маяков, Марушко, Гордышев -->
+<section class="hteam" id="team" data-hteam data-bg="#2B0E12">
+  <div class="hteam__viewport" data-hteam-viewport>
+    <div class="hteam__track" data-hteam-track>
+      <!-- ТЗ3 §3: волна пути перерисована под короткий трек из двух станций -->
+      <!-- ТЗ6 §3: подсветка пути с мягким градиентным хвостом — glow
+           закрыт маской-прямоугольником, чей правый край растворяется
+           градиентом; прямоугольник едет по X вместе с прогрессом -->
+      <!-- Правка 31.07 (пятая): линия продлена. Раньше SVG был шириной
+           ровно с трек, и в конце проезда линия обрывалась примерно за
+           треть экрана до правой кромки. Теперь на десктопе элемент
+           шире трека на экран (см. .hteam__path в CSS), а система
+           координат выросла с 1000 до 1500 единиц и волна дописана
+           двумя периодами — плотность волны осталась прежней.
+           Маска подсветки пересчитана пропорционально (1150→1725). -->
+      <svg class="hteam__path" viewBox="0 0 1500 100" preserveAspectRatio="none" aria-hidden="true">
+        <defs>
+          <linearGradient id="glowFade" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0" stop-color="#fff"/>
+            <stop offset="0.86" stop-color="#fff"/>
+            <stop offset="1" stop-color="#000" stop-opacity="0"/>
+          </linearGradient>
+          <mask id="glowMask" maskUnits="userSpaceOnUse" x="-1800" y="0" width="3600" height="100">
+            <rect data-hteam-glowmask x="-1725" y="0" width="1725" height="100" fill="url(#glowFade)"/>
+          </mask>
+        </defs>
+        <!-- ТЗ14 §4.5: волна под пятиместный трек; правка 31.07 — 6 периодов -->
+        <path class="hteam__path-base" d="M0,55 C80,20 170,85 250,52 C330,20 420,85 500,50 C580,18 670,82 750,48 C830,18 920,80 1000,45 C1080,16 1170,78 1250,42 C1330,15 1420,76 1500,40" pathLength="1"/>
+        <path class="hteam__path-glow" d="M0,55 C80,20 170,85 250,52 C330,20 420,85 500,50 C580,18 670,82 750,48 C830,18 920,80 1000,45 C1080,16 1170,78 1250,42 C1330,15 1420,76 1500,40" mask="url(#glowMask)"/>
+      </svg>
+      <!-- ТЗ16 §2: все декоративные напитки .hteam__float УДАЛЕНЫ
+           (отменяет ТЗ7 §2 / ТЗ12 §2 / ТЗ14 §4.2 — заказчик посмотрел
+           вживую: композицию несут станции и линия-путь) -->
+
+      <!-- Правка 31.07 (четвёртая): пилюля «Команда» и подпись «Команда,
+           которая собирает систему…» убраны по просьбе заказчика —
+           в интро-станции остаётся только заголовок. -->
+      <div class="hstation hstation--intro">
+        <h2 class="h-serif h2">BARPOINT в лицах</h2>
+      </div>
+
+      <div class="hstation" data-hstation>
+        <div class="hstation__card">
+          <figure class="hstation__photo"><img src="assets/img/team-artur-800.webp" width="800" height="1200" alt="Артур Шустериовас" loading="eager" decoding="async"></figure>
+          <span class="plaque"><span>Артур Шустериовас</span></span>
+          <p class="hstation__role">Co-founder BARPOINT · PIMS · Origin Group</p>
+          <p class="hstation__creds">Креативный директор PIMS. Маркетинг, дизайн, продуктовые стратегии, позиционирование, виральность, визуальный язык.</p>
+        </div>
+      </div>
+
+      <div class="hstation" data-hstation>
+        <div class="hstation__card">
+          <figure class="hstation__photo"><img src="assets/img/team-timur-800.webp" width="800" height="1200" alt="Тимур Бегляров" loading="eager" decoding="async"></figure>
+          <span class="plaque"><span>Тимур Бегляров</span></span>
+          <p class="hstation__role">Co-founder BARPOINT · PIMS</p>
+          <p class="hstation__creds">Операционный менеджмент, продукт и процессы. Команда, стабильность вкуса, экономика и маржа.</p>
+        </div>
+      </div>
+
+      <!-- ТЗ14 §4: возврат полной команды из презентаций — станции 03–05,
+           тексты дословно из таблицы ТЗ; формат станций не менялся -->
+      <div class="hstation" data-hstation>
+        <div class="hstation__card">
+          <figure class="hstation__photo"><img src="assets/img/team-mayakov-800.webp" width="800" height="1067" alt="Владимир Маяков" loading="eager" decoding="async"></figure>
+          <span class="plaque"><span>Владимир Маяков</span></span>
+          <p class="hstation__role">Co-owner BARPOINT RU / MENA</p>
+          <p class="hstation__creds">Экс-идеолог и директор INSADER BAR — #13 The World's 50 Best Bars 2021, GQ Bar Awards 2021. Экс-директор по напиткам GT.GROUP: ALICE и Vani — Michelin Guide 2021.</p>
+        </div>
+      </div>
+
+      <div class="hstation" data-hstation>
+        <div class="hstation__card">
+          <figure class="hstation__photo"><img src="assets/img/team-marushko-800.webp" width="800" height="1196" alt="Руслан Марушко" loading="eager" decoding="async"></figure>
+          <span class="plaque"><span>Руслан Марушко</span></span>
+          <p class="hstation__role">Creative Head Bartender &amp; R&amp;D Lead</p>
+          <p class="hstation__creds">Авторские коктейли и концептуальные барные карты. Гастрономические коллаборации, лаборатория вкуса: тестирования, экспериментальные рецептуры, технологии.</p>
+        </div>
+      </div>
+
+      <div class="hstation" data-hstation>
+        <div class="hstation__card">
+          <figure class="hstation__photo"><img src="assets/img/team-gordyshev-800.webp" width="800" height="1200" alt="Александр Гордышев" loading="eager" decoding="async"></figure>
+          <span class="plaque"><span>Александр Гордышев</span></span>
+          <p class="hstation__role">Operational Head Bartender</p>
+          <p class="hstation__creds">Процессы, стандарты и контроль качества. Аналитика, экономика и эффективность бара; подбор, обучение и аттестации команды.</p>
+        </div>
+      </div>
+
+      <!-- ТЗ16 §5.2: «выходной хвост» .hteam__tail удалён — проезд теперь
+           заканчивается центром последней станции (dist считается от неё),
+           хвост и был причиной перелёта влево -->
+
+    </div>
+  </div>
+</section>
+
+<!-- 6.11 Ценности и этика («Без коррупции…») — УДАЛЕНО по ТЗ12 §3.
+     6.12 «Как мы работаем» (.steps) — УДАЛЕНО 29.07 по просьбе заказчика.
+     После команды сразу идёт финальный CTA с формой. -->
+
+
+<!-- 6.13 Отзывы: в презентациях текстовых отзывов нет — по ТЗ раздел временно
+     заменён блоком цифр (6.9). Добавить карточки отзывов, когда заказчик
+     соберёт 3–5 цитат владельцев заведений (раздел 12 ТЗ). -->
+
+<!-- ============ 6.14 FAQ ============
+     [ЧЕРНОВИК вопросов по ТЗ 6.14 — согласовать с заказчиком] -->
+<!-- FAQ временно скрыт по просьбе заказчика (17.07.2026). Вернуть: раскомментировать до пометки КОНЕЦ FAQ.
+<section class="section section--black" id="faq" data-bg="#1B1916">
+  <div class="container">
+    <div class="sec-head" data-reveal>
+      <p class="pill">FAQ</p>
+      <h2 class="h-serif h2">Вопросы, которые нам задают</h2>
+    </div>
+    <div class="faq" data-faq data-reveal>
+      <details>
+        <summary>Сколько стоят услуги и от чего зависит цена?<span class="ic" aria-hidden="true"></span></summary>
+        <div class="faq__a"><p>Стоимость зависит от формата проекта: открытие с нуля, аудит действующей точки или сопровождение сети. После звонка-знакомства и брифа мы готовим предложение с прозрачным составом работ и расчётами.</p></div>
+      </details>
+      <details>
+        <summary>Работаете ли с небольшими кофейнями, а не только премиальными проектами?<span class="ic" aria-hidden="true"></span></summary>
+        <div class="faq__a"><p>Да. Направление BARPOINT Coffee работает и с локальными форматами — например, Landy, кафе в жилом комплексе, выросло от 1 млн до 5 млн с линейкой напитков под аудиторию ЖК.</p></div>
+      </details>
+      <details>
+        <summary>Сколько времени занимает запуск концепции с нуля?<span class="ic" aria-hidden="true"></span></summary>
+        <div class="faq__a"><p>Сроки зависят от масштаба проекта и готовности площадки — точный план по этапам (концепция, карта, запуск, обучение) фиксируем после брифа.</p></div>
+      </details>
+      <details>
+        <summary>Вы работаете только в Москве?<span class="ic" aria-hidden="true"></span></summary>
+        <div class="faq__a"><p>Нет: наши проекты — от Москвы до Восточной Европы, а направление RU/MENA развивает работу и на Ближнем Востоке.</p></div>
+      </details>
+      <details>
+        <summary>Что входит в сопровождение после запуска?<span class="ic" aria-hidden="true"></span></summary>
+        <div class="faq__a"><p>Аналитика и экономика (себестоимость, фудкост, инвентаризация), контроль стандартов, работа с поставщиками, обучение и аттестации команды, корректировки меню на основе данных.</p></div>
+      </details>
+      <details>
+        <summary>Как вы относитесь к откатам от поставщиков?<span class="ic" aria-hidden="true"></span></summary>
+        <div class="faq__a"><p>Без коррупции, без откатов, без скрытых комиссий. Полное отсутствие коррупционных практик — принципиальная политика: мы работаем на прямых связях и честных условиях.</p></div>
+      </details>
+    </div>
+  </div>
+</section>
+КОНЕЦ FAQ -->
+
+<!-- ============ 6.15 Финальный CTA + форма (возврат по ТЗ5 §7,
+     состав полей — ТЗ v1 §6.15; входит в body-механику ТЗ5 §5) ============ -->
+<section class="section final" id="contact" data-bg="#2B0E12">
+  <div class="container final__grid">
+    <!-- Правка 31.07 (четвёртая): пилюля «Контакты» убрана — блок
+         начинается сразу с фразы-приглашения. -->
+    <div data-reveal>
+      <h2 class="h-serif h2 final__title js-lines">Если вы чувствуете, что ваше заведение может стать больше, чем просто бар или кофейня, — <em>давайте создавать его вместе</em></h2>
+      <!-- TODO (раздел 12 ТЗ v1): подтвердить контакты у заказчика.
+           Значения — из презентации «Barpoint финально», сл.25 -->
+      <div class="final__contacts">
+        <div><span class="clbl">Телефон</span><a class="value" href="tel:+79688909890">+7 968-890-98-90</a></div>
+        <div><span class="clbl">Telegram</span><a class="value" href="https://t.me/INNA_ANTONYAN_WORK" rel="noopener">@INNA_ANTONYAN_WORK</a></div>
+        <!-- Правка 31.07 (четвёртая): строка «Сайт / Instagram» убрана -->
+      </div>
+      <img class="final__sig" src="assets/img/signature-light.png" width="640" height="279" alt="" loading="lazy" decoding="async">
+    </div>
+    <!-- Правка 31.07 (четвёртая): карточка формы перекрашена в молочный
+         (цвет «чернил» шапки над этим блоком), обводка карточки снята,
+         поля получили толстую рамку по референсу buckssauce.com/shop. -->
+    <div class="form-card" data-reveal>
+      <!-- Заголовок: было «Обсудить проект» — дублировало кнопку в шапке
+           и обещало разговор, которого форма не запрашивает. Форма
+           состоит из двух полей — имя и телефон, — поэтому честная и
+           самая ходовая для такого блока формулировка: «Оставьте
+           контакты». Со словом «заявка» не пересекается: оно занято
+           кнопкой отправки. -->
+      <h3>Оставьте контакты</h3>
+      <!-- Правка 31.07 (шестая): форма и экран благодарности лежат в одной
+           ячейке грида и накрывают друг друга. Раньше форма при отправке
+           убиралась в display:none и карточка схлопывалась до высоты одной
+           строки — заказчик просил, чтобы размер не менялся. Теперь высоту
+           ячейки всегда задаёт форма (она выше), а переключение идёт
+           видимостью, а не выкидыванием из потока. -->
+      <div class="form-card__stack">
+      <form data-lead-form novalidate>
+        <div class="field">
+          <label for="f-name">Имя</label>
+          <input id="f-name" name="name" type="text" autocomplete="name" required>
+          <p class="err">Укажите, как к вам обращаться</p>
+        </div>
+        <div class="field">
+          <label for="f-phone">Телефон</label>
+          <input id="f-phone" name="phone" type="tel" inputmode="tel" autocomplete="tel"
+                 placeholder="+7 (___) ___-__-__" required>
+          <p class="err">Укажите номер телефона полностью</p>
+        </div>
+        <!-- ТЗ10 §4: поля «Тип проекта» и «Комментарий» удалены — форма
+             минимальная: имя + телефон; чекбокс 152-ФЗ обязателен -->
+        <label class="consent">
+          <input type="checkbox" name="consent" required>
+          <span>Согласен(на) на обработку персональных данных в соответствии с <a href="privacy.html">политикой обработки персональных данных</a> (152-ФЗ)</span>
+        </label>
+        <p class="err" data-consent-err style="display:none; color:#A2321E; font-size:.78rem; margin:-8px 0 16px">Для отправки нужно согласие на обработку данных</p>
+        <!-- Правка 31.07 (четвёртая): главная кнопка формы вынесена в
+             собственный класс .btn--send — крупнее кегль, выше габарит,
+             стрелка-указатель (референс buckssauce.com/shop). Подпись
+             «Ответим в течение рабочего дня…» убрана. -->
+        <button class="btn btn--send" type="submit">Отправить заявку</button>
+      </form>
+      <!-- Правка 31.07 (пятая): экран благодарности сведён к одной строке.
+           ВНИМАНИЕ: вместе с пояснением убрана кнопка «Продублировать в
+           Telegram». Она была ЕДИНСТВЕННЫМ каналом доставки заявки, пока
+           в config.js пуст endpoint: сейчас заявка сохраняется только в
+           localStorage браузера гостя. Как только заказчик даст адрес
+           приёма — заполнить BARPOINT_CONFIG.endpoint. Вернуть кнопку:
+           см. ревизию 57 в памяти проекта. -->
+      <div class="form-success" data-form-success>
+        <h4>Спасибо! Заявка оформлена</h4>
+      </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Правка 31.07 (седьмая): пустой хвост под контактами. Высоту считает
+     main.js — ровно столько, чтобы в самом низу страницы карточка формы
+     встала по центру экрана; заодно за верхнюю кромку уходит блок команды,
+     который до этого подглядывал сверху. Значение зависит от высоты окна и
+     самой карточки, поэтому в CSS его не выразить: пересчитывается на
+     resize и на каждый refresh ScrollTrigger. По умолчанию высота 0 —
+     без JS страница выглядит как раньше. -->
+<div class="final-tail" data-final-tail aria-hidden="true"></div>
+
+</main>
+
+<!-- ============ 6.16 Футер (компактный, возврат по ТЗ5 §7) ============ -->
+<footer class="footer" data-bg="#1B1916">
+  <div class="container">
+    <!-- Правка 31.07 (четвёртая): верхняя полоса футера (лого + подпись
+         «Ателье барных концепций…» + дублирующая навигация) убрана
+         целиком по просьбе заказчика. Осталась только служебная строка
+         ниже: копирайт и обязательная ссылка на политику 152-ФЗ. -->
+    <div class="footer__bottom">
+      <span>© BARPOINT, 2016–2026</span>
+      <!-- TODO (раздел 12 ТЗ v1): реквизиты юрлица — запросить у заказчика -->
+      <a href="privacy.html">Политика обработки персональных данных</a>
+      <span>Москва — Восточная Европа</span>
+    </div>
+  </div>
+</footer>
+
+<!-- Яндекс.Метрика (ТЗ 9.5): раскомментировать и подставить номер счётчика заказчика.
+     Включить Вебвизор и карту скролла в настройках счётчика.
+<script>
+  (function(m,e,t,r,i,k,a){m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
+  m[i].l=1*new Date();k=e.createElement(t),a=e.getElementsByTagName(t)[0],
+  k.async=1,k.src=r,a.parentNode.insertBefore(k,a)})
+  (window,document,"script","https://mc.yandex.ru/metrika/tag.js","ym");
+  ym(XXXXXXXX, "init", { webvisor: true, clickmap: true, trackLinks: true, accurateTrackBounce: true });
+</script>
+-->
+<script src="assets/vendor/gsap.min.js" defer></script>
+<script src="assets/vendor/ScrollTrigger.min.js" defer></script>
+<script src="assets/vendor/SplitText.min.js" defer></script>
+<script src="assets/vendor/Flip.min.js" defer></script>
+<script src="assets/vendor/lenis.min.js" defer></script>
+<script src="assets/js/config.js" defer></script>
+<script src="assets/js/data.js" defer></script>
+<script src="assets/js/main.js" defer></script>
+</body>
+</html>

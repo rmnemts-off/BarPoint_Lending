@@ -1,0 +1,2049 @@
+/* ============================================================
+   BARPOINT — лендинг v3
+   Дизайн-токены и структура — строго по ТЗ (раздел 4)
+   ============================================================ */
+
+/* ---------- 4.1 Цветовая палитра ---------- */
+:root {
+  /* ТЗ11 §2: «супер-чёрный» → глубокий тёплый графит (барная лаунж-эстетика);
+     off-white чуть приглушён, чтобы мягче стыковаться с тёмным (меньше «звенит»).
+     Откат: --bp-black #0B0A08, --bp-off-white #F2EFE7. */
+  --bp-black: #1B1916;
+  --bp-ivory: #E8DCC2; /* притемнён по правке заказчика 17.07 (был #F6F2E9); тёплый беж гармонирует с графитом */
+  --bp-amber: #C6963C;
+  /* тёмный янтарь для мелкого текста на светлом фоне — WCAG 4.5:1 (ТЗ 9.3).
+     ТЗ11 §2.3: углублён #8C6420 → #7A561B, т.к. притемнённый ivory снизил
+     контраст до 3.9; теперь 4.87:1 на ivory, 5.67:1 на кремовой карточке кейса */
+  --bp-amber-text: #7A561B;
+  --bp-burgundy: #2B0E12;
+  --bp-graphite: #6E6A63;
+  --bp-dark-text: #17140F;
+  --bp-off-white: #EAE4D8;
+
+  /* 4.2 Типографика — правка заказчика 26.07: три роли —
+     - заголовки/крупные тексты: Roslindale Cyrillic Display Condensed
+       Medium ITALIC (семейство-алиас "Roslindale Italic" в fonts.css —
+       курсивное начертание как основное);
+     - подзаголовки/служебные капс-надписи (eyebrow, пилюли, кнопки,
+       навигация, лейблы): Copperplate (Brut Dept);
+     - основной текст: Apoc Regular Trial (кириллица полная; только 400,
+       жирный — синтетический).
+     Откат к «единому Copperplate» (правка 17.07) = все три строки на
+     "Copperplate". Playfair из проекта УДАЛЁН — не возвращать. */
+  --font-serif: "Roslindale Italic", "Roslindale Display Condensed", "Times New Roman", serif;
+  --font-grotesk: "Copperplate", "Arial Narrow", sans-serif;
+  --font-text: "Apoc", "Golos Text", system-ui, sans-serif;
+
+  /* 4.5 Сетка и отступы (шкала 8px) */
+  --s-1: 8px;  --s-2: 16px; --s-3: 24px; --s-4: 32px;
+  --s-6: 48px; --s-8: 64px; --s-12: 96px; --s-16: 128px;
+  /* Правка 29.07: сайт идёт ВО ВСЮ ШИРИНУ экрана (референс buckssauce.com).
+     Раньше контейнер был 1360px с полями 24/48px — на широких мониторах
+     это давало большие пустые поля слева и справа. Теперь контейнер
+     ограничения не имеет, а по краям остаётся только узкая кромка.
+     Откат: --container 1360px, --gutter 24px / 48px на ≥1024. */
+  --container: 100%;
+  --gutter: 16px;
+  --header-h: 56px;
+
+  /* 4.6 СТУПЕНЧАТАЯ ТИПОГРАФИКА (правка 30.07)
+     Раньше кегли считались от 1vw и «дышали» вместе с окном: при любом
+     изменении ширины текст внутри блока менялся, заголовки карточек то
+     складывались в две строки, то распрямлялись в одну.
+     --vw-step — ступенчатая замена 1vw: ВНУТРИ брейкпоинта он постоянен,
+     поэтому кегль не зависит от ширины окна и остаётся одинаковым
+     относительно своего блока; между брейкпоинтами меняется один раз.
+     Значения = 1% от опорной ширины (390 / 820 / 1440), так что на этих
+     ширинах размеры совпадают с прежним расчётом пиксель в пиксель.
+     Вилки clamp() сохранены — они по-прежнему держат нижний и верхний
+     предел. Исключение одно: .scn-head__title, он по замыслу заполняет
+     экран во всю ширину, и ему нужен НАСТОЯЩИЙ vw. */
+  --vw-step: 3.9px;
+
+  --ease: cubic-bezier(.22,.61,.36,1);
+}
+@media (min-width: 600px)  { :root { --vw-step: 8.2px; } }
+/* с 768 шапка выше (56 → 72): с этой ширины появляется кнопка-стикер,
+   а её наклонённый габарит в 56px не помещается */
+@media (min-width: 768px)  { :root { --header-h: 72px; } }
+/* Ступеней на десктопе две: на 1024–1439 опора 1280, дальше 1440.
+   Без промежуточной ступени текст, замороженный по 1440, не помещался
+   в барный блок на невысоких ноутбучных окнах (проверено: 1024×680 —
+   перелив 17px). На 1440 значения совпадают с прежними до пикселя. */
+@media (min-width: 1024px) {
+  :root { --header-h: 72px; --gutter: 20px; --vw-step: 12.8px; }
+}
+@media (min-width: 1440px) { :root { --vw-step: 14.4px; } }
+
+/* ---------- Reset / base ---------- */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+/* scroll-behavior:smooth отключён — плавный скролл делает Lenis (ТЗ2 §2),
+   нативный smooth с ним конфликтует */
+html { scroll-behavior: auto; -webkit-text-size-adjust: 100%; }
+
+/* Официальный CSS Lenis */
+html.lenis, html.lenis body { height: auto; }
+.lenis.lenis-smooth { scroll-behavior: auto !important; }
+.lenis.lenis-smooth [data-lenis-prevent] { overscroll-behavior: contain; }
+.lenis.lenis-stopped { overflow: hidden; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+  }
+}
+body {
+  font-family: var(--font-text);
+  font-size: 17px;
+  line-height: 1.6;
+  color: var(--bp-dark-text);
+  background: var(--bp-black);
+  /* ТЗ5 §5: цвет фона живёт на body и перетекает по скроллу (как у PINEA).
+     Правка 30.07: CSS-переход СНЯТ. Раньше цвет переключался скачком, а
+     этот переход растягивал скачок во времени — он шёл сам по себе, не
+     связанный со скроллом. Теперь цвет считается от позиции прокрутки
+     покадрово (main.js), и переход поверх него только смазывал бы
+     картину. Откат: transition: background-color .6s ease. */
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ТЗ5 §5: при активной body-механике (класс bgflow ставит JS, при
+   prefers-reduced-motion его нет — секции сохраняют свои фоны)
+   цветовые секции прозрачны, просвечивает переливающийся body */
+.bgflow section[data-bg], .bgflow footer[data-bg] { background: transparent; }
+img { max-width: 100%; height: auto; display: block; }
+a { color: inherit; }
+button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; }
+ul, ol { list-style: none; }
+:focus-visible { outline: 2px solid var(--bp-amber); outline-offset: 3px; }
+
+.skip-link {
+  position: absolute; left: -9999px; top: 0; z-index: 200;
+  background: var(--bp-amber); color: var(--bp-black);
+  padding: 10px 18px; font-weight: 600;
+}
+.skip-link:focus { left: 0; }
+
+.container {
+  width: 100%;
+  max-width: var(--container);
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+}
+
+.section { padding-block: var(--s-12); }
+@media (min-width: 1024px) { .section { padding-block: var(--s-16); } }
+.section--ivory { background: var(--bp-ivory); color: var(--bp-dark-text); }
+.section--black { background: var(--bp-black); color: var(--bp-off-white); }
+.section--burgundy { background: var(--bp-burgundy); color: var(--bp-off-white); }
+
+/* Тонкая линия-разделитель (4.6) */
+.rule { border: 0; border-top: 1px solid var(--bp-amber); opacity: .6; }
+
+/* ---------- Тихие зоны стыков (правка 30.07) ----------
+   Сам переход цвета делает JS: фон body интерполируется вместе со
+   скроллом (см. «ПЛАВНОЕ ПЕРЕТЕКАНИЕ ФОНА» в main.js). Здесь — только
+   пустая проставка между секциями: она даёт перетеканию воздух, чтобы
+   цвет менялся не поверх плотного содержимого.
+   Проставка ПРОЗРАЧНА — сквозь неё виден тот самый переливающийся body.
+   Первая версия правки заливала её готовым градиентом; от этого
+   отказались: полоса проезжала мимо, а сам фон оставался ступенькой. */
+.seam { height: clamp(140px, 26vh, 340px); }
+/* Правка 31.07 (вторая): секция кейсов залита СПЛОШНЫМ ivory, иначе
+   рампа фона к бордовой «Команде» начинается, пока карточки ещё на
+   экране, и пачкает их подложку. Чтобы сплошная заливка не давала
+   резкой горизонтальной кромки, растворение вынесено в тихие зоны по
+   обе стороны секции: сверху проставка проявляется в ivory, снизу —
+   растворяется обратно в переливающийся фон body. Стопы разложены по
+   S-кривой: у линейного градиента излом наклона на концах читается
+   глазом как полоса Маха — та самая «резкая тёмная граница».
+   Откат: снять классы seam--ivory-in / seam--ivory-out в index.html
+   и правило .bgflow #cases ниже. */
+/* Правка 31.07 (третья): градиентные проставки .seam--ivory-in/out и
+   сплошная заливка #cases УДАЛЕНЫ. Заказчик: переход «бары → кейсы»
+   должен быть ТОЧНО таким же, как «три сценария → кофе». А там нет
+   никакой пространственной подкраски: обе секции прозрачны, весь экран —
+   один ровный цвет body, который переливается вместе со скроллом. Любой
+   градиент на проставке даёт другую картинку, как бы мягко он ни был
+   разложен. Поэтому кейсы снова прозрачны, а «грязная» подложка под
+   карточками решалась ГЕОМЕТРИЕЙ — удлинённой проставкой .seam--long.
+   Откат: см. ревизию 52 в памяти проекта. */
+/* Правка 31.07 (четвёртая): .seam--long (max(600px, 88vh)) УДАЛЕНА —
+   заказчик: расстояние «кейсы → команда» слишком большое. Стык вернулся
+   к общей длине .seam, а значит и рампа фона считается по той же
+   геометрии, что и на всех остальных стыках: плавность прежняя.
+   Откат: вернуть правило .seam--long и класс в index.html. */
+
+/* ---------- Типографика ---------- */
+/* Serif — смысл/история; grotesk-слой — служебные надписи (4.2, ТЗ3 §1) */
+.h-serif {
+  font-family: var(--font-serif);
+  font-weight: 600;
+  line-height: 1.12;
+  letter-spacing: -.01em;
+}
+.h1 { font-size: clamp(2rem, calc(5.6 * var(--vw-step)), 4.4rem); }
+.h2 { font-size: clamp(1.7rem, calc(3.6 * var(--vw-step)), 3rem); }
+.h3 { font-size: clamp(1.25rem, calc(2.2 * var(--vw-step)), 1.75rem); }
+
+.eyebrow {
+  display: inline-flex; align-items: center; gap: 10px;
+  font-family: var(--font-grotesk);
+  font-size: .78rem; font-weight: 600;
+  letter-spacing: .18em; text-transform: uppercase;
+}
+/* Бейдж-пилюля (4.6) */
+.pill {
+  display: inline-block;
+  padding: 8px 18px;
+  border: 1px solid currentColor;
+  border-radius: 999px;
+  font-family: var(--font-grotesk);
+  font-size: .74rem; font-weight: 600;
+  letter-spacing: .16em; text-transform: uppercase;
+}
+.lead { font-size: 1.1rem; color: var(--bp-graphite); max-width: 46em; }
+.section--black .lead, .section--burgundy .lead { color: color-mix(in srgb, var(--bp-off-white) 72%, transparent); }
+
+.sec-head { margin-bottom: var(--s-6); }
+.sec-head .pill { margin-bottom: var(--s-3); }
+.sec-head .h2 { max-width: 18em; }
+.sec-head .lead { margin-top: var(--s-2); }
+@media (min-width: 1024px) { .sec-head { margin-bottom: var(--s-8); } }
+
+/* ---------- Кнопки (4.6) ---------- */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+  min-height: 52px; padding: 12px 30px;
+  font-family: var(--font-grotesk);
+  font-size: .84rem; font-weight: 600;
+  letter-spacing: .12em; text-transform: uppercase;
+  text-decoration: none; text-align: center;
+  border-radius: 2px;
+  transition: background-color .25s var(--ease), color .25s var(--ease), border-color .25s var(--ease), transform .25s var(--ease);
+}
+.btn--primary { background: var(--bp-amber); color: var(--bp-black); }
+.btn--primary:hover { background: #D9AC55; transform: translateY(-1px); }
+.btn--ghost { border: 1px solid var(--bp-off-white); color: var(--bp-off-white); }
+.btn--ghost:hover { border-color: var(--bp-amber); color: var(--bp-amber); }
+.btn--ghost-dark { border: 1px solid var(--bp-dark-text); color: var(--bp-dark-text); }
+.btn--ghost-dark:hover { border-color: var(--bp-amber); color: var(--bp-amber); }
+
+/* Правка 31.07 (четвёртая): главная кнопка формы заявки.
+   Заказчик: «она должна быть точно выразительнее, шрифт сделай больше».
+   Отличия от .btn--primary: кегль +26% (.84 → 1.06rem), габарит 52 → 66px,
+   тёмная заливка вместо амбера (на молочной карточке она контрастнее
+   амбера почти вдвое), радиус заодно с полями и стрелка-указатель,
+   которая на наведении уезжает вправо-вверх. Амбер остаётся ролью
+   наведения — акцент никуда не делся, он стал реакцией. */
+/* Правка 31.07 (пятая): стрелка-указатель убрана по просьбе заказчика —
+   вместе с ней снят её SVG из разметки и правила .btn--send svg. */
+.btn--send {
+  min-height: 66px; padding: 18px 28px;
+  background: var(--bp-black); color: var(--bp-off-white);
+  border-radius: 12px;
+  font-size: 1.06rem; font-weight: 700; letter-spacing: .14em;
+  box-shadow: 0 10px 24px rgba(27,25,22,.22);
+  transition: background-color .25s var(--ease), color .25s var(--ease),
+              transform .25s var(--ease), box-shadow .25s var(--ease);
+}
+.btn--send:hover {
+  background: var(--bp-amber); color: var(--bp-black);
+  transform: translateY(-2px);
+  box-shadow: 0 16px 34px rgba(27,25,22,.3);
+}
+@media (max-width: 480px) {
+  .btn--send { min-height: 58px; padding: 15px 20px; font-size: .95rem; letter-spacing: .1em; }
+}
+
+/* ============================================================
+   6.0 Шапка
+   ============================================================ */
+/* Правка 31.07: шапка ЗАФИКСИРОВАНА (никогда не прячется при скролле вниз)
+   и полностью ПРОЗРАЧНА — подложка `.header--solid` и её тень удалены,
+   инлайновую заливку по прогрессу полёта логотипа тоже снял main.js.
+   Читаемость держат «чернила»: каждый элемент шапки сам определяет цвет
+   по фону ПОД СОБОЙ (см. блок «чернила шапки» в main.js) плюс мягкое
+   гало. Откат: вернуть .header--solid/.header--hidden и строки с
+   header.style.backgroundColor / classList в main.js. */
+.header {
+  position: fixed; inset: 0 0 auto 0; z-index: 100;
+  height: var(--header-h);
+  display: flex; align-items: center;
+  background: transparent;
+  /* значения по умолчанию — светлые чернила (тёмный фон) */
+  --hdr-ink: var(--bp-off-white);
+  color: var(--hdr-ink);
+}
+/* Класс вешает JS КАЖДОМУ элементу отдельно: замер идёт в его собственной
+   точке, а не в центре экрана, поэтому пункты слева и знак по центру могут
+   оказаться на разном фоне и получить разный цвет. */
+.header .is-on-light {
+  --hdr-ink: var(--bp-dark-text);
+}
+/* Правка 31.07 (пятая): ГАЛО УБРАНО ВЕЗДЕ — переменная --hdr-halo и все
+   её потребители (text-shadow у пунктов, drop-shadow у знака и бургера,
+   тень под кнопкой «Обсудить проект») удалены по просьбе заказчика.
+   Читаемость держат только «чернила»: контраст в худшей точке 3.84:1,
+   а весь текст шапки — капс 700 кеглем ≥18.66px, для которого норма
+   WCAG AA равна 3:1. Откат: см. ревизию 54 в памяти проекта. */
+.header__inner {
+  width: 100%; max-width: var(--container); margin-inline: auto;
+  padding-inline: var(--gutter);
+  display: grid; grid-template-columns: 1fr auto 1fr;
+  align-items: center; gap: var(--s-3);
+}
+.header__left { display: flex; align-items: center; justify-self: start; }
+/* ТЗ4 §3: ячейка-слот — «посадочное место» летящего логотипа */
+.header__logoslot {
+  width: 150px; height: 100%;
+  display: flex; align-items: center; justify-content: center;
+}
+/* На 1024–1279 в шапке тесно: навигация выросла дважды, кнопка тоже.
+   Слот — это посадочное место логотипа (сам знак 101px при высоте 24px),
+   поэтому 120px ему хватает с запасом, а строка получает +30px воздуха. */
+@media (min-width: 1024px) and (max-width: 1279.98px) {
+  .header__logoslot { width: 120px; }
+}
+/* ГРАБЛИ (правка 31.07, пятая). Здесь стояло will-change: transform —
+   и оно же портило знак. Эта подсказка говорит браузеру «трансформ будет
+   меняться постоянно»: Chrome выносит элемент в отдельный композитный
+   слой, растрирует его ОДИН раз и дальше просто тянет готовую картинку
+   видеокартой. В полёте знак растёт почти в 10 раз, поэтому при возврате
+   вверх на экран разворачивался растр, снятый с пристыкованного знака
+   высотой 24px — отсюда «ужасное качество». Векторность источника тут ни
+   при чём, её убивал именно кэш слоя. Без will-change (и с force3D: false
+   у твина в main.js, иначе GSAP сам поднимет слой через matrix3d) браузер
+   каждый кадр перерисовывает SVG заново, в его настоящем размере. */
+.header__logo { display: block; color: var(--hdr-ink); }
+/* Знак — инлайновый SVG (правка 31.07, вторая итерация). Сначала он был
+   маской из wordmark-light.png; растр не годится: в полёте знак растёт
+   почти в 10 раз (transform: scale ≈ 9.4 на 1440), а исходник всего
+   800px по ширине — на первом экране буквы расплывались. Вектор из
+   фирменного PDF масштабируется без потерь и красится через
+   fill: currentColor, то есть слушается «чернил» из data-ink.
+   width: auto — пропорцию держит сам viewBox (1854.6 × 441.9).
+   Откат: см. ревизию 54 в памяти проекта. */
+.header__logo-mark {
+  display: block;
+  height: 20px; width: auto;
+  transition: color .25s var(--ease);
+}
+@media (min-width: 1024px) {
+  .header__logo-mark { height: 24px; }
+}
+/* Гало у знака (drop-shadow) убрано 31.07 по просьбе заказчика вместе с
+   классом-переключателем .header.is-flying. */
+.header__cta { justify-self: end; }
+.header__nav { display: none; }
+@media (min-width: 1024px) {
+  .header__nav { display: flex; align-items: center; gap: clamp(14px, 1.7vw, 30px); }
+  /* Правка 30.07: пункты плохо читались на светлых участках фото — были
+     тонкие (500), в нижнем регистре и приглушены до .88. Теперь капс,
+     Copperplate Bold (настоящее начертание 700, не синтетика), разрядка
+     и полная непрозрачность + мягкая тень: надпись держится и на кадре
+     геро, и на тёмной подложке шапки.
+     Откат: font-weight 500, opacity .88, без uppercase/letter-spacing. */
+  .header__nav a {
+    position: relative;
+    font-family: var(--font-grotesk);
+    /* правка 30.07: кегль растили дважды — .8/1.05/1.06 → .9/1.19/1.2 →
+       сейчас ещё +12%. На 1440 это 19.2px против исходных 15.1px. */
+    font-size: clamp(1rem, calc(1.33 * var(--vw-step)), 1.34rem);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .09em;
+    text-decoration: none;
+    opacity: 1;
+    /* цвет — из «чернил» элемента, их пересчитывает main.js;
+       свечение (text-shadow) убрано 31.07 по просьбе заказчика */
+    color: var(--hdr-ink);
+    white-space: nowrap;
+    padding-block: 6px;
+    transition: color .25s var(--ease);
+  }
+  /* янтарная линия выезжает слева направо — тот же жест, что у ссылок
+     в кейсах; на клавиатуре срабатывает по :focus-visible */
+  .header__nav a::after {
+    content: ""; position: absolute; left: 0; right: 0; bottom: 0;
+    height: 2px; background: var(--bp-amber);
+    transform: scaleX(0); transform-origin: left center;
+    transition: transform .35s var(--ease);
+  }
+  .header__nav a:hover, .header__nav a:focus-visible { color: var(--bp-amber); }
+  .header__nav a:hover::after, .header__nav a:focus-visible::after { transform: scaleX(1); }
+}
+.header__cta { display: none; }
+/* ---------- Кнопка «Обсудить проект» (правка 30.07, третья итерация) ----
+   Наклон снят — кнопка снова прямая, но заметно крупнее прежней: кегль,
+   поля и скругление выросли, тёмный контур (inset-обводка) убран, осталась
+   чистая янтарная плашка с мягкой тенью и бликом по наведению.
+   Кегль и поля заданы вилками: на 1024 в правой колонке шапки места мало
+   (навигация стала крупнее и отъедает ширину), там кнопка ужимается сама.
+   Откат к наклонной «наклейке»: transform translateY(14px) rotate(16deg),
+   flex-direction column и метка в две строки в разметке. */
+@media (min-width: 768px) {
+  .header__cta {
+    position: relative;
+    display: inline-flex;
+    min-height: 0;
+    padding: clamp(14px, calc(1.2 * var(--vw-step)), 19px) clamp(20px, calc(2.1 * var(--vw-step)), 32px);
+    font-size: clamp(.9rem, calc(1.2 * var(--vw-step)), 1.25rem);
+    font-weight: 700; line-height: 1.2; letter-spacing: .1em;
+    white-space: nowrap;
+    border-radius: 16px;
+    overflow: hidden;
+    /* Свечение вокруг кнопки (box-shadow 0 10px 26px) убрано 31.07 по
+       просьбе заказчика — и в покое, и на наведении. */
+    transition: transform .35s var(--ease), background-color .25s var(--ease);
+  }
+  .header__cta::after {
+    content: ""; position: absolute; inset: -40% -60%;
+    background: linear-gradient(100deg, transparent 42%, rgba(255,255,255,.5) 50%, transparent 58%);
+    transform: translateX(-120%);
+    transition: transform .7s var(--ease);
+    pointer-events: none;
+  }
+  .header__cta:hover, .header__cta:focus-visible {
+    transform: scale(1.05);
+    background: #DDB25E;
+  }
+  .header__cta:hover::after, .header__cta:focus-visible::after { transform: translateX(120%); }
+}
+
+/* Мобильное меню */
+.burger {
+  display: inline-flex; flex-direction: column; gap: 5px;
+  padding: 10px; margin-left: -10px;
+  color: var(--hdr-ink); /* полоски рисуются currentColor */
+  /* гало убрано вместе со свечением остальных элементов шапки (31.07) */
+}
+.burger span { width: 22px; height: 2px; background: currentColor; transition: transform .3s, opacity .3s; }
+.burger[aria-expanded="true"] span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+.burger[aria-expanded="true"] span:nth-child(2) { opacity: 0; }
+.burger[aria-expanded="true"] span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+@media (min-width: 1024px) { .burger { display: none; } }
+
+.mnav {
+  position: fixed; inset: 0; z-index: 90;
+  background: var(--bp-black);
+  display: flex; flex-direction: column; justify-content: center;
+  padding: var(--gutter);
+  opacity: 0; visibility: hidden;
+  transition: opacity .3s var(--ease), visibility .3s;
+}
+.mnav.is-open { opacity: 1; visibility: visible; }
+/* Пока шторка открыта, знак в шапке убран: на первом экране он ещё
+   «в полёте» — крупный — и накрывал бы собой пункты меню. */
+.menu-open .header__logo { opacity: 0; pointer-events: none; }
+.header__logo { transition: opacity .25s var(--ease); }
+/* тот же капс, что и в десктопной навигации (правка 30.07) */
+.mnav a {
+  font-family: var(--font-grotesk);
+  font-size: 1.75rem; font-weight: 700;
+  text-transform: uppercase; letter-spacing: .06em;
+  color: var(--bp-off-white);
+  text-decoration: none; padding: 10px 0;
+  border-bottom: 1px solid rgba(198,150,60,.25);
+}
+.mnav a.btn {
+  margin-top: var(--s-4);
+  font-family: var(--font-grotesk); font-size: .82rem; letter-spacing: .12em;
+  color: var(--bp-black); border-bottom: 0;
+}
+
+/* ============================================================
+   6.1 Hero
+   ============================================================ */
+.hero {
+  position: relative;
+  min-height: 100svh;
+  display: flex; flex-direction: column; justify-content: flex-end;
+  color: var(--bp-off-white);
+  background: var(--bp-black);
+  overflow: hidden;
+}
+.hero__media { position: absolute; inset: 0; }
+.hero__media picture { display: contents; }
+/* ТЗ8 §2: стакан с негрони — в центральной трети кадра, над текстом
+   (46% x — центр стакана ретро-натюрморта) */
+.hero__media img, .hero__media video {
+  width: 100%; height: 100%; object-fit: cover; object-position: 46% 42%;
+}
+/* ТЗ11 §5.3: фон затемнён сильнее — вертикальный градиент глубже +
+   левый скрим под текстово-логотипной зоной: и логотип, и заголовок
+   читаются безусловно */
+.hero__media::after {
+  content: ""; position: absolute; inset: 0;
+  background:
+    linear-gradient(90deg, rgba(27,25,22,.72) 0%, rgba(27,25,22,.28) 48%, rgba(27,25,22,.05) 72%, transparent 100%),
+    linear-gradient(180deg, rgba(27,25,22,.62) 0%, rgba(27,25,22,.30) 36%, rgba(27,25,22,.92) 100%);
+}
+/* ТЗ15 §4.2: трастлайн удалён — кнопки не должны липнуть к нижней кромке,
+   отступ снизу ≥ 8vh */
+.hero__content { position: relative; z-index: 2; padding-block: 0 max(var(--s-4), 8vh); }
+/* Правка 30.07: строка-eyebrow героя удалена вместе с разметкой.
+   Правка 30.07 (вторая): фраза идёт СПЛОШНЫМ текстом по центру экрана,
+   капсом и тем же шрифтом, что навигация (Copperplate, --font-grotesk) —
+   размер, разумеется, свой. Разбивка на серифный заголовок + капс-хвост
+   (.hero__kicker) снята целиком вместе с янтарной линейкой.
+   Кегль подобран так, чтобы фраза ложилась в три строки на десктопе:
+   капс Copperplate с разрядкой широкий, ~0.8 кегля на знак.
+   Откат: font-family serif, text-align left, max-width 13em + отдельный
+   .hero__kicker (см. историю правок в памяти проекта). */
+.hero__title {
+  max-width: 36em;
+  margin-inline: auto;
+  text-align: center;
+  font-family: var(--font-grotesk);
+  font-style: normal; font-weight: 700;
+  /* правка 30.07: +30% к кеглю (было .95/1.5/1.55) */
+  font-size: clamp(1.25rem, calc(1.95 * var(--vw-step)), 2rem);
+  line-height: 1.5; letter-spacing: .12em;
+  text-transform: uppercase;
+  text-shadow: 0 2px 24px rgba(27,25,22,.6);
+}
+/* На узком экране в строку влезает ~21 знак — это длина самих неразрывных
+   групп, и они начинают рвать текст на огрызки («ЗАКРЫВАЯ», «ПОЛНЫЙ ЦИКЛ:»
+   каждый отдельной строкой). Там переносы отдаём браузеру. */
+@media (max-width: 599.98px) {
+  .hero__title .nw { white-space: normal; }
+}
+/* ТЗ6 §5 / ТЗ15: жёсткая сетка героя в 100svh — логотип (центр ~32vh),
+   текстовая группа с 42vh, кнопки; всё в одном экране.
+   .hero__sub и .hero__trust удалены по ТЗ15 §2.3/§4. */
+.hero__content { margin-top: 42vh; }
+.hero__title em { font-style: italic; color: var(--bp-amber); }
+/* ТЗ15 §3.3: неразрывные группы (союз/предлог + слово) — nbsp не работает
+   под SplitText, переносы держит nowrap-обёртка */
+.nw { white-space: nowrap; }
+
+/* ============================================================
+   6.2 Полоса ключевых проектов (marquee)
+   Правка 29.07: полоса стала выше и спокойнее — тонкие линейки
+   сверху и снизу, крупный шаг между проектами, ромб-разделитель
+   вместо точки. Каждый проект набран СВОИМ фирменным начертанием
+   (см. комментарий в разметке), поэтому у элементов нет общего
+   font-family: базовый кегль задаёт --mq, а каждый знак берёт от
+   него свою долю — так разнородные логотипы стоят на одной
+   оптической высоте.
+   ============================================================ */
+.trust {
+  background: var(--bp-ivory); color: var(--bp-dark-text);
+  /* правка 30.07: полоса дважды понижена — сперва срезаны поля
+     (172 → 124px), затем ещё на ~17% вместе с самими знаками
+     (124 → ~104px): поля 24 → 20px, базовый кегль --mq 40 → 33.6px. */
+  padding-block: clamp(12px, 1.6vw, 20px);
+  overflow: hidden;
+  border-top: 1px solid color-mix(in srgb, var(--bp-dark-text) 16%, transparent);
+  border-bottom: 1px solid color-mix(in srgb, var(--bp-dark-text) 16%, transparent);
+  /* базовый кегль полосы — от него считаются все начертания и логотипы */
+  --mq: clamp(1.2rem, calc(2.55 * var(--vw-step)), 2.1rem);
+}
+.marquee { position: relative; overflow: hidden; }
+.marquee__track {
+  display: flex; align-items: center;
+  /* правка 29.07: шаг сокращён — строка стала заметно короче и плотнее */
+  gap: clamp(var(--s-3), 2.6vw, var(--s-6));
+  width: max-content;
+  animation: marquee 36s linear infinite;
+  will-change: transform;
+}
+@keyframes marquee { to { transform: translateX(-50%); } }
+@media (prefers-reduced-motion: reduce) {
+  .marquee__track {
+    animation: none; flex-wrap: wrap; width: auto;
+    justify-content: center; row-gap: var(--s-4);
+  }
+  /* строка не зациклена — хвостовой ромб после последнего проекта лишний */
+  .marquee__item:last-child::after { display: none; }
+}
+.marquee__item {
+  white-space: nowrap;
+  display: flex; align-items: center;
+  gap: clamp(var(--s-3), 2.6vw, var(--s-6));
+  color: var(--bp-dark-text);
+}
+/* разделитель — маленький амберовый ромб вместо точки */
+.marquee__item::after {
+  content: ""; flex: 0 0 auto;
+  width: 7px; height: 7px;
+  background: var(--bp-amber);
+  transform: rotate(45deg);
+}
+
+/* ---------- фирменные начертания проектов ---------- */
+/* Duran Bar — контрастная антиква смешанным регистром, как в презентации */
+.mq--duran {
+  font-family: "Roslindale Display Condensed", "Times New Roman", serif;
+  font-weight: 500; font-style: normal;
+  font-size: calc(var(--mq) * 1.06);
+  letter-spacing: .01em;
+}
+/* BURO. ЦУМ — тонкая разряжённая антиква в две строки, как в лого ресторана.
+   Локап отдельным столбцом: сам .marquee__item — строка, в ней ещё и ромб. */
+.mq__lockup { display: flex; flex-direction: column; align-items: center; }
+.mq__buro, .mq__tsum {
+  display: block; text-align: center;
+  font-family: var(--font-grotesk);
+  font-weight: 300; text-transform: uppercase;
+  line-height: 1.1;
+}
+/* у Copperplate капитель низкая — 0.53 кегля, поэтому множитель выше,
+   чем кажется по числу: так «BURO» встаёт вровень с остальными знаками */
+.mq__buro { font-size: calc(var(--mq) * 1.13); letter-spacing: .18em; text-indent: .18em; }
+.mq__tsum {
+  margin-top: .3em;
+  font-size: calc(var(--mq) * .44); letter-spacing: .42em; text-indent: .42em;
+  color: color-mix(in srgb, var(--bp-dark-text) 72%, transparent);
+}
+
+/* ---------- знаки, извлечённые из презентации ----------
+   Высоты подобраны ПОШТУЧНО по оптике, а не по коробке файла: у «Зойки»
+   больше половины кадра занимают росчерки, у Lúwo сверху висит акцент,
+   у АЙНЫ — плотные капители. */
+.mq--logo { align-items: center; }
+.mq__img { display: block; width: auto; }
+.mq__img--zoyka { height: calc(var(--mq) * 1.45); }
+.mq__img--aina  { height: calc(var(--mq) * .95); }
+.mq__img--luwo  { height: calc(var(--mq) * 1.04); }
+/* PIMS — чистая капитель без выносных, поэтому высота знака = высота
+   капители соседей (у «S» лишь типографский овершут в пару пикселей) */
+.mq__img--pims  { height: calc(var(--mq) * .76); }
+
+/* 6.3 PAS и 6.4 Философия — секции и стили УДАЛЕНЫ по ТЗ14 §2–3;
+   «Три сценария» (id=about) занял место PAS сразу после трастстрипа */
+
+/* ============================================================
+   6.5 Услуги — два блока-слайдера с вертикальной полоской.
+   Референс механики: bonito-flakes-for-pets.com. Полоска = тонкая
+   линия + кружки: активный крупнее и залит, пройденные закрашены,
+   будущие контурные; поверх базовой линии растёт линия-прогресс.
+   Полоска у кофе справа, у бара слева; живёт только внутри своего
+   блока и появляется/исчезает вместе с ним.
+   JS не анимирует — считает активный слайд и переставляет классы.
+   ============================================================ */
+.prs {
+  --prs-nav-w: 40px;
+  --prs-dot: 13px;
+  --prs-dot-active: 21px;
+  --prs-step: 52px;          /* шаг между точками, как в референсе */
+  /* --prs-bg — фон блока: им же заливаются кружки полоски, чтобы линия
+     не просвечивала сквозь них; --prs-accent — цвет акцентов, свой для
+     светлой и тёмной темы (на светлом амбер #C6963C не проходит по
+     контрасту, поэтому там тёмный янтарь #7A561B). */
+  position: relative;
+  overflow: clip;
+  isolation: isolate;
+}
+/* Правка 29.07: кофейный блок — СВЕТЛЫЙ на всех слайдах, барный — тёмный.
+   Кофейный красит себя САМ: у него снят data-bg, поэтому правило
+   .bgflow section[data-bg] { background: transparent } его не задевает
+   и фон одинаков на всей длине блока, включая вход и выход. */
+/* --prs-stroke — цвет фона СОСЕДНЕГО блока: им обводится контурный
+   заголовок (см. .prs__manifest) */
+.prs--coffee {
+  --prs-bg: var(--bp-ivory);
+  --prs-stroke: var(--bp-black);
+  --prs-accent: var(--bp-amber-text);
+  --prs-ink: var(--bp-dark-text);
+  background: var(--bp-ivory); color: var(--bp-dark-text);
+}
+.prs--bar {
+  --prs-bg: var(--bp-black);
+  --prs-stroke: var(--bp-ivory);
+  --prs-accent: var(--bp-amber);
+  --prs-ink: var(--bp-off-white);
+  background: var(--bp-black); color: var(--bp-off-white);
+}
+
+/* Правка 30.07: строки-eyebrow («Услуги · Кофе», «Услуги · Бар») удалены
+   из разметки. Манифест — крупная надпись по центру, ПРЯМЫМ Roslindale
+   (курсив снят), в одну строку; кегль в настоящих vw, как у «ТРИ СЦЕНАРИЯ
+   РАБОТЫ» — строка держит постоянную долю ширины экрана.
+   Откат: font-family var(--font-serif), font-size 4 × --vw-step, без
+   text-align/white-space. */
+/* Правка 31.07: заголовок контурный — только тонкий штрих цветом фона
+   СОСЕДНЕГО блока (у кофейного графит, у барного беж).
+   Правка 31.07 (вторая): заливка стала ПРОЗРАЧНОЙ вместо «цвета своего
+   фона». Разница видна во время перетекания фона: сквозь буквы
+   просвечивает сам переливающийся фон, а не зафиксированный цвет блока.
+   Штрих сильно тоньше — .05em → .014em (волосяная линия), кегль +5%.
+   ВАЖНО: заливки нет вообще, поэтому без обводки текст был бы невидим —
+   на движках без -webkit-text-stroke возвращаем обычный цвет через
+   @supports ниже. */
+.prs__manifest {
+  margin-top: 0;
+  text-align: center;
+  font-family: "Roslindale Display Condensed", "Times New Roman", serif;
+  font-style: normal; font-weight: 700;
+  font-size: clamp(2.48rem, 10.2vw, 14.2rem);
+  line-height: .96; letter-spacing: .01em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: transparent;
+  /* нижний предел: на мобильном доля от кегля даёт полпикселя — волосок
+     рассыпается на неретиновых экранах. Правка 31.07: штрих наращивали
+     дважды — .014 → .0165em (+18%) → .0248em (ещё +50%), предел
+     1 → 1.2 → 1.8px. */
+  -webkit-text-stroke-color: var(--prs-stroke);
+  -webkit-text-stroke-width: max(1.8px, .0248em);
+}
+@supports not (-webkit-text-stroke: 1px #000) {
+  .prs__manifest { color: var(--prs-ink); }
+}
+
+/* ---------- полоска-навигация ---------- */
+.prs__nav {
+  position: absolute; top: 50%; transform: translateY(-50%);
+  z-index: 5;
+  width: var(--prs-nav-w);
+  display: flex; flex-direction: column; align-items: center;
+  gap: calc(var(--prs-step) - var(--prs-dot));
+  opacity: 0;                       /* появляется вместе с блоком (JS) */
+  transition: opacity .4s var(--ease);
+}
+.prs.is-live .prs__nav { opacity: 1; }
+.prs[data-prs-side="right"] .prs__nav { right: var(--s-4); }
+.prs[data-prs-side="left"]  .prs__nav { left: var(--s-4); }
+
+/* базовая линия сквозь все точки + линия-прогресс поверх неё */
+.prs__line {
+  position: absolute; top: 6px; bottom: 6px; left: 50%;
+  width: 2px; margin-left: -1px;
+  background: color-mix(in srgb, var(--prs-ink) 26%, transparent);
+}
+.prs__fill {
+  position: absolute; top: 0; left: 0; width: 100%; height: 0;
+  background: var(--prs-accent);
+  transition: height .3s var(--ease);
+}
+
+/* кружки: непрозрачный фон, чтобы линия не просвечивала насквозь */
+.prs__dot {
+  position: relative; z-index: 2;
+  flex: 0 0 auto;
+  width: var(--prs-dot); height: var(--prs-dot);
+  border-radius: 50%;
+  background: var(--prs-bg);
+  border: 2px solid color-mix(in srgb, var(--prs-ink) 42%, transparent);
+  padding: 0; cursor: pointer;
+  transition: width .3s var(--ease), height .3s var(--ease),
+              background-color .3s var(--ease), border-color .3s var(--ease);
+}
+.prs__dot:hover { border-color: var(--prs-accent); }
+/* пройденные — закрашены амбером */
+.prs__dot.is-done { background: var(--prs-accent); border-color: var(--prs-accent); }
+/* активный — крупнее и залит (главный приём референса) */
+.prs__dot.is-current {
+  width: var(--prs-dot-active); height: var(--prs-dot-active);
+  background: var(--prs-accent); border-color: var(--prs-accent);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--prs-accent) 22%, transparent);
+}
+
+/* ---------- слайды ---------- */
+.prs__stage { position: relative; }
+.prs__slide {
+  display: grid; gap: var(--s-4);
+  opacity: 0; visibility: hidden;
+  transform: translateY(16px);
+  transition: opacity .45s var(--ease), transform .5s var(--ease), visibility .45s;
+}
+.prs__slide.is-active { opacity: 1; visibility: visible; transform: none; }
+
+/* .prs__num (01/02/…) удалён из разметки по правке 30.07 */
+.prs__title {
+  margin-top: 0;
+  /* курсив снят: тот же прямой Roslindale, что в манифесте и сценариях */
+  font-family: "Roslindale Display Condensed", "Times New Roman", serif;
+  font-style: normal; font-weight: 700;
+  font-size: clamp(1.9rem, calc(3.6 * var(--vw-step)), 3.2rem); line-height: 1.04;
+  text-transform: uppercase;
+}
+.prs__lead {
+  margin-top: var(--s-3);
+  font-family: var(--font-text); font-size: clamp(1rem, calc(1.25 * var(--vw-step)), 1.2rem);
+  line-height: 1.5; max-width: 30em;
+  color: color-mix(in srgb, var(--prs-ink) 84%, transparent);
+}
+/* ---------- наполнение слайдов (структуры из презентации) ----------
+   Правка 30.07: цифры-счётчики убраны, их место занял янтарный ромб —
+   тот же знак, что разделяет проекты в бежевой полосе, так список
+   держит фирменный ритм и без нумерации. Кегль поднят (+16%), строки
+   разрежены — набор стал заметно читаемее. */
+.prs__list { margin-top: var(--s-4); display: grid; gap: 0; }
+.prs__list li {
+  display: grid; grid-template-columns: 7px minmax(0, 1fr); gap: 14px;
+  align-items: start;
+  padding: 12px 0;
+  border-bottom: 1px solid color-mix(in srgb, var(--prs-ink) 18%, transparent);
+  font-family: var(--font-grotesk);
+  font-size: clamp(.84rem, calc(1.08 * var(--vw-step)), 1.08rem); font-weight: 700;
+  letter-spacing: .07em; text-transform: uppercase;
+  line-height: 1.3;
+}
+.prs__list li::before {
+  content: ""; width: 7px; height: 7px; margin-top: .5em;
+  background: var(--prs-accent); transform: rotate(45deg);
+}
+
+/* пары «термин — уточнение»: крупный термин слева, пояснение справа */
+.prs__defs { margin-top: var(--s-4); display: grid; }
+.prs__defs > div {
+  display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, .86fr);
+  gap: var(--s-3); align-items: baseline;
+  padding: 15px 0;
+  border-bottom: 1px solid color-mix(in srgb, var(--prs-ink) 18%, transparent);
+}
+.prs__defs dt {
+  /* курсив снят вместе с заголовками (правка 30.07) */
+  font-family: "Roslindale Display Condensed", "Times New Roman", serif;
+  font-style: normal; font-weight: 700;
+  font-size: clamp(1.25rem, calc(2.05 * var(--vw-step)), 2rem); line-height: 1.02;
+  text-transform: uppercase;
+}
+.prs__defs dd {
+  margin: 0;
+  font-family: var(--font-text); font-size: clamp(.95rem, calc(1.15 * var(--vw-step)), 1.15rem); line-height: 1.4;
+  color: color-mix(in srgb, var(--prs-ink) 78%, transparent);
+}
+
+/* Два раздела на одном слайде — разворот «Наши сильные стороны».
+   Правка 30.07: вместо двух блоков друг под другом, разделённых линейкой,
+   они разведены по диагонали — первый прижат к одному краю колонки,
+   второй к противоположному, и с каждым слайдом стороны меняются
+   местами. Разделительную линейку заменил короткий янтарный штрих над
+   заголовком (с той стороны, к которой прижат раздел).
+   Откат: снять justify-self/text-align, вернуть border-top у второго. */
+.prs__groups { margin-top: var(--s-4); display: grid; gap: var(--s-6); }
+.prs__group .prs__title {
+  position: relative;
+  margin-top: 0; padding-top: 14px;
+  font-size: clamp(1.55rem, calc(2.7 * var(--vw-step)), 2.6rem); line-height: 1.04;
+}
+.prs__group .prs__title::before {
+  content: ""; position: absolute; top: 0; left: 0;
+  width: 48px; height: 2px; background: var(--prs-accent);
+}
+.prs__facts { margin-top: var(--s-2); display: grid; gap: 9px; }
+.prs__facts li {
+  font-family: var(--font-text);
+  font-size: clamp(1.05rem, calc(1.38 * var(--vw-step)), 1.45rem); line-height: 1.45;
+  color: color-mix(in srgb, var(--prs-ink) 88%, transparent);
+}
+
+/* два самостоятельных утверждения рядом: каждое под янтарной линейкой */
+.prs__pair { margin-top: var(--s-6); display: grid; gap: var(--s-6); }
+.prs__pair p {
+  padding-top: var(--s-2);
+  border-top: 2px solid var(--prs-accent);
+  font-family: var(--font-text); font-size: clamp(1.05rem, calc(1.35 * var(--vw-step)), 1.4rem); line-height: 1.5;
+  color: color-mix(in srgb, var(--prs-ink) 88%, transparent);
+}
+
+.prs__media { margin: 0; overflow: hidden; border-radius: 8px; }
+.prs__media img { width: 100%; height: 100%; object-fit: cover; }
+
+/* ---------- десктоп: пин + раскладка ---------- */
+@media (min-width: 1024px) and (prefers-reduced-motion: no-preference) {
+  .prs { height: 100svh; }
+  /* Правка 30.07: манифест стоит В ПОТОКЕ, а не абсолютом с магическим
+     отступом 12vh у сцены. Он стал крупным (8vw), и при абсолютном
+     позиционировании пришлось бы вручную пересчитывать зазор под каждый
+     кегль; теперь высоту делит flex: заголовок по содержимому, сцена
+     забирает остаток. */
+  .prs__inner {
+    height: 100%;
+    display: flex; flex-direction: column;
+    padding-block: var(--s-6);
+  }
+  .prs__stage { flex: 1; display: grid; align-items: center; margin-top: var(--s-4); }
+  .prs__slide {
+    grid-area: 1 / 1;
+    grid-template-columns: minmax(0, 1fr) minmax(0, .85fr);
+    align-items: center; gap: var(--s-8);
+  }
+  /* контент отодвинут от той кромки, где стоит полоска */
+  .prs[data-prs-side="right"] .prs__inner { padding-right: calc(var(--prs-nav-w) + var(--s-6)); }
+  .prs[data-prs-side="left"]  .prs__inner { padding-left: calc(var(--prs-nav-w) + var(--s-6)); }
+  /* …но манифест центрируем по ЭКРАНУ, а не по отодвинутой колонке —
+     иначе крупная надпись съезжает на 44px от середины */
+  .prs[data-prs-side="right"] .prs__manifest { margin-right: calc(-1 * (var(--prs-nav-w) + var(--s-6))); }
+  .prs[data-prs-side="left"]  .prs__manifest { margin-left:  calc(-1 * (var(--prs-nav-w) + var(--s-6))); }
+  /* у барного блока фото слева, текст справа — зеркально кофейному;
+     колонки тоже зеркалим, иначе тексту (а он тут из двух разделов)
+     достаётся узкая доля и строки ломаются пополам */
+  .prs[data-prs-side="left"] .prs__slide { grid-template-columns: minmax(0, .85fr) minmax(0, 1fr); }
+  .prs[data-prs-side="left"] .prs__text  { order: 2; }
+  .prs[data-prs-side="left"] .prs__media { order: 1; }
+  .prs__media { height: min(58svh, 560px); }
+  .prs__list--two { grid-template-columns: 1fr 1fr; column-gap: var(--s-6); }
+  .prs__pair { grid-template-columns: 1fr 1fr; gap: var(--s-6); }
+
+  /* ---- потолок по ВЫСОТЕ экрана ----
+     Слайды живут в запиненном экране: связывающее ограничение здесь не
+     ширина, а высота. После увеличения кеглей на окне 1024×680 самый
+     плотный слайд («Команда и кадровая экспертиза» + «Соответствие
+     стандартам») перерастал экран на 190px и обрезался. Поэтому каждый
+     кегль и вертикальный отступ берут МЕНЬШЕЕ из двух: своей ширинной
+     вилки и доли высоты экрана. На 1440×900 работает вилка — размеры
+     ровно те, что задуманы; ужимается только низкое окно. */
+  /* сверху отступ считается от ВЫСОТЫ ШАПКИ: манифест стоит в потоке
+     первым, и при обычном отступе его верхушку срезала фиксированная
+     панель (замер: заходила на буквы на 12px) */
+  .prs__inner { padding-block: calc(var(--header-h) + 10px) min(var(--s-6), 5svh); }
+  .prs__stage { margin-top: min(var(--s-4), 2svh); }
+  .prs__manifest { font-size: min(clamp(2.48rem, 10.2vw, 14.2rem), 15.4svh); }
+  .prs__title { font-size: min(clamp(1.9rem, calc(3.6 * var(--vw-step)), 3.2rem), 5.4svh); }
+  .prs__list { margin-top: min(var(--s-4), 3svh); }
+  .prs__list li {
+    font-size: min(clamp(.84rem, calc(1.08 * var(--vw-step)), 1.08rem), 1.92svh);
+    padding-block: min(12px, 1svh);
+  }
+  .prs__defs { margin-top: min(var(--s-4), 3svh); }
+  .prs__defs > div { padding-block: min(15px, 1.8svh); }
+  .prs__defs dt { font-size: min(clamp(1.25rem, calc(2.05 * var(--vw-step)), 2rem), 3.4svh); }
+  .prs__defs dd { font-size: min(clamp(.95rem, calc(1.15 * var(--vw-step)), 1.15rem), 2svh); }
+  .prs__pair { margin-top: min(var(--s-6), 4.4svh); }
+  .prs__pair p { font-size: min(clamp(1.05rem, calc(1.35 * var(--vw-step)), 1.4rem), 2.4svh); }
+  .prs__groups { margin-top: min(var(--s-4), 2.9svh); gap: min(var(--s-6), 3.5svh); }
+  .prs__group .prs__title {
+    font-size: min(clamp(1.55rem, calc(2.7 * var(--vw-step)), 2.6rem), 4.05svh);
+    padding-top: min(14px, 1.7svh);
+  }
+  .prs__facts { margin-top: min(var(--s-2), 1.9svh); gap: min(9px, 1.2svh); }
+  .prs__facts li { font-size: min(clamp(1.05rem, calc(1.38 * var(--vw-step)), 1.45rem), 2svh); }
+
+  /* диагональ: раздел 1 у одного края колонки, раздел 2 у другого;
+     на каждом следующем слайде стороны меняются местами */
+  .prs__group { max-width: 88%; }
+  .prs__slide:nth-of-type(odd)  .prs__group:nth-child(1),
+  .prs__slide:nth-of-type(even) .prs__group:nth-child(2) { justify-self: start; text-align: left; }
+  .prs__slide:nth-of-type(odd)  .prs__group:nth-child(2),
+  .prs__slide:nth-of-type(even) .prs__group:nth-child(1) { justify-self: end; text-align: right; }
+  /* янтарный штрих над заголовком встаёт с той же стороны, что и раздел */
+  .prs__slide:nth-of-type(odd)  .prs__group:nth-child(2) .prs__title::before,
+  .prs__slide:nth-of-type(even) .prs__group:nth-child(1) .prs__title::before { left: auto; right: 0; }
+}
+
+/* Список из десяти пунктов идёт в одну колонку — так он читается лучше
+   всего. Но на невысоком окне десять строк подряд не помещаются в экран,
+   поэтому там он складывается в две колонки. */
+@media (min-width: 1024px) and (max-height: 880px) {
+  .prs__list { grid-template-columns: 1fr 1fr; column-gap: var(--s-6); }
+}
+
+/* ---------- мобильные и reduced-motion: обычный поток ---------- */
+@media (max-width: 1023.98px), (prefers-reduced-motion: reduce) {
+  .prs { height: auto; overflow: visible; padding-block: var(--s-12); }
+  .prs__nav { display: none; }
+  .prs__stage { display: grid; gap: var(--s-12); margin-top: var(--s-8); }
+  .prs__slide { opacity: 1; visibility: visible; transform: none; grid-template-columns: 1fr; }
+  .prs__media { aspect-ratio: 4 / 3; }
+}
+
+/* ============================================================
+   6.7 «Кому мы полезны» — три карточки-сценария.
+   Формат по референсу buckssauce.com/shop: равные цветные карточки
+   в ряд, у каждой пунктирная рамка внутри, активная насыщенная —
+   соседние приглушены; под ними тёмная плашка с описанием активного
+   сценария и кнопкой. Прежняя запиненная сцена (.sc*) снята целиком.
+   Правка 29.07: переключение по наведению убрано — все карточки всегда
+   в насыщенном состоянии, описание видно постоянно. Класса is-active
+   больше нет, JS-логики у блока нет вообще.
+   ============================================================ */
+
+/* ---------- заголовок блока ----------
+   По референсу заказчика: одна строка капсом по центру, буквы во всю
+   ширину экрана. Без обводки и без разнобоя в кеглях — вся строка
+   одного размера и одной заливки. Шрифт — ПРЯМОЙ Roslindale Display
+   Condensed (не курсивный алиас --font-serif): курсив снят по правке.
+   Размер задан в vw, а строка не переносится, поэтому её ширина
+   остаётся постоянной долей экрана на любой ширине окна. */
+.scn-head { text-align: center; margin-bottom: var(--s-8); }
+.scn-head__title {
+  font-family: "Roslindale Display Condensed", "Times New Roman", serif;
+  font-style: normal; font-weight: 700;
+  font-size: clamp(2.2rem, 9.6vw, 15rem);   /* НАСТОЯЩИЙ vw: строка заполняет экран во всю ширину */
+  line-height: .94;
+  letter-spacing: .005em;
+  text-transform: uppercase;
+  color: var(--bp-off-white);
+  white-space: nowrap;
+}
+/* узкие экраны: строка в одну линию стала бы нечитаемо мелкой —
+   разрешаем перенос и снимаем nowrap */
+@media (max-width: 599.98px) {
+  .scn-head__title { white-space: normal; font-size: clamp(2.2rem, 13vw, 4rem); }
+}
+
+/* Правка 30.07 (вторая): вся геометрия карточки задана В ДОЛЯХ ЕЁ ШИРИНЫ.
+   Раньше кегли считались от ширины ЭКРАНА, а ширина карточки — от числа
+   колонок, и одно с другим не совпадало: на 768 карточка сжималась до
+   230px, а текст оставался 18px — он выглядел огромным; на большом
+   мониторе карточка вырастала, а текст упирался в потолок clamp() и
+   казался мелким. Теперь единица измерения одна — ширина самой карточки:
+   поля в %, кегли в cqi, высота через aspect-ratio. Пропорции блока
+   одинаковы на любом разрешении, меняется только масштаб.
+   row-gap оставлен в пикселях: процентный row-gap в гриде считается от
+   высоты, а она здесь не определена, и зазор схлопнулся бы в ноль. */
+.scn {
+  display: grid;
+  row-gap: var(--s-2);
+  column-gap: 1.15%;
+  margin-top: var(--s-6);
+  /* стопкой карточка не должна растягиваться на весь планшет; ограничение
+     стоит на СЕТКЕ, а не на карточке: проценты полей внутри карточки
+     считаются от ширины её ячейки в гриде, и при max-width на самой
+     карточке поля брались бы от полной ширины колонки — шире карточки */
+  max-width: 460px;   /* ≈ ширина карточки на опорном десктопе 1440 (451px) */
+  margin-inline: auto;
+  /* без stretch: высоту карточки задаёт aspect-ratio, а не строка грида */
+  align-items: start;
+}
+/* Три колонки — с 1024, а не с 768: на планшете колонка выходила шириной
+   230px, и в такой карточке пропорциональный текст был бы 8–9px. До 1024
+   карточки идут стопкой и ограничены по ширине, чтобы не растянуться на
+   весь планшет. Откат: @media (min-width:768px) с repeat(3,1fr). */
+@media (min-width: 1024px) {
+  .scn {
+    grid-template-columns: repeat(3, 1fr);
+    /* потолок для очень широких мониторов: без него на 2560 карточка
+       выросла бы до 830px и по высоте не влезла бы в экран */
+    max-width: 1700px;
+  }
+}
+
+.scn__card {
+  position: relative;
+  display: flex; flex-direction: column; align-items: center;
+  text-align: center;
+  /* поля в процентах от ширины карточки (у padding ОБЕ оси считаются от
+     inline-размера) — те же 48/24px на опорной ширине 451px */
+  padding: 10.6% 5.3%;
+  /* карточка — контейнер для cqi: кегли внутри считаются от ЕЁ ширины */
+  container-type: inline-size;
+  border-radius: 12px;
+  overflow: hidden;
+  /* Форма карточки постоянна. Правка 30.07: −8% по высоте (138 → 127) —
+     блок целиком не помещался в экран. Кегли привязаны к ШИРИНЕ карточки,
+     поэтому текст от этого не изменился, ужался только запас по высоте. */
+  aspect-ratio: 100 / 127;
+  width: 100%;
+  box-shadow: 0 24px 60px rgba(0,0,0,.38);
+}
+/* Три фирменных цвета: амбер → жжёный оранжевый → бордо.
+   Тона взяты ГЛУБОКИМИ намеренно: на светлом амбере (#C6963C, как в
+   референсе) молочный заголовок давал контраст 2.52 при норме 4.5 —
+   на этих значениях 6–8. Приглушённых состояний больше нет: наведение
+   снято, все три карточки всегда в насыщенном тоне. */
+.scn__card:nth-child(1) { background: #6B4A16; }
+.scn__card:nth-child(2) { background: #8A3D14; }
+.scn__card:nth-child(3) { background: #7A1F2A; }
+/* Правка 29.07: фото занимает ВСЮ карточку и лежит ПОД текстом,
+   цветной блок остаётся подложкой и просвечивает сквозь кадр.
+   Порядок слоёв: фото (0) → притеняющая вуаль (1) → пунктирная
+   рамка (2) → заголовок (3). Надписи «Сценарий 0X» убраны. */
+.scn__photo {
+  position: absolute; inset: 0; z-index: 0;
+  margin: 0; width: auto; aspect-ratio: auto;
+  overflow: hidden; border-radius: inherit;
+}
+.scn__photo img {
+  width: 100%; height: 100%; object-fit: cover;
+  /* прозрачность: сквозь кадр читается цвет карточки, а поверх — текст */
+  opacity: .4;
+}
+
+/* Вуаль поверх фото: без неё светлые участки кадров (лёд, белая одежда)
+   роняют контраст заголовка ниже нормы 4.5 — замерено по пикселям самих
+   фотографий. Цвет вуали — тот же графит, что и фон секции, поэтому
+   тонировка читается как затемнение самой карточки. */
+.scn__card::after {
+  content: ""; position: absolute; inset: 0; z-index: 1;
+  /* низ плотнее верха: там стоит описание — мелкий текст, ему нужен
+     запас по контрасту (на .52 худший случай был 4.6 при норме 4.5) */
+  background: linear-gradient(180deg, rgba(27,25,22,.62) 0%, rgba(27,25,22,.32) 40%, rgba(27,25,22,.68) 100%);
+  pointer-events: none;
+}
+
+/* пунктирная рамка внутри — приём референса, рифмуется с плашками бренда */
+/* отступ рамки тоже в долях ширины: у margin все четыре процента
+   считаются от inline-размера, поэтому сверху и сбоку он одинаковый
+   (у inset проценты по вертикали считались бы от высоты) */
+.scn__frame {
+  position: absolute; inset: 0; margin: 2.66%; z-index: 2;
+  border: 1px dashed color-mix(in srgb, var(--bp-off-white) 55%, transparent);
+  border-radius: 8px;
+  opacity: .9;
+  pointer-events: none;
+}
+
+/* Заголовок карточки — тоже ПРЯМЫМ Roslindale: курсив снят по правке 29.07.
+   Заголовок ВСЕГДА в две строки — перенос задан <br> прямо в разметке,
+   а не отдан на откуп ширине колонки. Самая длинная строка —
+   «МАСШТАБИРОВАТЬСЯ»: она обязана влезать в карточку на всех
+   разрешениях (проверено на 375–2560). */
+.scn__title {
+  position: relative; z-index: 3;
+  font-family: "Roslindale Display Condensed", "Times New Roman", serif;
+  font-style: normal; font-weight: 700;
+  /* кегль привязан к ширине карточки, а не к ширине экрана: 1cqi = 1%
+     контентной коробки карточки. Потолок — 11.17cqi: «МАСШТАБИРОВАТЬСЯ»
+     шириной 8.95 кегля, при 10.5cqi слово занимает 94% строки, и до
+     пунктирной рамки остаётся запас с обеих сторон. */
+  font-size: 10.5cqi;
+  line-height: 1.05;
+  text-transform: uppercase;
+  color: var(--bp-off-white);
+  max-width: 12em;
+  text-shadow: 0 2px 18px rgba(27,25,22,.55);
+}
+
+/* ---------- описание: видно всегда ----------
+   Правка 29.07: всплывание по наведению снято по просьбе заказчика —
+   текст стоит в карточке постоянно и стал чуть крупнее. */
+.scn__desc {
+  position: relative; z-index: 3;
+  margin-top: auto;                 /* прижато к низу карточки */
+  max-width: 26em;
+  font-family: var(--font-text); font-size: 5.2cqi;
+  line-height: 1.45;
+  color: var(--bp-off-white);
+  text-shadow: 0 2px 16px rgba(27,25,22,.6);
+}
+
+/* ============================================================
+   6.8 Кейсы
+   ============================================================ */
+/* Правка 31.07: фильтр «Все / Бар / Кофе» снят с вёрстки — показываем
+   все проекты сразу. Стили .cases-filter удалены; обработчик в main.js
+   оставлен (querySelectorAll по пустому списку безвреден) — если фильтр
+   когда-нибудь вернут, достаточно вернуть разметку и эти правила. */
+
+/* ---------- Шапка секции кейсов (правка 31.07) ----------
+   Заказчик: пилюлю «Портфолио» убрать, «НАШИ ПРОЕКТЫ» — капсом, без
+   курсива, крупнее и по центру; подпись — курсивом, по центру, тише.
+   Кегль и начертание перекликаются с манифестами COFFEE / BAR CONSULTING:
+   прямой Roslindale Display Condensed (у --font-serif алиас курсивный).
+   Откат: убрать класс cases-head в index.html. */
+.cases-head { text-align: center; }
+.cases-head .h2 {
+  max-width: none;
+  font-family: "Roslindale Display Condensed", "Times New Roman", serif;
+  font-style: normal; font-weight: 700;
+  font-size: clamp(3.05rem, calc(7.4 * var(--vw-step)), 6.7rem);
+  line-height: 1.02; letter-spacing: .012em;
+  text-transform: uppercase;
+  color: var(--bp-dark-text);
+  /* «Жирнее» упирается в шрифт: у Roslindale Display Condensed объявлен
+     диапазон 400–700, и 700 уже взято. Добавочный вес даёт обводка тем
+     же цветом — она наращивает штрих, а не рисует контур. */
+  -webkit-text-stroke: max(1px, .0135em) currentColor;
+}
+.cases-head .lead {
+  max-width: 34em; margin-inline: auto; margin-top: var(--s-3);
+  font-family: var(--font-serif); font-style: italic;
+  font-size: clamp(1.18rem, calc(1.7 * var(--vw-step)), 1.7rem);
+  line-height: 1.35;
+}
+/* «Тише» — только там, где подпись уже крупная (≥24px): на этом кегле
+   AA требует 3:1, и приглушённый графит его держит (3.26:1). Ниже 1280
+   цвет остаётся штатным .lead — иначе мелкий текст ушёл бы под порог. */
+@media (min-width: 1280px) {
+  .cases-head .lead { color: color-mix(in srgb, var(--bp-graphite) 88%, transparent); }
+}
+.cases-grid { display: grid; gap: var(--s-3); margin-top: var(--s-6); }
+@media (min-width: 640px) { .cases-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (min-width: 1024px) { .cases-grid { grid-template-columns: repeat(3, 1fr); } }
+
+.case-card {
+  background: #F1E8D3;
+  border: 1px solid rgba(23,20,15,.08);
+  border-radius: 4px; overflow: hidden;
+  text-align: left; display: flex; flex-direction: column;
+  transition: box-shadow .3s var(--ease), transform .3s var(--ease);
+}
+.case-card:hover { box-shadow: 0 18px 44px rgba(23,20,15,.12); transform: translateY(-3px); }
+.case-card__logo {
+  height: 108px; display: flex; align-items: center; justify-content: center;
+  padding: var(--s-3);
+}
+.case-card__logo img { max-height: 100%; max-width: 72%; width: auto; object-fit: contain; }
+.case-card__logo .tlogo { font-family: var(--font-serif); font-weight: 600; font-size: 1.9rem; }
+.case-card__logo .tlogo--grotesk { font-family: var(--font-serif); font-weight: 600; font-size: 1.6rem; letter-spacing: .04em; }
+.case-card__photo { position: relative; aspect-ratio: 4 / 3; overflow: hidden; }
+.case-card__photo img {
+  width: 100%; height: 100%; object-fit: cover;
+  transition: transform .7s var(--ease);
+}
+.case-card:hover .case-card__photo img { transform: scale(1.05); }
+.case-card__meta { padding: var(--s-3); display: flex; justify-content: space-between; align-items: center; gap: var(--s-2); }
+.case-card__meta .cat {
+  font-family: var(--font-grotesk); font-size: .72rem; font-weight: 600; letter-spacing: .14em;
+  text-transform: uppercase; color: var(--bp-graphite);
+}
+.case-card__meta .more { font-size: .9rem; color: var(--bp-amber-text); white-space: nowrap; }
+.case-card[hidden] { display: none; }
+
+/* ============================================================
+   РАЗВОРОТ КЕЙСА — по ТЗ «переработка разворота кейса BARPOINT
+   по структуре Bucks Sauce» (эталон block_3.html).
+   Слева галерея с вырезом под крестик, справа заголовок,
+   подзаголовок и сетка карточек 2×2. Старые правила .cover*
+   (44 штуки) удалены целиком, а не закомментированы.
+
+   Отступление от ТЗ §3.2, о котором надо знать: шрифтовые файлы
+   Bucks (PeperoncinoSans, Inter Tight) с их CDN на коммерческий
+   сайт не переносим — это чужие лицензии, ровно та же история,
+   что и с графикой в §7.4. Роли отданы фирменной паре BARPOINT:
+   заголовки/кнопки/названия карточек — Roslindale Display
+   Condensed (прямое начертание), основной текст — Apoc.
+   Ступени кеглей, интерлиньяж и трекинг — как в ТЗ.
+   ============================================================ */
+.cover {
+  /* палитра эталона — решение заказчика «берём оформление один в один».
+     Переключить акцент на фирменный янтарь = одна строка --cv-theme. */
+  --cv-bg: #100b06;
+  --cv-fg: #f5e4c7;
+  --cv-theme: #f15726;
+
+  --cv-serif: "Roslindale Display Condensed", "Times New Roman", serif;
+  --cv-sans: "Apoc", "Golos Text", system-ui, sans-serif;
+  --cv-ease: cubic-bezier(.4, 0, .2, 1);
+
+  /* сетка оригинала: 12 колонок от ширины экрана */
+  --cv-col: calc(100vw / 12);
+  --cv-ggap: .625rem;
+
+  /* ступени кеглей — мобильная ступень */
+  --cv-base: 16px;
+  --cv-small: 14px;
+  --cv-2xl: 18px;
+  --cv-30: 24px;
+  --cv-40: 28px;
+
+  position: fixed; inset: 0; z-index: 200; /* выше шапки (100) */
+  display: none;
+  /* фон — ТОЛЬКО здесь: слой паттерна лежит внутри и должен быть виден */
+  background: var(--cv-bg);
+  color: var(--cv-fg);
+  font-family: var(--cv-sans);
+  font-size: var(--cv-base);
+  line-height: 1.5;
+}
+.cover.is-open { display: block; }
+@media (min-width: 1024px) {
+  .cover {
+    --cv-ggap: 1.25rem;
+    --cv-small: clamp(.6222rem, .9722vw, 1.1667rem);
+    --cv-2xl:   clamp(1.0667rem, 1.6667vw, 2rem);
+    --cv-30:    clamp(1.3333rem, 2.0833vw, 2.5rem);
+    --cv-40:    clamp(1.7778rem, 2.7778vw, 3.3333rem);
+    --cv-100:   clamp(4.4444rem, 6.9444vw, 8.3333rem);
+  }
+}
+
+/* ---------- фоновый паттерн: плитка со знаком BARPOINT ----------
+   95×158 и прозрачность 10% — как в эталоне; графика своя
+   (рукописный знак «B» из Materials v3, см. assets/img/case-pattern.png) */
+.cover__pattern { display: none; }
+@media (min-width: 1024px) {
+  .cover__pattern {
+    display: block;
+    position: absolute; inset: 0; top: -40px; height: calc(100% + 2.5rem);
+    z-index: 0; opacity: .1;
+    background-image: url(../img/case-pattern.png);
+    background-repeat: repeat;
+    background-size: 95px 158px;
+    animation: 12s linear infinite cover-pattern;
+  }
+}
+@keyframes cover-pattern { 0% { background-position: 0 0; } to { background-position: 95px 0; } }
+@media (prefers-reduced-motion: reduce) { .cover__pattern { animation: none; } }
+
+/* ---------- контейнер ---------- */
+.cover__inner {
+  position: relative; z-index: 1;
+  height: 100%;
+  padding: 10px 5px;
+  overflow-y: auto; overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+}
+@media (min-width: 1024px) { .cover__inner { padding: 10px; } }
+
+.cover__grid { display: flex; flex-direction: column; gap: 40px; }
+@media (min-width: 1024px) {
+  /* обе колонки строго minmax(0, 1fr): с обычным 1fr содержимое
+     карточек растягивает колонки неравномерно (расхождение до 40px).
+     Отступление от ТЗ §2.1: вместо height calc(100vh - 2rem) +
+     min-height 800px здесь min-height по высоте окна. Эталон —
+     секция прокручиваемой страницы, у нас слой на весь экран, и
+     фиксированные 800px на ноутбучном окне давали скролл при любом
+     содержимом. Описания кейсов втрое длиннее эталонных, поэтому
+     правая колонка при необходимости прокручивается, а галерея
+     остаётся на месте (sticky) — обрезки текста ТЗ не допускает. */
+  .cover__grid {
+    display: grid; grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px; align-items: start;
+    min-height: calc(100vh - 20px);
+  }
+}
+
+/* ---------- крестик: садится в вырез левого верхнего угла ---------- */
+.cover__close {
+  position: absolute; top: 12px; left: 9px; z-index: 6;
+  width: 48px; height: 48px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--cv-fg); border: 2px solid var(--cv-fg); color: var(--cv-bg);
+  transition: background-color .3s var(--cv-ease), color .3s var(--cv-ease);
+}
+.cover__close:hover { background: var(--cv-bg); color: var(--cv-fg); }
+.cover__close svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; }
+@media (min-width: 1024px) {
+  /* вырез 146×68 начинается в (10,10) — кнопка 60px встаёт в него с полями */
+  .cover__close { top: 14px; left: 14px; width: 60px; height: 60px; }
+  .cover__close svg { width: 20px; height: 20px; }
+}
+
+/* ============ галерея кейса ============ */
+.cgal {
+  position: relative; width: 100%; height: auto; aspect-ratio: 1 / 1;
+  flex: 1 1 0%; overflow: hidden; border-radius: 10px;
+}
+@media (min-width: 1024px) {
+  .cgal { aspect-ratio: auto; height: calc(100vh - 20px); position: sticky; top: 0; }
+}
+.cgal__clipsvg { position: absolute; width: 0; height: 0; }
+.cgal__stage { position: relative; width: 100%; height: 100%; overflow: hidden; touch-action: pan-y; }
+/* два слоя-слота: входящий едет на полную ширину, уходящий — на 10% назад */
+.cgal__layer {
+  position: absolute; inset: 0; overflow: hidden;
+  background: color-mix(in oklab, var(--cv-fg) 10%, transparent);
+  will-change: transform;
+}
+.cgal__img {
+  width: 100%; height: 100%; object-fit: cover;
+  pointer-events: none; user-select: none; -webkit-user-drag: none;
+}
+.cgal__preload { position: absolute; width: 0; height: 0; overflow: hidden; opacity: 0; pointer-events: none; }
+
+.cgal__arrows {
+  position: absolute; top: 50%; transform: translateY(-50%); z-index: 3;
+  left: 4px; right: 4px; display: flex; justify-content: space-between; gap: 10px;
+}
+@media (min-width: 1024px) {
+  .cgal__arrows { left: auto; right: 20px; flex-direction: column; justify-content: flex-start; }
+}
+/* анимация «стрелки уезжают в scale 0» висит на обёртке, не на кнопке */
+.cgal__slot { will-change: transform; }
+.carrow {
+  position: relative; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  width: 60px; height: 60px; border-radius: 50%;
+}
+.carrow__bg {
+  position: absolute; inset: 0; border-radius: 50%; z-index: 0;
+  background: var(--cv-fg); border: 2px solid var(--cv-fg);
+  transition-property: color, background-color, border-color;
+  transition-duration: .3s; transition-timing-function: var(--cv-ease);
+}
+.carrow:hover .carrow__bg { background: var(--cv-bg); }
+.carrow[data-disabled] .carrow__bg {
+  background: color-mix(in oklab, var(--cv-fg) 10%, transparent);
+  border-color: color-mix(in oklab, var(--cv-fg) 10%, transparent);
+}
+.carrow__ico {
+  position: relative; z-index: 1; display: block; width: 20px; color: var(--cv-bg);
+  transition: color .3s var(--cv-ease);
+}
+.carrow:hover .carrow__ico { color: var(--cv-fg); }
+.carrow--prev .carrow__ico { transform: rotate(180deg); }
+.carrow__ico svg { width: 100%; height: auto; display: block; fill: currentColor; }
+
+/* ============ правая колонка ============ */
+.cinfo { position: relative; display: flex; flex-direction: column; width: 100%; height: 100%; }
+@media (min-width: 1024px) { .cinfo { height: auto; min-height: calc(100vh - 20px); } }
+.cinfo__head {
+  flex-grow: 1; display: flex; flex-direction: column; gap: 32px;
+  align-items: center; justify-content: center; text-align: center;
+}
+.cinfo__title {
+  width: 100%; text-transform: uppercase;
+  font-family: var(--cv-serif); font-weight: 700; font-style: normal;
+  font-size: 70px; line-height: .9; letter-spacing: -.02em;
+}
+@media (min-width: 1024px) {
+  /* ширина w-col-4 по формуле оригинала */
+  .cinfo__title {
+    width: calc(((var(--cv-col) - var(--cv-ggap)) * 4) + (var(--cv-ggap) * 3));
+    flex-shrink: 0; font-size: var(--cv-100);
+  }
+}
+.cinfo__subwrap { width: 50%; }
+@media (min-width: 1024px) {
+  /* ширина w-col-3: у эталона тут 4 слова, у нас — предложение,
+     на w-col-2 оно вставало в 8 строк */
+  .cinfo__subwrap {
+    width: calc(((var(--cv-col) - var(--cv-ggap)) * 3) + (var(--cv-ggap) * 2));
+    flex-shrink: 0;
+  }
+}
+.cinfo__sub { font-size: 18px; font-weight: 700; text-transform: uppercase; line-height: 1.15; }
+
+/* ============ сетка карточек ============ */
+.cboxes { display: grid; grid-template-columns: minmax(0, 1fr); gap: 10px; margin-top: 40px; }
+@media (min-width: 1024px) {
+  .cboxes { grid-template-columns: repeat(2, minmax(0, 1fr)); grid-template-rows: auto auto; margin-top: 0; }
+}
+.cbox {
+  position: relative; border-radius: 10px;
+  background: var(--cv-bg); border: 1px solid var(--cv-fg);
+  padding: 20px; display: flex; flex-direction: column; gap: 24px;
+}
+/* display:flex перебил бы браузерное [hidden]{display:none} — а карточка
+   «Что сделали» именно так и прячется, пока в data.js нет works */
+.cbox[hidden] { display: none; }
+.cbox__title {
+  text-transform: uppercase; font-family: var(--cv-serif);
+  font-weight: 700; font-style: normal;
+  font-size: var(--cv-30); line-height: 1; letter-spacing: -.02em;
+}
+.cbox__text { font-size: var(--cv-base); line-height: 1.5; }
+
+/* «Что сделали» */
+.cworks li { display: flex; align-items: flex-start; gap: 4px; width: 100%; }
+.cworks__bullet { flex: 0 0 auto; width: 12px; height: 12px; margin-top: 4px; }
+.cworks__bullet svg { width: 100%; height: 100%; display: block; fill: var(--cv-theme); }
+.cworks__text { font-size: var(--cv-base); line-height: 1.25; }
+
+/* «Факты»: 2–4 колонки в ряд */
+.cfacts {
+  display: flex; flex-direction: row; flex-wrap: wrap;
+  align-items: center; justify-content: space-around;
+  gap: 10px; height: 100%;
+}
+@media (min-width: 1280px) { .cfacts { gap: 24px; } }
+.cfact {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 20px; width: 60px; height: 100%; text-align: center;
+}
+@media (min-width: 1280px) { .cfact { width: 80px; } }
+.cfact__val {
+  font-family: var(--cv-serif); font-weight: 700; font-style: normal;
+  font-size: var(--cv-2xl); line-height: 1.05; text-align: center;
+  overflow-wrap: anywhere;
+}
+.cfact__cap {
+  font-size: var(--cv-small); text-transform: uppercase;
+  letter-spacing: -.025em; font-weight: 500; line-height: 1; text-align: center;
+}
+
+/* ============ ячейка «Действие» ============
+   Своё внутреннее устройство: рамки несут внутренние строки,
+   обычного оформления карточки у неё нет. */
+.cact {
+  display: grid; grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: repeat(2, minmax(0, 1fr));
+  gap: 10px; width: 100%; height: 100%;
+  order: -1; padding-bottom: 40px;   /* на мобильном стоит первой */
+}
+@media (min-width: 1024px) { .cact { order: 1; padding-bottom: 0; } }
+.cact__row {
+  display: flex; align-items: center; gap: 10px;
+  background: var(--cv-bg); border-radius: 10px; border: 1px solid var(--cv-fg);
+  overflow: hidden;
+}
+/* ниже 1440 колонка карточек всего ~240px, и при полных отступах
+   эталона на само название оставалось 42px — поджимаем поля и кегль */
+.cact__name {
+  flex: 1 1 auto; min-width: 0;
+  padding: 16px 14px; font-size: 15px; line-height: 1.5;
+  color: color-mix(in oklab, var(--cv-fg) 50%, transparent);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.cact__nav {
+  flex: 0 0 auto; display: flex; align-items: center; gap: 8px;
+  height: 100%; padding: 0 8px; border-left: 1px solid var(--cv-fg);
+}
+@media (min-width: 1440px) {
+  .cact__name { padding: 24px 20px; font-size: 18px; }
+  .cact__nav { gap: 12px; padding: 0 12px; }
+}
+.cact__navbtn {
+  width: 32px; height: 32px; border-radius: 8px; background: transparent;
+  display: flex; align-items: center; justify-content: center;
+  transition: background-color .15s var(--cv-ease);
+}
+.cact__navbtn:hover { background: color-mix(in oklab, var(--cv-fg) 5%, transparent); }
+.cact__navbtn svg { width: 12px; height: auto; display: block; fill: var(--cv-fg); }
+.cact__count { min-width: 16px; text-align: center; font-weight: 500; }
+
+/* ---------- главная кнопка ---------- */
+.cbtn {
+  position: relative; display: flex; align-items: center; justify-content: center;
+  width: 100%; border-radius: 10px;
+  font-family: var(--cv-serif); font-weight: 700; font-style: normal;
+  text-transform: uppercase; color: var(--cv-fg);
+  padding: 16px 12px; font-size: var(--cv-40); line-height: 1.1; letter-spacing: -.02em;
+}
+@media (min-width: 1024px) {
+  .cbtn {
+    min-width: 192px; min-height: 72px; padding: 12px 20px;
+    font-size: var(--cv-2xl); line-height: 1.25;
+  }
+}
+/* подложка отдельным слоем — её и масштабирует ховер */
+.cbtn__bg {
+  position: absolute; inset: 0; border-radius: 10px; overflow: hidden;
+  border: 2px solid var(--cv-theme); background: var(--cv-theme);
+}
+.cbtn__content {
+  position: relative; z-index: 20; display: flex; width: 100%;
+  align-items: center; justify-content: space-between; gap: 8px;
+}
+/* clbl__ghost — невидимая распорка: держит ширину, чтобы при подмене
+   слоёв кнопка не дёргалась */
+.clbl { position: relative; display: inline-flex; align-items: center; justify-content: flex-start; line-height: 1; }
+.clbl--right { position: relative; flex-shrink: 0; display: inline-flex; align-items: center; justify-content: flex-end; }
+.clbl__ghost { visibility: hidden; white-space: pre; }
+.clbl__layer { position: absolute; inset: 0; display: flex; align-items: center; justify-content: flex-start; white-space: pre; }
+.clbl--right .clbl__layer { justify-content: flex-end; white-space: nowrap; }
+.cbtn__arrow { width: 1.15em; height: auto; display: block; fill: currentColor; }
+
+/* ---------- плавающий предмет ---------- */
+.cbox__food { display: none; }
+@media (min-width: 1024px) {
+  /* В ТЗ вынос задан как top: -75%, но карточка «Что сделали» у нас
+     втрое выше эталонной (описания кейсов длиннее), и от процента
+     предмет улетал за верх экрана, а на промежуточных значениях
+     ложился прямо на название карточки. Привязываем его к ВЕРХНЕЙ
+     кромке карточки: bottom: calc(100% - 12px) — предмет стоит над
+     карточкой, заходя на неё уголком на 12px, как в эталоне.
+     Ширина уменьшается на узких десктопах, иначе предмет накрывает
+     подзаголовок (он у нас шире эталонного). */
+  .cbox__food {
+    display: block; position: absolute;
+    bottom: calc(100% - 12px); right: 0; width: 120px; height: auto;
+  }
+}
+@media (min-width: 1280px) { .cbox__food { width: 150px; } }
+@media (min-width: 1440px) { .cbox__food { width: 180px; } }
+.cinfo__foodmob { position: relative; width: calc(((var(--cv-col) - var(--cv-ggap)) * 4) + (var(--cv-ggap) * 3)); height: auto; }
+@media (min-width: 1024px) { .cinfo__foodmob { display: none; } }
+.cfood {
+  width: 100%; height: auto; user-select: none;
+  transform: translateZ(0); backface-visibility: hidden; will-change: transform;
+}
+.cfood__inner {
+  position: relative; width: 100%; height: 100%;
+  transform: translateZ(0); backface-visibility: hidden; will-change: transform;
+}
+.cfood img { width: 100%; height: auto; object-fit: contain; user-select: none; -webkit-user-drag: none; }
+
+/* клон-фото для FLIP-зума открытия/закрытия */
+.cover__ghost { pointer-events: none; }
+
+/* ============================================================
+   6.10 Команда
+   ============================================================ */
+/* 6.11 Ценности / этика — секция и её стили УДАЛЕНЫ по ТЗ12 §3 */
+
+/* ============================================================
+   6.12 Как мы работаем
+   ============================================================ */
+/* ============================================================
+   6.14 FAQ
+   ============================================================ */
+.faq { max-width: 860px; }
+/* тёмная тема FAQ (ТЗ4 §5.1): фон bp-black, вопросы ivory, акценты амбер */
+.faq details { border-top: 1px solid rgba(234,228,216,.14); }
+.faq details:last-child { border-bottom: 1px solid rgba(234,228,216,.14); }
+.faq summary {
+  list-style: none; cursor: pointer;
+  display: flex; justify-content: space-between; align-items: center; gap: var(--s-3);
+  padding: var(--s-3) 0;
+  font-family: var(--font-serif); font-weight: 600; font-size: 1.15rem;
+}
+.faq summary::-webkit-details-marker { display: none; }
+.faq summary .ic {
+  flex: 0 0 auto; width: 28px; height: 28px; position: relative;
+  transition: transform .3s var(--ease);
+}
+.faq summary .ic::before, .faq summary .ic::after {
+  content: ""; position: absolute; inset: 0; margin: auto;
+  background: var(--bp-amber);
+}
+.faq summary .ic::before { width: 16px; height: 1.5px; }
+.faq summary .ic::after { width: 1.5px; height: 16px; transition: transform .3s var(--ease); }
+.faq details[open] summary .ic { transform: rotate(45deg); }
+.faq .faq__a { padding: 0 0 var(--s-3); color: color-mix(in srgb, var(--bp-off-white) 72%, transparent); max-width: 52em; }
+
+/* ---------- Форма заявки (живёт в мега-футере, ТЗ4 §7) ---------- */
+.field { margin-bottom: var(--s-3); }
+.field label { display: block; font-size: .82rem; font-weight: 600; margin-bottom: 6px; }
+.field input, .field select, .field textarea {
+  width: 100%; padding: 13px 14px;
+  font: inherit; font-size: .95rem;
+  color: var(--bp-dark-text);
+  background: #F5EEDD;
+  border: 1px solid rgba(23,20,15,.25); border-radius: 3px;
+}
+.field input::placeholder { color: rgba(23,20,15,.32); }
+.field input:focus, .field select:focus, .field textarea:focus {
+  outline: 2px solid var(--bp-amber); outline-offset: 0; border-color: var(--bp-amber);
+}
+.field textarea { min-height: 96px; resize: vertical; }
+.field .err { display: none; font-size: .78rem; color: #A2321E; margin-top: 4px; }
+.field.is-invalid input, .field.is-invalid select { border-color: #A2321E; }
+.field.is-invalid .err { display: block; }
+.consent { display: flex; gap: 10px; align-items: flex-start; font-size: .8rem; color: var(--bp-graphite); margin-bottom: var(--s-3); }
+.consent input { margin-top: 3px; width: 16px; height: 16px; accent-color: var(--bp-amber); flex: 0 0 auto; }
+.consent a { color: var(--bp-dark-text); }
+.form-card .btn { width: 100%; }
+/* .form-note («Ответим в течение рабочего дня. Звонок-знакомство —
+   бесплатно.») удалена 31.07 по просьбе заказчика вместе с правилом. */
+/* Правка 31.07 (шестая): форма и «спасибо» — в одной ячейке грида, друг
+   поверх друга. Оба остаются в потоке, поэтому высота ячейки всегда равна
+   высоте более крупного из них (формы) и карточка не меняет размер при
+   отправке. Переключение — visibility, а не display: display:none выкинул
+   бы форму из потока, и ячейка снова схлопнулась бы. visibility заодно
+   убирает поля из таба и из дерева доступности — как и прежний display. */
+.form-card__stack { display: grid; }
+.form-card__stack > * { grid-area: 1 / 1; }
+.form-success { visibility: hidden; align-self: center; text-align: center; padding: var(--s-6) 0; }
+.form-success.is-visible { visibility: visible; }
+/* Правка 31.07 (пятая): на экране благодарности осталась одна строка.
+   Курсив снят (у --font-serif алиас курсивный, прямое начертание пишем
+   явно), кегль 1.4 → 1.75rem (+25%). */
+.form-success h4 {
+  font-family: "Roslindale Display Condensed", "Times New Roman", serif;
+  font-style: normal; font-weight: 700;
+  font-size: 1.75rem; line-height: 1.1;
+}
+/* было display:none — см. комментарий у .form-card__stack выше */
+form.is-hidden { visibility: hidden; }
+
+/* ---------- Reveal-анимации (раздел 8) ---------- */
+@media (prefers-reduced-motion: no-preference) {
+  [data-reveal] { opacity: 0; transform: translateY(26px); }
+}
+
+/* ---------- 404 / служебные страницы ---------- */
+.page-plain {
+  min-height: 100svh; display: flex; flex-direction: column;
+  align-items: center; justify-content: center; text-align: center;
+  background: var(--bp-black); color: var(--bp-off-white);
+  padding: var(--gutter);
+}
+.page-plain .code { font-family: var(--font-grotesk); font-weight: 700; font-size: clamp(4rem, calc(16 * var(--vw-step)), 9rem); color: var(--bp-amber); line-height: 1; }
+.page-plain h1 { font-family: var(--font-serif); font-weight: 600; font-size: 1.6rem; margin-top: var(--s-3); }
+.page-plain p { margin-top: var(--s-2); color: color-mix(in srgb, var(--bp-off-white) 65%, transparent); }
+.page-plain .btn { margin-top: var(--s-4); }
+
+.doc-page { background: var(--bp-ivory); color: var(--bp-dark-text); min-height: 100svh; padding-block: calc(var(--header-h) + var(--s-8)) var(--s-12); }
+.doc-page .container { max-width: 860px; }
+.doc-page h1 { font-family: var(--font-serif); font-size: 2rem; margin-bottom: var(--s-4); }
+.doc-page h2 { font-family: var(--font-serif); font-size: 1.3rem; margin: var(--s-4) 0 var(--s-2); }
+.doc-page p, .doc-page li { margin-bottom: var(--s-2); color: #33302A; }
+.doc-page ul { list-style: disc; padding-left: 22px; }
+.doc-page .todo { background: #FBEFD8; border: 1px solid var(--bp-amber); border-radius: 4px; padding: var(--s-2); font-size: .9rem; }
+
+/* ============================================================
+   ТЗ2 — анимационная доработка
+   ============================================================ */
+
+/* ---------- Плашка-шильдик с точками-заклёпками (фирменный приём ТЗ2) ---------- */
+.plaque {
+  position: relative;
+  display: inline-flex; align-items: center; justify-content: center;
+  background: var(--bp-off-white); color: var(--bp-dark-text);
+  border: 1px solid rgba(23,20,15,.18);
+  border-radius: 999px;
+  padding: 9px 36px;
+  font-family: var(--font-grotesk); font-size: .74rem; font-weight: 600;
+  letter-spacing: .12em; text-transform: uppercase;
+  white-space: nowrap;
+  box-shadow: 0 4px 14px rgba(0,0,0,.14);
+}
+.plaque::before, .plaque::after {
+  content: ""; position: absolute; top: 50%; width: 7px; height: 7px;
+  border-radius: 50%; background: var(--bp-dark-text); opacity: .75;
+  transform: translateY(-50%);
+}
+.plaque::before { left: 13px; }
+.plaque::after { right: 13px; }
+.plaque b { color: var(--bp-amber-text); font-weight: 700; }
+
+/* Секция «Как мы работаем» (.steps) и её стили удалены 29.07
+   по просьбе заказчика. */
+
+/* ============================================================
+   ТЗ2 §5 — «Команда»: горизонтальный проезд
+   ============================================================ */
+.hteam {
+  position: relative;
+  background: var(--bp-burgundy); color: var(--bp-off-white);
+  overflow: clip; /* ТЗ6 §2: ничто не видно за границами секции */
+}
+.hteam__viewport { position: relative; }
+.hteam__track {
+  position: relative;
+  display: flex;
+  /* ТЗ16 §3: станции равняются по ВЕРХНЕЙ кромке фото (flex-start) —
+     разная длина текста под фото больше не толкает рамки по вертикали;
+     интро-станция центрируется отдельно (align-self) */
+  align-items: flex-start;
+  gap: 5.5vw; /* ТЗ14 §4.3: пятеро — плотнее (−~25% от прежнего ориентира), проезд не утомляет */
+  width: max-content;
+  padding: var(--s-12) 8vw;
+}
+/* .hteam__tail удалён по ТЗ16 §5.2 — конец проезда считается от центра
+   последней станции, «выходной хвост» вызывал перелёт влево */
+.hteam__path {
+  position: absolute; left: 0; top: 50%; width: 100%; height: 220px;
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+.hteam__path path {
+  fill: none; stroke-width: 1.5; vector-effect: non-scaling-stroke;
+}
+.hteam__path-base { stroke: rgba(198,150,60,.5); stroke-dasharray: .012 .008; }
+.hteam__path-glow { stroke: var(--bp-amber); }
+/* .hteam__float (декоры-напитки) удалены по ТЗ16 §2 */
+.hstation {
+  position: relative;
+  flex: 0 0 auto;
+  display: flex; align-items: flex-start;
+}
+/* ТЗ16 §3: интро центрируется сама — карточки равняются без неё */
+.hstation--intro { width: 50vw; max-width: 640px; display: block; align-self: center; }
+/* ТЗ16 §4: заголовок интро крупнее (+~22% к верху clamp).
+   Правка 31.07 (пятая): вся вилка умножена ровно на 1.3 по просьбе
+   заказчика — 2.1/4.4/3.7 → 2.73/5.72/4.81. */
+.hstation--intro .h2 { font-size: clamp(2.73rem, calc(5.72 * var(--vw-step)), 4.81rem); }
+/* Правка 31.07 (четвёртая): правила .hstation--intro .pill и .hteam__sub
+   удалены вместе с самими надписями («Команда» и «Команда, которая
+   собирает систему…») — в интро остался один заголовок. */
+/* ТЗ16 §4.2: карточка шире — укрупнённые регалии (Маяков) не ужимаем */
+.hstation__card { position: relative; width: clamp(300px, 32vw, 470px); text-align: center; }
+.hstation__photo {
+  aspect-ratio: 3 / 4; overflow: hidden; border-radius: 8px;
+  box-shadow: 0 18px 44px rgba(0,0,0,.4);
+}
+.hstation__photo img { width: 100%; height: 100%; object-fit: cover; }
+/* ТЗ16 §4: имя в плашке ~1rem (было .74) — плашка пропорционально выше */
+.hstation__card .plaque {
+  position: absolute; top: auto; left: 50%; transform: translate(-50%, -50%);
+  max-width: 96%;
+  font-size: 1rem;
+  padding: 12px 44px;
+}
+.hstation__role {
+  margin-top: var(--s-4);
+  font-family: var(--font-grotesk); font-size: .95rem; font-weight: 600;
+  letter-spacing: .14em; text-transform: uppercase;
+  color: var(--bp-amber);
+}
+.hstation__creds {
+  margin-top: var(--s-2);
+  font-size: 1.08rem; line-height: 1.45;
+  color: color-mix(in srgb, var(--bp-off-white) 74%, transparent);
+}
+/* десктоп: пин на 100vh (движение ведёт GSAP) */
+@media (min-width: 1024px) and (prefers-reduced-motion: no-preference) {
+  .hteam__viewport { height: 100vh; display: flex; align-items: center; overflow: hidden; }
+  .hteam__track { padding-block: 0; }
+  /* Правка 31.07 (пятая): линия длиннее трека на ширину экрана. Раньше
+     SVG был ровно по треку, а трек в финальном кадре кончается примерно
+     на трети экрана от правой кромки (после ТЗ16 §5.2 «выходного хвоста»
+     нет) — линия обрывалась в воздухе. Продлевать можно только здесь:
+     ниже 1024 вьюпорт команды — нативный горизонтальный скроллер
+     (overflow-x: auto), и элемент шире трека добавил бы экран пустой
+     прокрутки. Секция обрезает лишнее сама (.hteam { overflow: clip }). */
+  .hteam__path { width: calc(100% + 100vw); }
+}
+/* мобайл и reduced-motion: нативный свайп со scroll-snap (ТЗ2 §5) */
+@media (max-width: 1023.98px) {
+  .hteam__viewport { overflow-x: auto; scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; }
+  .hteam__track { gap: 8vw; padding: var(--s-12) 9vw; }
+  .hstation { width: 82vw; scroll-snap-align: center; flex-direction: column; align-items: flex-start; gap: 0; }
+  .hstation--intro { width: 82vw; }
+  .hstation__card { width: min(78vw, 360px); margin-inline: auto; }
+}
+@media (min-width: 1024px) and (prefers-reduced-motion: reduce) {
+  .hteam__viewport { overflow-x: auto; scroll-snap-type: x mandatory; }
+  .hstation { scroll-snap-align: center; }
+}
+/* ТЗ16 §4.2: на низких десктопных экранах (720–800px) укрупнённая
+   станция Маякова занимала весь вьюпорт впритык (719/720) — ужимаем
+   КАРТОЧКУ (фото), а не тексты: воздух сверху/снизу возвращается */
+@media (min-width: 1024px) and (max-height: 800px) {
+  .hstation__card { width: clamp(280px, 28vw, 400px); }
+  /* та же вилка ×1.3, что и в базовом правиле (правка 31.07, пятая) */
+  .hstation--intro .h2 { font-size: clamp(2.47rem, calc(4.94 * var(--vw-step)), 4.03rem); }
+}
+
+/* ============================================================
+   ТЗ2 §6 — кейсы: бесконечная лента
+   ============================================================ */
+/* full-bleed лента не должна давать горизонтальный скроллбар (ТЗ3 §2.3) */
+#cases { overflow-x: clip; }
+/* Своего фона у секции НЕТ (как у всех остальных): его целиком даёт
+   переливающийся body. */
+.crail {
+  overflow: hidden;
+  /* ТЗ3 §2.3: full-bleed — лента на всю ширину вьюпорта, карточки
+     входят из-за правой кромки экрана и уходят за левую целиком */
+  width: 100vw;
+  margin-inline: calc(50% - 50vw);
+  margin-top: var(--s-6);
+  /* Место под выступающие плашки сверху и под тени карточек снизу:
+     overflow:hidden режет по padding-box, и без нижнего поля тень
+     обрубалась ровно по нижней кромке карточки. */
+  padding-top: clamp(46px, calc(4.4 * var(--vw-step)), 64px);
+  padding-bottom: 46px;
+  cursor: grab;
+}
+.crail.is-dragging { cursor: grabbing; }
+.crail__track {
+  display: flex; gap: 20px;
+  width: max-content;
+  touch-action: pan-y;
+  will-change: transform;
+}
+/* статичный режим (фильтр «кофе»: 2 кейса по центру, ТЗ2 §6) */
+.crail--static { cursor: default; }
+.crail--static .crail__track { width: 100%; justify-content: center; flex-wrap: wrap; }
+/* ТЗ11 §7.1: кремовые карточки вместо чёрных — не «дырявят» бежевую
+   секцию; фон чуть светлее секции, тёмный текст, мягкая тень; плашка —
+   ТЁМНАЯ (инверсия прежней молочной) с молочным текстом и амбер-номером */
+.ccard {
+  position: relative;
+  flex: 0 0 auto;
+  /* Правка 31.07 (вторая): плашка с названием выросла ещё в 1.5 раза, и
+     карточка под неё расширена — в прежние 430px самое длинное имя
+     («Memo Dine & Bar + hide») не влезало ни при каких полях. Делитель
+     3 → 2.3: на 1440 в кадре ~2.8 карточки вместо 3.3. Ниже 768 ширину
+     задаёт vw-правило в конце блока. */
+  width: clamp(320px, calc((100vw - 2 * var(--gutter) - 40px) / 2.3), 500px);
+  background: #F3EDE0; color: var(--bp-dark-text);
+  border: 1px solid rgba(23,20,15,.10);
+  border-radius: 12px;
+  /* Верхнее поле держит зазор до плашки: она садится наполовину выше
+     кромки, и с укрупнённым кеглем прежние 32px упирались в фото. */
+  padding: clamp(36px, calc(3.6 * var(--vw-step)), 56px) var(--s-3) var(--s-3);
+  text-align: left;
+  box-shadow: 0 12px 32px rgba(27,25,22,.10);
+  transition: border-color .3s var(--ease), box-shadow .3s var(--ease), transform .3s var(--ease);
+}
+.ccard:hover { border-color: rgba(198,150,60,.55); box-shadow: 0 18px 44px rgba(27,25,22,.16); transform: translateY(-3px); }
+/* Правка 31.07: плашка с названием кейса заметно крупнее и длиннее —
+   кегль 11.8 → 24.8px на 1440 (два захода: +40%, затем ещё ×1.5).
+   Посадка через translate(-50%,-50%) при top:0 — плашка сама садится
+   ровно наполовину выше кромки карточки при любой своей высоте
+   (кегль и поля меняются по брейкпоинтам, фиксированный top пришлось бы
+   пересчитывать вручную). Откат: top -17px, padding 9px 36px. */
+.ccard .plaque {
+  position: absolute; top: 0; left: 50%; transform: translate(-50%, -50%);
+  max-width: 100%; overflow: hidden; text-overflow: ellipsis;
+  background: var(--bp-black); color: var(--bp-off-white);
+  border-color: rgba(234,228,216,.2);
+  /* Боковые поля — ДОЛЯ ширины карточки (проценты у абсолютного элемента
+     считаются от padding-box .ccard), поэтому плашка остаётся одинаково
+     «длинной» на любом брейкпоинте, а длинные названия («Memo Dine & Bar
+     + hide») не упираются в многоточие на узких карточках. 58px — потолок
+     на 1440. Откат: padding 9px 36px и кегль от .plaque. */
+  padding: clamp(13px, calc(1.3 * var(--vw-step)), 19px) min(9%, 46px);
+  font-size: clamp(1.02rem, calc(1.72 * var(--vw-step)), 1.55rem);
+  font-weight: 700; letter-spacing: .1em;
+}
+/* ---------- фирменные начертания в плашке (правка 02.08) ----------
+   Каждое название стоит своим знаком — тот же приём, что в трастстрипе
+   (см. 6.2). --ar = ширина/высота файла, --k = оптический множитель
+   высоты относительно кегля плашки; оба приходят из data.js, где для
+   каждого знака подобраны поштучно (у «Зойки» полкадра занимают
+   росчерки, у Marcelo под словом висит вторая строка «SHOP & BAR»).
+   Габарит задан ОБЕИМИ сторонами в em, без процентов: плашка сама
+   ужимается по содержимому, и процент внутри неё циклический —
+   Chrome резолвит его в 0 и знак схлопывается (проверено). Самый
+   широкий знак (Marcelo) на 375px даёт 195px при доступных 264px,
+   так что ограничение не нужно; страховка — max-width у .plaque.
+   Знак — обычная картинка, уже перекрашенная в молочный (файлы
+   -light.png). CSS-маска с заливкой currentColor тут НЕ годится:
+   маска ограничена по origin, и при открытии страницы через file://
+   она не применяется — знак пропадает целиком (проверено). */
+.ccard .plaque { gap: .5em; }
+.pmark-img {
+  display: block; flex: 0 0 auto;
+  width: calc(var(--k) * var(--ar) * 1em);
+  height: calc(var(--k) * 1em);
+  object-fit: contain;
+}
+/* «+ hide» у Memo: знак второго бара, набранный текстом плашки */
+.pmark-suffix { font-size: .62em; letter-spacing: .1em; opacity: .8; }
+/* Sixty, Duran Bar, Buro Tsum — знака нет, в презентации имя набрано
+   контрастной антиквой смешанным регистром (стр. 20, 22, 23) */
+.pmark-type {
+  font-family: "Roslindale Display Condensed", "Times New Roman", serif;
+  font-weight: 500; font-style: normal;
+  font-size: 1.16em; line-height: 1.06;
+  letter-spacing: .01em; text-transform: none;
+}
+.ccard .plaque::before, .ccard .plaque::after {
+  background: var(--bp-off-white); width: 9px; height: 9px;
+}
+.ccard .plaque::before { left: max(10px, min(4.9%, 21px)); }
+.ccard .plaque::after { right: max(10px, min(4.9%, 21px)); }
+.ccard__photo {
+  position: relative; display: block;
+  aspect-ratio: 4 / 3; overflow: hidden; border-radius: 6px;
+  margin-top: var(--s-1);
+}
+.ccard__photo img { width: 100%; height: 100%; object-fit: cover; }
+/* .ccard__badge (пилюля с метрикой поверх фото) удалён 31.07 по правке
+   заказчика — цифры «2 млн → 5 млрд» мешали кадру у PIMS и Landy.
+   Разметку бейджа снял main.js, метрики остались в развороте кейса. */
+.ccard__meta { display: block; margin-top: var(--s-2); }
+.ccard__meta .cat {
+  font-family: var(--font-grotesk); font-size: .66rem; font-weight: 700;
+  letter-spacing: .14em; text-transform: uppercase;
+  color: var(--bp-amber-text);
+}
+.ccard__desc {
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+  overflow: hidden;
+  margin-top: 6px;
+  font-family: var(--font-text); font-size: .92rem; line-height: 1.5;
+  color: color-mix(in srgb, var(--bp-dark-text) 82%, transparent);
+}
+@media (max-width: 767.98px) {
+  /* 78 → 86vw: укрупнённая плашка требует ширины; соседняя карточка всё
+     ещё выглядывает краем и подсказывает, что ленту можно тянуть. */
+  .ccard { width: 86vw; }
+}
+/* На узких карточках трекинг чуть плотнее — иначе самое длинное название
+   («Memo Dine & Bar + hide») не укладывается и уходит в многоточие. */
+@media (max-width: 1279.98px) {
+  .ccard .plaque { letter-spacing: .085em; }
+}
+
+/* ============================================================
+   6.15 Финальный CTA + форма (возврат по ТЗ5 §7; фон даёт body)
+   ============================================================ */
+/* ТЗ12 §4: при упоре скролла в низ карточка формы видна ЦЕЛИКОМ вместе
+   с футером — хвост страницы ниже верха формы ужат до высоты вьюпорта:
+   нижний паддинг секции срезан, воздух под контактами/подписью убран */
+.final { color: var(--bp-off-white); padding-block: var(--s-12) var(--s-6); }
+@media (min-width: 1024px) { .final { padding-block: var(--s-16) var(--s-4); } }
+/* компактификация финала для низких экранов — в КОНЦЕ файла (ТЗ12 §4),
+   иначе базовые .footer/.form-card ниже по файлу перебивают её */
+.final__grid { display: grid; gap: var(--s-8); }
+@media (min-width: 1024px) { .final__grid { grid-template-columns: 6fr 5fr; align-items: start; } }
+.final__title { max-width: 15em; }
+.final__title em { font-style: italic; color: var(--bp-amber); }
+.final__contacts { margin-top: var(--s-4); display: grid; gap: var(--s-2); }
+.final__contacts a { text-decoration: none; }
+.final__contacts .lbl {
+  font-family: var(--font-grotesk); font-size: .7rem; font-weight: 600; letter-spacing: .16em;
+  text-transform: uppercase; color: var(--bp-amber); display: block; margin-bottom: 2px;
+}
+.final__contacts .value { font-size: 1.15rem; }
+.final__sig { width: 120px; margin-top: var(--s-2); opacity: .8; }
+
+/* Правка 31.07 (четвёртая): карточка формы МОЛОЧНАЯ.
+   Заказчик: «цвет формы сделай как цвет кнопок сверху на данном блоке» —
+   над бордовым финальным блоком «чернила» шапки светлые (--hdr-ink =
+   --bp-off-white), этот же тон и взят фоном карточки. Поэтому весь
+   тёмный слой оверрайдов ниже снят: текст, поля, согласие и вторичная
+   кнопка возвращаются к базовым «тёмным на светлом» правилам.
+   Собственной обводки у карточки нет (убрана по просьбе заказчика) —
+   её границу держит контраст со фоном плюс мягкая тень.
+   Откат к тёмной: background #242119, color off-white,
+   border 1px rgba(234,228,216,.18) + прежний блок оверрайдов
+   (см. ревизию 55 в памяти проекта). */
+.form-card {
+  background: var(--bp-off-white); color: var(--bp-dark-text);
+  border: 0;
+  border-radius: 16px; padding: var(--s-4);
+  box-shadow: 0 24px 60px rgba(0,0,0,.32);
+}
+@media (min-width: 768px) { .form-card { padding: var(--s-6); } }
+/* Заголовок: прямой Roslindale (курсив снят), кегль поднят с 1.5rem
+   до вилки ~1.85–2.35rem — по просьбе заказчика «убери курсив и сделай
+   чуть больше шрифт». */
+.form-card h3 {
+  font-family: "Roslindale Display Condensed", "Times New Roman", serif;
+  font-style: normal; font-weight: 700;
+  font-size: clamp(1.85rem, calc(2.6 * var(--vw-step)), 2.35rem);
+  line-height: 1.06; letter-spacing: .005em;
+  margin-bottom: var(--s-4);
+  color: var(--bp-dark-text);
+}
+.form-card .btn { width: 100%; }
+/* Поля: толстая рамка и заметный радиус — референс buckssauce.com/shop.
+   Подложка поля светлее карточки, чтобы «колодец» читался без обводки
+   в один пиксель. */
+.form-card .field label { font-size: 1rem; color: var(--bp-dark-text); }
+.form-card .field input, .form-card .field select, .form-card .field textarea {
+  background: #F5EEDD;
+  color: var(--bp-dark-text);
+  border: 2px solid var(--bp-dark-text);
+  border-radius: 12px;
+  padding: 15px 16px;
+  font-size: 1rem;
+}
+.form-card .field input::placeholder { color: rgba(23,20,15,.38); }
+.form-card .field.is-invalid input { border-color: #A2321E; }
+/* графит (--bp-graphite) на молочном даёт всего 4.25:1 — ниже нормы
+   4.5:1 для мелкого текста (ТЗ 9.3); берём тот же тон, но глубже */
+.form-card .consent { color: rgba(23,20,15,.68); }
+.form-card .consent a { color: var(--bp-dark-text); }
+.form-card .form-success h4 { color: var(--bp-dark-text); }
+
+/* Пустой хвост под контактами (правка 31.07, седьмая). Своего фона нет —
+   сквозь него виден переливающийся body. Высоту ставит main.js; ноль по
+   умолчанию нужен и как значение «места не требуется» (узкие/низкие окна,
+   где карточка и так занимает больше половины экрана), и как исходное
+   состояние на время замера. */
+.final-tail { height: 0; }
+
+/* ============================================================
+   6.16 Футер (компактный, возврат по ТЗ5 §7; фон даёт body)
+   ============================================================ */
+/* Правка 31.07 (четвёртая): верхняя полоса футера убрана целиком
+   (лого + подпись + дублирующая навигация), вместе с ней удалены
+   правила .footer__top / .footer__logo / .footer__tag / .footer__nav.
+   Осталась служебная строка: копирайт и ссылка на политику 152-ФЗ.
+   Разделительная линия над ней снята — отделять больше нечего. */
+.footer { color: var(--bp-off-white); padding-block: var(--s-3); }
+.footer__bottom {
+  display: flex; flex-wrap: wrap; gap: var(--s-2) var(--s-4);
+  font-size: .78rem; color: color-mix(in srgb, var(--bp-off-white) 50%, transparent);
+}
+.footer__bottom a { color: inherit; }
+
+/* ============================================================
+   ТЗ12 §4 — низкие экраны (1280×720, ноутбуки 13" с масштабом ОС):
+   компактный финал и футер, чтобы при упоре скролла в самый низ
+   карточка формы была видна ЦЕЛИКОМ вместе с футером.
+   Блок стоит В КОНЦЕ файла осознанно: базовые .footer/.form-card
+   объявлены ниже секции .final и при равной специфичности
+   перебивали бы эти правила, стой они выше.
+   ============================================================ */
+@media (min-width: 1024px) and (max-height: 800px) {
+  /* зазор форма↔футер (≥40px по ТЗ12 §4.4) держит свес левой колонки:
+     gap = свес + этот паддинг, поэтому паддинг здесь минимальный */
+  .final { padding-block: var(--s-8) var(--s-2); }
+  .final__contacts { margin-top: var(--s-3); gap: 12px; }
+  .final__sig { display: none; } /* декоративная подпись уходит первой */
+  .form-card { padding: var(--s-3); }
+  /* кегль ужимается, но остаётся крупнее прежней базы (было 1.5rem) */
+  .form-card h3 { font-size: 1.65rem; margin-bottom: var(--s-3); }
+  .form-card .field { margin-bottom: 12px; }
+  .btn--send { min-height: 58px; padding: 15px 22px; }
+  .form-card .consent { margin-bottom: var(--s-2); }
+  .footer { padding-block: var(--s-2); }
+}

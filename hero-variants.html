@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BARPOINT — варианты фона героя (ТЗ6 §8, на выбор заказчика)</title>
+  <meta name="robots" content="noindex">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="assets/css/fonts.css">
+  <link rel="stylesheet" href="assets/css/style.css">
+  <style>
+    body { background: var(--bp-black); }
+    .hv-note {
+      position: sticky; top: 0; z-index: 50;
+      background: var(--bp-amber); color: var(--bp-black);
+      font-family: var(--font-grotesk); font-weight: 600;
+      font-size: .8rem; letter-spacing: .08em; text-transform: uppercase;
+      padding: 12px var(--gutter); text-align: center;
+    }
+    .hv {
+      position: relative; min-height: 100svh;
+      display: flex; flex-direction: column; justify-content: flex-end;
+      color: var(--bp-off-white); overflow: hidden;
+    }
+    .hv__media { position: absolute; inset: 0; }
+    .hv__media img { width: 100%; height: 100%; object-fit: cover; }
+    .hv__media::after {
+      content: ""; position: absolute; inset: 0;
+      background: linear-gradient(180deg, rgba(11,10,8,.55) 0%, rgba(11,10,8,.15) 40%, rgba(11,10,8,.82) 100%);
+    }
+    .hv__tag {
+      position: absolute; top: 18px; left: var(--gutter); z-index: 3;
+      background: var(--bp-ivory); color: var(--bp-dark-text);
+      font-family: var(--font-grotesk); font-weight: 700; font-size: .9rem;
+      letter-spacing: .1em; text-transform: uppercase;
+      padding: 10px 22px; border-radius: 999px;
+    }
+    .hv__logo { position: absolute; top: 26vh; left: 50%; transform: translate(-50%, -50%); width: 42vw; z-index: 2; opacity: .96; }
+    .hv__content { position: relative; z-index: 2; padding: 0 var(--gutter) var(--s-6); max-width: var(--container); margin-inline: auto; width: 100%; }
+    .hv__title { font-family: var(--font-serif); font-weight: 600; font-size: clamp(1.3rem, 2.6vw, 2.2rem); line-height: 1.15; max-width: 16em; }
+    .hv__title em { font-style: italic; color: var(--bp-amber); }
+    .hv__sub { margin-top: 12px; max-width: 36em; color: rgba(242,239,231,.82); font-size: .95rem; }
+  </style>
+</head>
+<body>
+  <p class="hv-note">ТЗ6 §8 — три варианта фона героя. Напишите в чат номер выбранного — только после этого он попадёт в сборку.</p>
+
+  <section class="hv">
+    <div class="hv__media"><img src="assets/img/hero-sixty-2000.webp" alt="Вариант 1 — панорама Sixty"></div>
+    <span class="hv__tag">Вариант 1 · Панорама с 62-го этажа (Sixty)</span>
+    <img class="hv__logo" src="assets/img/wordmark-light.png" alt="">
+    <div class="hv__content">
+      <h2 class="hv__title">Бар становится культурным кодом. <em>Бизнес становится системой</em></h2>
+      <p class="hv__sub">BARPOINT создаёт бары, кофейни и напиточные бренды: от идеи и дизайна — до операционки, экономики и масштабирования</p>
+    </div>
+  </section>
+
+  <section class="hv">
+    <div class="hv__media"><img src="assets/img/hero-inta-2000.webp" alt="Вариант 2 — дымящийся коктейль Inta"></div>
+    <span class="hv__tag">Вариант 2 · Дымящийся ритуал (Inta)</span>
+    <img class="hv__logo" src="assets/img/wordmark-light.png" alt="">
+    <div class="hv__content">
+      <h2 class="hv__title">Бар становится культурным кодом. <em>Бизнес становится системой</em></h2>
+      <p class="hv__sub">BARPOINT создаёт бары, кофейни и напиточные бренды: от идеи и дизайна — до операционки, экономики и масштабирования</p>
+    </div>
+  </section>
+
+  <section class="hv">
+    <div class="hv__media"><img src="assets/img/hero-luwo-2000.webp" alt="Вариант 3 — атмосферный кадр Lúwo"></div>
+    <span class="hv__tag">Вариант 3 · Шёлковый путь (Lúwo)</span>
+    <img class="hv__logo" src="assets/img/wordmark-light.png" alt="">
+    <div class="hv__content">
+      <h2 class="hv__title">Бар становится культурным кодом. <em>Бизнес становится системой</em></h2>
+      <p class="hv__sub">BARPOINT создаёт бары, кофейни и напиточные бренды: от идеи и дизайна — до операционки, экономики и масштабирования</p>
+    </div>
+  </section>
+</body>
+</html>

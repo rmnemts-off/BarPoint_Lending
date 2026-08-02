@@ -1,0 +1,23 @@
+# --- macOS ---
+.DS_Store
+._*
+.Spotlight-V100
+.Trashes
+
+# --- редакторы и IDE ---
+.vscode/
+.idea/
+*.swp
+*~
+
+# --- исходные материалы бренда ---
+# Презентации, .ai, .pdf и оригиналы шрифтов — 405 МБ, на сайте
+# не используются: в assets/fonts лежат готовые сабсеты .woff2,
+# а в assets/img — уже подготовленные webp/png.
+# Лежат локально в «BarPoint landing/Materials v3».
+Materials v3/
+
+# --- сборка и зависимости (на случай, если появятся) ---
+node_modules/
+dist/
+*.log
