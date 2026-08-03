@@ -569,7 +569,26 @@
 <!-- ============ 6.10 Команда (deck3 сл.4–8) ============
      ТЗ2 §5: закреплённая горизонтальная прокрутка (десктоп ≥1024),
      свайп-лента со scroll-snap (мобайл и reduced-motion).
-     Все 5 человек, порядок: Шустериовас, Бегляров, Маяков, Марушко, Гордышев -->
+     Все 5 человек, порядок: Шустериовас, Бегляров, Маяков, Марушко, Гордышев
+
+     Правка 03.08 (вторая): подписи под фото переписаны по «Barpoint Bars»
+     (Materials v3, сл. 4–8) и сокращены. Заказчик: «текста под фото много,
+     который почти белый». В презентации под каждым лицом стоят не абзацы,
+     а короткие строки-должности: янтарным — роль в BARPOINT, светлым —
+     всё остальное. Так теперь и здесь: .hstation__role — одна строка
+     BARPOINT, .hstation__creds — одна-три строки через <br>.
+     ДЛИНА ЗДЕСЬ — НЕ КОСМЕТИКА. Станции равняются по верхней кромке фото,
+     трек центрируется в экране, поэтому высоту ВСЕГО трека задаёт самая
+     длинная подпись: лишняя строка у одного человека опускает фотографии
+     всех и съедает запас до шапки. Предел — три строки, и строка обязана
+     вставать в одну на карточке 358px (это 1280×720, самый тесный из
+     десктопных экранов). Отсюда и правки формулировок: у Марушко и
+     Гордышева фразы укорочены до тех, что помещаются в строку, у Маякова
+     из презентационного списка оставлены RU/MENA, INSADER BAR и GT.GROUP.
+     Не поместились награды (#13 The 50 Best Bars, GQ, WTE, top-500) и
+     разбор GT.GROUP по заведениям (ALICE и Vani, Michelin 2021).
+     Понадобится вернуть — придётся уменьшать фотографию, а не добавлять
+     строку. -->
 <section class="hteam" id="team" data-hteam data-bg="#100b06">
   <div class="hteam__viewport" data-hteam-viewport>
     <div class="hteam__track" data-hteam-track>
@@ -614,8 +633,8 @@
         <div class="hstation__card">
           <figure class="hstation__photo"><img src="assets/img/team-artur-800.webp" width="800" height="1200" alt="Артур Шустериовас" loading="eager" decoding="async"></figure>
           <span class="plaque"><span>Артур Шустериовас</span></span>
-          <p class="hstation__role" data-gsap-text-on-scroll>Co-founder BARPOINT · PIMS · Origin Group</p>
-          <p class="hstation__creds" data-gsap-text-on-scroll data-gsap-delay="0.08">Креативный директор PIMS. Маркетинг, дизайн, продуктовые стратегии, позиционирование, виральность, визуальный язык.</p>
+          <p class="hstation__role" data-gsap-text-on-scroll>Co-founder BARPOINT</p>
+          <p class="hstation__creds" data-gsap-text-on-scroll data-gsap-delay="0.08">Co-founder PIMS, Origin Group<br>Креативный директор PIMS</p>
         </div>
       </div>
 
@@ -623,19 +642,19 @@
         <div class="hstation__card">
           <figure class="hstation__photo"><img src="assets/img/team-timur-800.webp" width="800" height="1200" alt="Тимур Бегляров" loading="eager" decoding="async"></figure>
           <span class="plaque"><span>Тимур Бегляров</span></span>
-          <p class="hstation__role" data-gsap-text-on-scroll>Co-founder BARPOINT · PIMS</p>
-          <p class="hstation__creds" data-gsap-text-on-scroll data-gsap-delay="0.08">Операционный менеджмент, продукт и процессы. Команда, стабильность вкуса, экономика и маржа.</p>
+          <p class="hstation__role" data-gsap-text-on-scroll>Co-founder BARPOINT</p>
+          <p class="hstation__creds" data-gsap-text-on-scroll data-gsap-delay="0.08">Co-founder PIMS</p>
         </div>
       </div>
 
-      <!-- ТЗ14 §4: возврат полной команды из презентаций — станции 03–05,
-           тексты дословно из таблицы ТЗ; формат станций не менялся -->
+      <!-- ТЗ14 §4: возврат полной команды из презентаций — станции 03–05;
+           формат станций не менялся -->
       <div class="hstation" data-hstation>
         <div class="hstation__card">
           <figure class="hstation__photo"><img src="assets/img/team-mayakov-800.webp" width="800" height="1067" alt="Владимир Маяков" loading="eager" decoding="async"></figure>
           <span class="plaque"><span>Владимир Маяков</span></span>
-          <p class="hstation__role" data-gsap-text-on-scroll>Co-owner BARPOINT RU / MENA</p>
-          <p class="hstation__creds" data-gsap-text-on-scroll data-gsap-delay="0.08">Экс-идеолог и директор INSADER BAR — #13 The World's 50 Best Bars 2021, GQ Bar Awards 2021. Экс-директор по напиткам GT.GROUP: ALICE и Vani — Michelin Guide 2021.</p>
+          <p class="hstation__role" data-gsap-text-on-scroll>Co-owner BARPOINT</p>
+          <p class="hstation__creds" data-gsap-text-on-scroll data-gsap-delay="0.08">Co-owner RU / MENA<br>Ex-идеолог INSADER BAR<br>Ex-директор по напиткам GT.GROUP</p>
         </div>
       </div>
 
@@ -643,8 +662,11 @@
         <div class="hstation__card">
           <figure class="hstation__photo"><img src="assets/img/team-marushko-800.webp" width="800" height="1196" alt="Руслан Марушко" loading="eager" decoding="async"></figure>
           <span class="plaque"><span>Руслан Марушко</span></span>
-          <p class="hstation__role" data-gsap-text-on-scroll>Creative Head Bartender &amp; R&amp;D Lead</p>
-          <p class="hstation__creds" data-gsap-text-on-scroll data-gsap-delay="0.08">Авторские коктейли и концептуальные барные карты. Гастрономические коллаборации, лаборатория вкуса: тестирования, экспериментальные рецептуры, технологии.</p>
+          <!-- перенос жёсткий: строка не помещается на карточку целиком ни
+               на одном экране, а браузер рвал её в разных местах — на 1440
+               после «Bartender», на 1280 после «Head» -->
+          <p class="hstation__role" data-gsap-text-on-scroll>Creative Head Bartender<br>&amp; R&amp;D Lead</p>
+          <p class="hstation__creds" data-gsap-text-on-scroll data-gsap-delay="0.08">Авторские коктейли и барные карты<br>Лаборатория вкуса и коллаборации</p>
         </div>
       </div>
 
@@ -653,7 +675,7 @@
           <figure class="hstation__photo"><img src="assets/img/team-gordyshev-800.webp" width="800" height="1200" alt="Александр Гордышев" loading="eager" decoding="async"></figure>
           <span class="plaque"><span>Александр Гордышев</span></span>
           <p class="hstation__role" data-gsap-text-on-scroll>Operational Head Bartender</p>
-          <p class="hstation__creds" data-gsap-text-on-scroll data-gsap-delay="0.08">Процессы, стандарты и контроль качества. Аналитика, экономика и эффективность бара; подбор, обучение и аттестации команды.</p>
+          <p class="hstation__creds" data-gsap-text-on-scroll data-gsap-delay="0.08">Процессы, стандарты, качество<br>Экономика, обучение, аттестации</p>
         </div>
       </div>
 

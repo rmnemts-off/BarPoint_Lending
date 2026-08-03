@@ -1777,39 +1777,88 @@ form.is-hidden { visibility: hidden; }
 .hstation--intro { width: 50vw; max-width: 640px; display: block; align-self: center; }
 /* ТЗ16 §4: заголовок интро крупнее (+~22% к верху clamp).
    Правка 31.07 (пятая): вся вилка умножена ровно на 1.3 по просьбе
-   заказчика — 2.1/4.4/3.7 → 2.73/5.72/4.81. */
-.hstation--intro .h2 { font-size: clamp(2.73rem, calc(5.72 * var(--vw-step)), 4.81rem); }
+   заказчика — 2.1/4.4/3.7 → 2.73/5.72/4.81.
+   Правка 03.08 (третья): заголовок ПРЯМОЙ. Курсив давал не .h-serif как
+   стиль, а сама гарнитура: --font-serif это «Roslindale Italic»,
+   отдельное семейство, и font-style: normal его бы не выпрямил —
+   нужна смена семейства на прямой «Roslindale Display Condensed».
+   Он же стоит у всех прочих заголовков секций (услуги, кейсы). */
+.hstation--intro .h2 {
+  font-family: "Roslindale Display Condensed", "Times New Roman", serif;
+  font-style: normal; font-weight: 700;
+  letter-spacing: .012em;
+  font-size: clamp(2.73rem, calc(5.72 * var(--vw-step)), 4.81rem);
+}
 /* Правка 31.07 (четвёртая): правила .hstation--intro .pill и .hteam__sub
    удалены вместе с самими надписями («Команда» и «Команда, которая
    собирает систему…») — в интро остался один заголовок. */
 /* ТЗ16 §4.2: карточка шире — укрупнённые регалии (Маяков) не ужимаем */
 .hstation__card { position: relative; width: clamp(300px, 32vw, 470px); text-align: center; }
+/* Правка 03.08 (третья): кадр подрезан с 3/4 до 4/5 — заказчик разрешил
+   («относительно этого можешь немного обрезать фотографии команды»).
+   Это плата за укрупнённые подписи: карточка стала выше на текст, и без
+   подрезки трек переставал помещаться между шапкой и нижней кромкой.
+   Исходники 800×1200, object-fit: cover режет по центру — при 4/5 видно
+   960px из 1200, по 120 сверху и снизу. Проверено на всех пятерых: лица
+   в кадре целиком. Дальше 4/5 не резать без просмотра — у Гордышева и
+   Маякова головы стоят ближе к верхней кромке. */
 .hstation__photo {
-  aspect-ratio: 3 / 4; overflow: hidden; border-radius: 8px;
+  aspect-ratio: 4 / 5; overflow: hidden; border-radius: 8px;
   box-shadow: 0 18px 44px rgba(0,0,0,.4);
 }
 .hstation__photo img { width: 100%; height: 100%; object-fit: cover; }
-/* ТЗ16 §4: имя в плашке ~1rem (было .74) — плашка пропорционально выше */
+/* ТЗ16 §4: имя в плашке ~1rem (было .74) — плашка пропорционально выше.
+   Правка 03.08 (третья): весь текстовый блок станции укрупнён — заказчик:
+   «очень плохо читаются фамилия и имя, роль и снизу текст». Ступени
+   1.18 / 1.12 / .95rem держат заданный порядок: имя чуть крупнее роли,
+   роль крупнее подписи. Место под это дала фотография (см. --hst-ratio). */
 .hstation__card .plaque {
   position: absolute; top: auto; left: 50%; transform: translate(-50%, -50%);
   max-width: 96%;
-  font-size: 1rem;
-  padding: 12px 44px;
+  font-size: 1.18rem;
+  padding: 13px 48px;
 }
+/* ГРАБЛИ: это поле НЕ равно просвету под плашкой. Плашка вынута из потока
+   (position: absolute) и приподнята на половину своей высоты, поэтому
+   отсчёт идёт от нижней кромки ФОТО, а нижние 29px плашки съедают то же
+   поле. При прежних 32px между плашкой и ролью оставалось 3px — заказчик:
+   «роль слишком близко к имени». 46px дают просвет в 17px. Меняется кегль
+   плашки — пересчитать и это число. */
 .hstation__role {
-  margin-top: var(--s-4);
-  font-family: var(--font-grotesk); font-size: .95rem; font-weight: 600;
-  letter-spacing: .14em; text-transform: uppercase;
+  margin-top: 46px;
+  font-family: var(--font-grotesk); font-size: 1.12rem; font-weight: 600;
+  /* .13 → .11em: самая длинная роль («Creative Head Bartender & R&D Lead»)
+     при .13em переставала вставать в строку даже на карточке 461px */
+  letter-spacing: .11em; text-transform: uppercase;
   color: var(--bp-amber);
 }
+/* Правка 03.08 (вторая): не абзац, а строки-должности, как в презентации
+   «Barpoint Bars» (сл. 4–8) — тот же капс и трекинг, что у янтарной роли
+   выше, только мельче и светлым. Абзац в 1.08rem/1.45 занимал под фото
+   до четырёх строк на человека и поднимал весь трек под шапку. */
 .hstation__creds {
-  margin-top: var(--s-2);
-  font-size: 1.08rem; line-height: 1.45;
+  margin-top: 10px;
+  font-family: var(--font-grotesk); font-size: .95rem; font-weight: 600;
+  /* трекинг ужат с .12 до .08em вместе с ростом кегля: капс с широким
+     трекингом на карточке в 358px (1280×720) переставал вставать в строку,
+     а каждая лишняя строка поднимает весь трек — см. комментарий в
+     index.html у секции команды */
+  letter-spacing: .08em; text-transform: uppercase;
+  line-height: 1.5;
   color: color-mix(in srgb, var(--bp-off-white) 74%, transparent);
 }
 /* десктоп: пин на 100vh (движение ведёт GSAP) */
 @media (min-width: 1024px) and (prefers-reduced-motion: no-preference) {
-  .hteam__viewport { height: 100vh; display: flex; align-items: center; overflow: hidden; }
+  /* ГРАБЛИ: шапка фиксированная и лежит ПОВЕРХ секции, а трек центрируется
+     во всю высоту экрана — верхняя кромка фотографий заезжала под неё
+     (замер 1440×900: трек 762px, верх на 69 при высоте шапки 72).
+     Отдаём шапке её полосу паддингом: центрирование считается уже от
+     свободной высоты. Одного сокращения подписей мало — на низких экранах
+     (1280×720) трек и без них выше свободного места. */
+  .hteam__viewport {
+    height: 100vh; padding-top: var(--header-h);
+    display: flex; align-items: center; overflow: hidden;
+  }
   .hteam__track { padding-block: 0; }
   /* Правка 31.07 (пятая): линия длиннее трека на ширину экрана. Раньше
      SVG был ровно по треку, а трек в финальном кадре кончается примерно
@@ -1827,6 +1876,11 @@ form.is-hidden { visibility: hidden; }
   .hstation { width: 82vw; scroll-snap-align: center; flex-direction: column; align-items: flex-start; gap: 0; }
   .hstation--intro { width: 82vw; }
   .hstation__card { width: min(78vw, 360px); margin-inline: auto; }
+  /* карточка тут ~293px — капс с трекингом ломается почти на каждой
+     строке; кегль и трекинг ужимаем, как на низких десктопах */
+  .hstation__card .plaque { font-size: 1.02rem; padding: 11px 36px; }
+  .hstation__role { font-size: 1rem; letter-spacing: .1em; }
+  .hstation__creds { font-size: .86rem; letter-spacing: .06em; line-height: 1.45; }
 }
 @media (min-width: 1024px) and (prefers-reduced-motion: reduce) {
   .hteam__viewport { overflow-x: auto; scroll-snap-type: x mandatory; }
@@ -1839,6 +1893,18 @@ form.is-hidden { visibility: hidden; }
   .hstation__card { width: clamp(280px, 28vw, 400px); }
   /* та же вилка ×1.3, что и в базовом правиле (правка 31.07, пятая) */
   .hstation--intro .h2 { font-size: clamp(2.47rem, calc(4.94 * var(--vw-step)), 4.03rem); }
+  /* Правка 03.08 (вторая): на 1280×720 запаса над шапкой оставалось 19px.
+     Самая высокая карточка здесь — Марушко: его роль «Creative Head
+     Bartender & R&D Lead» на 358px не вставала в строку и добавляла
+     карточке лишний ряд. Кегль и поля подписей ужаты — роль встаёт в
+     одну строку, а под фото уходит на 30+px меньше.
+     Правка 03.08 (третья): вся ступень поднята вслед за базовой — порядок
+     «имя > роль > подпись» тот же, просто на шаг мельче. */
+  .hstation__card .plaque { font-size: 1.05rem; padding: 11px 40px; }
+  /* тот же расчёт, что и в базовом правиле: плашка здесь ниже, её половина
+     съедает ~25px, оставляем просвет ~13px */
+  .hstation__role { margin-top: 38px; font-size: 1.02rem; letter-spacing: .1em; }
+  .hstation__creds { margin-top: 8px; font-size: .86rem; letter-spacing: .06em; line-height: 1.45; }
 }
 
 /* ============================================================
