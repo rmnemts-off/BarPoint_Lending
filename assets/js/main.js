@@ -343,31 +343,42 @@
   var railTrack = document.querySelector("[data-crail-track]");
   var railDragMoved = false;
 
-  /* ---- физика ленты (правка 03.08, образец — лента отзывов buckssauce)
-     Раньше лента была одним gsap-твином, а drag и тачпад дёргали его
-     progress(). Отсюда две беды: палец двигал ленту рывками по кадрам
-     событий, а на отпускании твин мгновенно возвращался к своему
-     единственному направлению — влево, даже если жест был вправо.
+  /* ---- физика ленты (правка 03.08, вторая: один в один лента отзывов
+     buckssauce — там gsap.ticker + Draggable, и разобранная модель такая).
 
-     Теперь у ленты есть СКОРОСТЬ, и кадр считает одно из двух:
-       жест (палец/тачпад) — лента догоняет цель со сглаживанием RAIL_LAG;
-       свободный ход       — скорость экспоненциально сходится к автопрокату
-                             за RAIL_EASE, то есть бросок доезжает по инерции.
-     Направление автопроката задаётся знаком скорости в момент отпускания:
-     свайпнул вправо — лента и дальше едет вправо. */
+     У ленты есть СКОРОСТЬ, и кадр считает одно из трёх:
+       жест (палец/тачпад) — кадр не вмешивается вообще, ленту ведёт сам
+                             жест 1:1, а скорость берётся из dx/dt;
+       выбег после броска  — остаток скорости сверх автопроката затухает
+                             (RAIL_DECAY за кадр + линейное RAIL_PULL) и
+                             лента доезжает, сходясь к автопрокату;
+       свободный ход       — скорость подтягивается к автопрокату долей
+                             RAIL_TAKEUP за кадр.
+     Направление автопроката — знак последнего заметного движения жеста:
+     свайпнул вправо — лента и дальше едет вправо.
+
+     ГЛАВНОЕ ОТЛИЧИЕ ОТ ПРЕЖНЕЙ ВЕРСИИ: у ленты не осталось пауз по
+     наведению и по фокусу. Именно focusin/focusout её и заклинивали —
+     см. комментарий в initRail. */
   var railPos = 0;       // отрисованное смещение трека, px
-  var railGoal = 0;      // куда тянет жест
-  var railVel = 0;       // скорость, px/с
+  var railVel = 0;       // текущая скорость, px/с
+  var railAim = 0;       // скорость автопроката, к которой всё сходится
+  var railExtra = 0;     // остаток броска сверх автопроката (выбег)
+  var railFling = false; // идёт выбег после отпускания
   var railDir = -1;      // сторона автопроката: −1 влево, +1 вправо
   var railHalf = 0;      // период ленты (один набор карточек), px
-  var railHeld = false;  // палец на ленте
-  var railGain = 1;      // 0 — автопрокат выключен (открыт разворот, фокус)
+  var railHeld = false;  // палец (или жест тачпада) ведёт ленту
+  var railGain = 1;      // 0 — автопрокат выключен (открыт разворот)
   var railLive = true;   // лента в кадре
   var railWheelT = null; // таймер «жест тачпада ещё идёт»
+  var railGestT = 0;     // performance.now() прошлого события жеста
 
-  var RAIL_LAG = 0.075;  // с — насколько лента отстаёт от пальца
-  var RAIL_EASE = 0.45;  // с — за сколько инерция сходится к автопрокату
-  var RAIL_MAXV = 3200;  // px/с — потолок скорости броска
+  var RAIL_DRIFT = 40;     // px/с — скорость автопроката (у buckssauce 28)
+  var RAIL_MAXV = 2000;    // px/с — потолок скорости броска
+  var RAIL_TAKEUP = 0.05;  // доля подтяжки к автопрокату за кадр
+  var RAIL_DECAY = 0.96;   // затухание выбега за кадр (при 60 fps)
+  var RAIL_PULL = 0.015;   // добавочное линейное стягивание выбега к нулю
+  var RAIL_SNAP = 2;       // px/с — ниже этого выбег обнуляется
 
   function ccardNode(i, isDup) {
     var c = CASES[i];
@@ -398,7 +409,10 @@
     var idx = visibleCaseIndices();
     var isStatic = idx.length < 4; // «кофе»: 2 кейса — статично по центру (ТЗ2 §6)
     railTrack.innerHTML = "";
-    railPos = railGoal = railVel = 0;
+    railPos = railExtra = 0;
+    railFling = false;
+    railDir = -1;
+    railVel = railAim = railDir * RAIL_DRIFT;
     railTrack.style.transform = "";
     idx.forEach(function (i) { railTrack.appendChild(ccardNode(i, false)); });
     rail.classList.toggle("crail--static", isStatic);
@@ -418,41 +432,68 @@
 
   function railWrap() {
     if (!railHalf) return;
-    /* позицию и цель жеста сдвигаем на один период вместе — иначе лента
-       после перескока рванёт догонять цель, оставшуюся в старой системе */
-    while (railPos <= -railHalf) { railPos += railHalf; railGoal += railHalf; }
-    while (railPos > 0) { railPos -= railHalf; railGoal -= railHalf; }
+    while (railPos <= -railHalf) railPos += railHalf;
+    while (railPos > 0) railPos -= railHalf;
   }
 
-  function railFrame(_time, deltaMs) {
-    if (!railHalf) return;
-    var s = deltaMs / 1000;
-    if (s <= 0) return;
-    if (s > 0.1) s = 0.1; // вернулись во вкладку — не улетать на секунды кадра
-    if (railHeld || railWheelT !== null) {
-      /* Скорость берём из фактического перемещения ленты, а не из дельты
-         события: бросок наследует то же сглаживание, что и сама лента,
-         и один дёрганый кадр не выстреливает её через пол-экрана. */
-      var prev = railPos;
-      railPos += (railGoal - railPos) * (1 - Math.exp(-s / RAIL_LAG));
-      railVel = (railPos - prev) / s;
-    } else {
-      if (!railLive) return; // за кадром лента стоит
-      var drift = railDir * (window.innerWidth < 768 ? 30 : 50) * railGain; // px/с (ТЗ2 §6)
-      railVel += (drift - railVel) * (1 - Math.exp(-s / RAIL_EASE));
-      railPos += railVel * s;
-    }
-    railWrap();
+  function railRender() {
     railTrack.style.transform = "translate3d(" + railPos.toFixed(2) + "px,0,0)";
   }
 
-  /* Отпускание жеста — общее для пальца и тачпада: гасим бросок по потолку
-     и разворачиваем автопрокат в сторону, куда его вели. */
+  /* Один шаг жеста: лента идёт за пальцем 1:1 (никакого догоняющего
+     сглаживания — оно и давало ощущение «отстаёт»), а скорость берётся из
+     dx/dt с потолком ±RAIL_MAXV — ровно как Draggable считает deltaX у
+     ленты отзывов buckssauce. Сторону автопроката задаёт последнее
+     заметное движение: остановился пальцем перед отпусканием — лента
+     поедет туда же, куда её вели, а не рванёт обратно. */
+  function railStep(dx) {
+    var now = performance.now();
+    var dt = Math.max(now - railGestT, 16);
+    railGestT = now;
+    var v = dx / dt * 1000;
+    if (v > RAIL_MAXV) v = RAIL_MAXV; else if (v < -RAIL_MAXV) v = -RAIL_MAXV;
+    if (Math.abs(v) > 0.5) railDir = v > 0 ? 1 : -1;
+    railVel = railAim = v;
+    railPos += dx;
+    railWrap();
+    railRender();
+  }
+
+  function railGrab() {
+    railHeld = true;
+    railFling = false;
+    railExtra = 0;
+    railGestT = performance.now();
+  }
+
+  /* Отпускание жеста — общее для пальца и тачпада: то, что лента набрала
+     сверх автопроката, становится выбегом и затухает в кадре. */
   function railRelease() {
     if (railWheelT !== null) { clearTimeout(railWheelT); railWheelT = null; }
     railHeld = false;
-    railVel = Math.max(-RAIL_MAXV, Math.min(RAIL_MAXV, railVel));
-    if (Math.abs(railVel) > 8) railDir = railVel > 0 ? 1 : -1;
+    railAim = railDir * RAIL_DRIFT * railGain;
+    railExtra = railVel - railAim;
+    railFling = true;
+  }
+
+  function railFrame(_time, deltaMs) {
+    if (!railHalf || railHeld) return; // под жестом позицию ведёт сам жест
+    if (!railLive) return;             // за кадром лента стоит
+    var s = deltaMs / 1000;
+    if (s <= 0) return;
+    if (s > 0.05) s = 0.05; // вернулись во вкладку — не улетать на секунды кадра
+    railAim = railDir * RAIL_DRIFT * railGain;
+    if (railFling) {
+      railExtra *= Math.pow(RAIL_DECAY, 60 * s);
+      railExtra += (0 - railExtra) * RAIL_PULL;
+      railVel = railAim + railExtra;
+      if (Math.abs(railExtra) < RAIL_SNAP) { railExtra = 0; railVel = railAim; railFling = false; }
+    } else {
+      railVel += (railAim - railVel) * RAIL_TAKEUP;
+    }
+    railPos += railVel * s;
+    railWrap();
+    railRender();
   }
 
   function setRailSpeed(scale) { railGain = scale; }
@@ -474,10 +515,22 @@
       rz = setTimeout(function () { railMeasure(); railWrap(); }, 150);
     });
 
-    /* ТЗ3 §2.1: hover на скорость НЕ влияет — лента едет постоянно.
-       Пауза остаётся только для клавиатурного фокуса и открытой модалки. */
-    rail.addEventListener("focusin", function () { setRailSpeed(0); });
-    rail.addEventListener("focusout", function () { if (!rail.matches(":focus-within")) setRailSpeed(1); });
+    /* ГРАБЛИ (правка 03.08, вторая). Здесь стояла пара
+         rail.addEventListener("focusin",  () => setRailSpeed(0));
+         rail.addEventListener("focusout", () => { if (!rail.matches(":focus-within")) setRailSpeed(1); });
+       и это была та самая «лента встала и больше не едет»:
+         — клик по карточке даёт ей фокус, то есть автопрокат выключался
+           при любом открытии кейса, а не только при обходе с клавиатуры;
+         — closeCover сначала зовёт setRailSpeed(1), а сразу за ним
+           lastFocus.focus() — фокус возвращается на карточку, focusin
+           снова гасит ленту, и она стоит уже навсегда;
+         — на самом focusout ещё держится :focus-within (новый элемент
+           фокуса на этот момент не проставлен), так что уход табом из
+           ленты тоже оставлял railGain === 0 без единого шанса на возврат.
+       У ленты отзывов buckssauce пауз нет вообще — ни по hover, ни по
+       фокусу. Оставляем ровно одну (railGain в openCase/closeCover): при
+       открытом развороте лента не видна, зато обратный FLIP-зум приезжает
+       в неподвижную карточку. Откат: вернуть две строки выше. */
 
     /* ТЗ3 §2.2: горизонтальный жест тачпада двигает ленту;
        вертикальный скролл страницы не перехватываем.
@@ -488,8 +541,8 @@
       if (!railHalf) return;
       if (Math.abs(e.deltaX) <= Math.abs(e.deltaY)) return;
       e.preventDefault();
-      if (railWheelT === null) railGoal = railPos; else clearTimeout(railWheelT);
-      railGoal -= e.deltaX;
+      if (railWheelT === null) railGrab(); else clearTimeout(railWheelT);
+      railStep(-e.deltaX);
       railWheelT = setTimeout(railRelease, 90);
     }, { passive: false });
 
@@ -501,13 +554,12 @@
       dragId = e.pointerId;
       dragFrom = prevX = e.clientX;
       railDragMoved = false;
-      railHeld = true;
-      railGoal = railPos; // тянем от текущего места, а не от места прошлого жеста
+      railGrab();
       rail.classList.add("is-dragging");
     });
     window.addEventListener("pointermove", function (e) {
       if (dragId === null || e.pointerId !== dragId) return;
-      railGoal += e.clientX - prevX;
+      railStep(e.clientX - prevX);
       prevX = e.clientX;
       if (Math.abs(e.clientX - dragFrom) > 7) railDragMoved = true;
     }, { passive: true });
@@ -1121,7 +1173,11 @@
       lenisStart();
       setRailSpeed(1);
       revertSplits();
-      if (lastFocus && lastFocus.focus) lastFocus.focus();
+      /* preventScroll обязателен: .crail — overflow:hidden, но скроллить
+         его программно браузеру никто не мешает, и обычный focus() на
+         уехавшую карточку сдвигал ленте scrollLeft — карточки вставали
+         со смещением, которое ничем уже не сбрасывалось. */
+      if (lastFocus && lastFocus.focus) lastFocus.focus({ preventScroll: true });
     };
     var target = findLiveCardImg(currentCase);
     var curImg = galImg(galFront);
