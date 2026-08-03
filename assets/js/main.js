@@ -341,8 +341,33 @@
   /* ---------- Режим B (ТЗ2 §6): бесконечная лента с drag ---------- */
   var rail = document.querySelector("[data-crail]");
   var railTrack = document.querySelector("[data-crail-track]");
-  var railTween = null;
   var railDragMoved = false;
+
+  /* ---- физика ленты (правка 03.08, образец — лента отзывов buckssauce)
+     Раньше лента была одним gsap-твином, а drag и тачпад дёргали его
+     progress(). Отсюда две беды: палец двигал ленту рывками по кадрам
+     событий, а на отпускании твин мгновенно возвращался к своему
+     единственному направлению — влево, даже если жест был вправо.
+
+     Теперь у ленты есть СКОРОСТЬ, и кадр считает одно из двух:
+       жест (палец/тачпад) — лента догоняет цель со сглаживанием RAIL_LAG;
+       свободный ход       — скорость экспоненциально сходится к автопрокату
+                             за RAIL_EASE, то есть бросок доезжает по инерции.
+     Направление автопроката задаётся знаком скорости в момент отпускания:
+     свайпнул вправо — лента и дальше едет вправо. */
+  var railPos = 0;       // отрисованное смещение трека, px
+  var railGoal = 0;      // куда тянет жест
+  var railVel = 0;       // скорость, px/с
+  var railDir = -1;      // сторона автопроката: −1 влево, +1 вправо
+  var railHalf = 0;      // период ленты (один набор карточек), px
+  var railHeld = false;  // палец на ленте
+  var railGain = 1;      // 0 — автопрокат выключен (открыт разворот, фокус)
+  var railLive = true;   // лента в кадре
+  var railWheelT = null; // таймер «жест тачпада ещё идёт»
+
+  var RAIL_LAG = 0.075;  // с — насколько лента отстаёт от пальца
+  var RAIL_EASE = 0.45;  // с — за сколько инерция сходится к автопрокату
+  var RAIL_MAXV = 3200;  // px/с — потолок скорости броска
 
   function ccardNode(i, isDup) {
     var c = CASES[i];
@@ -372,70 +397,129 @@
   function buildRail() {
     var idx = visibleCaseIndices();
     var isStatic = idx.length < 4; // «кофе»: 2 кейса — статично по центру (ТЗ2 §6)
-    if (railTween) { railTween.kill(); railTween = null; }
     railTrack.innerHTML = "";
-    gsap.set(railTrack, { x: 0, xPercent: 0 });
+    railPos = railGoal = railVel = 0;
+    railTrack.style.transform = "";
     idx.forEach(function (i) { railTrack.appendChild(ccardNode(i, false)); });
     rail.classList.toggle("crail--static", isStatic);
-    if (isStatic) return;
+    if (isStatic) { railHalf = 0; return; }
     idx.forEach(function (i) { railTrack.appendChild(ccardNode(i, true)); }); // дубль ×2
-    var half = railTrack.scrollWidth / 2;
-    var speed = window.innerWidth < 768 ? 30 : 50; // px/с (ТЗ2 §6)
-    railTween = gsap.to(railTrack, {
-      xPercent: -50, ease: "none",
-      duration: half / speed, repeat: -1
-    });
+    railMeasure();
   }
 
-  function setRailSpeed(scale) {
-    if (railTween) gsap.to(railTween, { timeScale: scale, duration: 0.4, overwrite: true });
+  /* Период ленты — это ОДИН набор карточек ВМЕСТЕ с зазором, который стоит
+     между набором и его дублем. scrollWidth считает n−1 зазор на 2n карточек,
+     поэтому просто /2 давало недостачу в ползазора и микрорывок на стыке. */
+  function railMeasure() {
+    if (rail.classList.contains("crail--static")) { railHalf = 0; return; }
+    var gap = parseFloat(getComputedStyle(railTrack).columnGap) || 0;
+    railHalf = (railTrack.scrollWidth + gap) / 2;
   }
+
+  function railWrap() {
+    if (!railHalf) return;
+    /* позицию и цель жеста сдвигаем на один период вместе — иначе лента
+       после перескока рванёт догонять цель, оставшуюся в старой системе */
+    while (railPos <= -railHalf) { railPos += railHalf; railGoal += railHalf; }
+    while (railPos > 0) { railPos -= railHalf; railGoal -= railHalf; }
+  }
+
+  function railFrame(_time, deltaMs) {
+    if (!railHalf) return;
+    var s = deltaMs / 1000;
+    if (s <= 0) return;
+    if (s > 0.1) s = 0.1; // вернулись во вкладку — не улетать на секунды кадра
+    if (railHeld || railWheelT !== null) {
+      /* Скорость берём из фактического перемещения ленты, а не из дельты
+         события: бросок наследует то же сглаживание, что и сама лента,
+         и один дёрганый кадр не выстреливает её через пол-экрана. */
+      var prev = railPos;
+      railPos += (railGoal - railPos) * (1 - Math.exp(-s / RAIL_LAG));
+      railVel = (railPos - prev) / s;
+    } else {
+      if (!railLive) return; // за кадром лента стоит
+      var drift = railDir * (window.innerWidth < 768 ? 30 : 50) * railGain; // px/с (ТЗ2 §6)
+      railVel += (drift - railVel) * (1 - Math.exp(-s / RAIL_EASE));
+      railPos += railVel * s;
+    }
+    railWrap();
+    railTrack.style.transform = "translate3d(" + railPos.toFixed(2) + "px,0,0)";
+  }
+
+  /* Отпускание жеста — общее для пальца и тачпада: гасим бросок по потолку
+     и разворачиваем автопрокат в сторону, куда его вели. */
+  function railRelease() {
+    if (railWheelT !== null) { clearTimeout(railWheelT); railWheelT = null; }
+    railHeld = false;
+    railVel = Math.max(-RAIL_MAXV, Math.min(RAIL_MAXV, railVel));
+    if (Math.abs(railVel) > 8) railDir = railVel > 0 ? 1 : -1;
+  }
+
+  function setRailSpeed(scale) { railGain = scale; }
 
   function initRail() {
     rail.hidden = false;
     buildRail();
+    gsap.ticker.add(railFrame);
+
+    if (window.IntersectionObserver) {
+      railLive = false;
+      new IntersectionObserver(function (es) { railLive = es[0].isIntersecting; },
+        { rootMargin: "160px 0px" }).observe(rail);
+    }
+
+    var rz;
+    window.addEventListener("resize", function () {
+      clearTimeout(rz);
+      rz = setTimeout(function () { railMeasure(); railWrap(); }, 150);
+    });
 
     /* ТЗ3 §2.1: hover на скорость НЕ влияет — лента едет постоянно.
        Пауза остаётся только для клавиатурного фокуса и открытой модалки. */
-    rail.addEventListener("focusin", function () { if (railTween) railTween.timeScale(0); });
+    rail.addEventListener("focusin", function () { setRailSpeed(0); });
     rail.addEventListener("focusout", function () { if (!rail.matches(":focus-within")) setRailSpeed(1); });
 
     /* ТЗ3 §2.2: горизонтальный жест тачпада двигает ленту;
-       вертикальный скролл страницы не перехватываем */
+       вертикальный скролл страницы не перехватываем.
+       Тачпад присылает и собственную инерцию, поэтому жест считается
+       законченным только через 90 мс тишины — тогда лента подхватывает
+       накопленную скорость и доезжает уже своей. */
     rail.addEventListener("wheel", function (e) {
-      if (!railTween) return;
+      if (!railHalf) return;
       if (Math.abs(e.deltaX) <= Math.abs(e.deltaY)) return;
       e.preventDefault();
-      var half = railTrack.scrollWidth / 2;
-      var wrap = gsap.utils.wrap(0, 1);
-      railTween.progress(wrap(railTween.progress() + e.deltaX / half));
+      if (railWheelT === null) railGoal = railPos; else clearTimeout(railWheelT);
+      railGoal -= e.deltaX;
+      railWheelT = setTimeout(railRelease, 90);
     }, { passive: false });
 
     /* drag мышью и пальцем; клик подавляется при смещении > 7px */
-    var dragX = null, prevX = 0;
+    var dragId = null, dragFrom = 0, prevX = 0;
     rail.addEventListener("pointerdown", function (e) {
-      if (!railTween) return;
-      dragX = prevX = e.clientX;
+      if (!railHalf || dragId !== null) return;
+      if (e.pointerType === "mouse" && e.button !== 0) return;
+      dragId = e.pointerId;
+      dragFrom = prevX = e.clientX;
       railDragMoved = false;
-      railTween.pause();
+      railHeld = true;
+      railGoal = railPos; // тянем от текущего места, а не от места прошлого жеста
       rail.classList.add("is-dragging");
     });
     window.addEventListener("pointermove", function (e) {
-      if (dragX === null || !railTween) return;
-      var dx = e.clientX - prevX;
+      if (dragId === null || e.pointerId !== dragId) return;
+      railGoal += e.clientX - prevX;
       prevX = e.clientX;
-      if (Math.abs(e.clientX - dragX) > 7) railDragMoved = true;
-      var half = railTrack.scrollWidth / 2;
-      var wrap = gsap.utils.wrap(0, 1);
-      railTween.progress(wrap(railTween.progress() - dx / half));
+      if (Math.abs(e.clientX - dragFrom) > 7) railDragMoved = true;
     }, { passive: true });
-    window.addEventListener("pointerup", function () {
-      if (dragX === null) return;
-      dragX = null;
+    function endDrag(e) {
+      if (dragId === null || (e && e.pointerId !== dragId)) return;
+      dragId = null;
       rail.classList.remove("is-dragging");
-      if (railTween) railTween.play();
+      railRelease();
       setTimeout(function () { railDragMoved = false; }, 0); // после click-события
-    });
+    }
+    window.addEventListener("pointerup", endDrag);
+    window.addEventListener("pointercancel", endDrag);
   }
 
   /* Выбор режима кейсов */
@@ -483,7 +567,6 @@
   var coverDesc = document.querySelector("[data-cover-desc]");
   var coverWorks = document.querySelector("[data-cover-works]");
   var coverWorksBox = document.querySelector("[data-cover-worksbox]");
-  var coverFacts = document.querySelector("[data-cover-facts]");
   var coverName = document.querySelector("[data-cover-name]");
   var coverCount = document.querySelector("[data-cover-count]");
   var coverClip = document.querySelector("[data-cover-clip]");
@@ -663,16 +746,32 @@
      Наполнение разворота
      ============================================================ */
   var splitTitle = null, splitSub = null;
+  var titleIsMark = false;   /* заголовок сейчас картинка-знак, а не текст */
 
-  function factsHTML(c, i) {
-    var cols = [{ v: CAT_LABEL[c.category], c: "категория" }];
-    if (c.metrics) c.metrics.forEach(function (m) { cols.push({ v: m.value, c: m.label }); });
-    if (c.externalMentions) c.externalMentions.forEach(function (m) { cols.push({ v: m.value, c: m.label }); });
-    cols.push({ v: caseNumber(i), c: "в портфолио" });
-    return cols.slice(0, 4).map(function (col) {
-      return '<div class="cfact"><p class="cfact__val">' + col.v +
-        '</p><p class="cfact__cap">' + col.c + "</p></div>";
-    }).join("");
+  /* Карточка «Факты» снята по правке 03.08 — функция factsHTML удалена,
+     метрики и externalMentions в data.js остались на будущее. */
+
+  /* Заголовок разворота — тем же начертанием, что и плашка в ленте:
+     где есть знак заведения, ставим его картинкой, где знака нет
+     (Sixty, Duran Bar, Buro Tsum) — имя набирается антиквой.
+     Возвращает true, если заголовок оказался картинкой: тогда во
+     вступлении его нельзя резать SplitText на буквы. */
+  function fillTitle(c) {
+    var m = c.mark;
+    coverTitle.setAttribute("aria-label", c.title);
+    if (m && m.img) {
+      coverTitle.classList.remove("cinfo__title--type");
+      coverTitle.classList.add("cinfo__title--mark");
+      coverTitle.innerHTML = '<img class="cinfo__mark" src="' + m.img +
+        '" alt="" style="--ar:' + m.ar + ";--k:" + m.k + '" decoding="async">';
+      return true;
+    }
+    /* знака нет — имя набирается антиквой смешанным регистром, ровно
+       как на плашке в ленте и как в презентации (стр. 20, 22, 23) */
+    coverTitle.classList.remove("cinfo__title--mark");
+    coverTitle.classList.add("cinfo__title--type");
+    coverTitle.textContent = c.title;
+    return false;
   }
 
   /* иконка-буллет 12×12: фирменный ромб BARPOINT (тот же знак, что
@@ -688,13 +787,11 @@
        записи нового заголовка — на экране останется предыдущий кейс */
     revertSplits();
 
-    coverTitle.textContent = c.title;
-    coverTitle.setAttribute("aria-label", c.title);
+    titleIsMark = fillTitle(c);
     coverSub.textContent = c.shortDescription;
     coverSub.setAttribute("aria-label", c.shortDescription);
     coverDesc.textContent = c.fullDescription;
     coverName.textContent = c.title;
-    coverFacts.innerHTML = factsHTML(c, i);
 
     /* «Что сделали»: пока заказчик не прислал финальные формулировки,
        поле works может отсутствовать — тогда карточка просто не
@@ -768,8 +865,14 @@
     gsap.set(coverPattern, { opacity: 0 });
     tl.to(coverPattern, { opacity: .1, duration: CVD.base, ease: CVE.base }, 0);
 
-    /* заголовок — по буквам, с перелётом */
-    if (window.SplitText) {
+    /* Заголовок. Текстовый режём SplitText и выводим по буквам; знак
+       заведения — картинка, резать нечего, поэтому он входит целиком
+       тем же движением, что и буквы (правка 03.08). */
+    if (titleIsMark) {
+      tl.fromTo(coverTitle, { opacity: 0, y: 60, scaleX: .8, scaleY: .5 },
+        { opacity: 1, y: 0, scaleX: 1, scaleY: 1,
+          duration: CVD.title, ease: CVE.backBase }, 0);
+    } else if (window.SplitText) {
       splitTitle = new SplitText(coverTitle, { type: "lines,words,chars" });
       Array.prototype.forEach.call(coverTitle.children, function (n) { n.setAttribute("aria-hidden", "true"); });
       if (splitTitle.chars.length) {
@@ -985,7 +1088,7 @@
     cover.classList.add("is-open");
     document.body.style.overflow = "hidden";
     lenisStop();
-    if (railTween) railTween.timeScale(0); // лента на паузе при открытом развороте
+    setRailSpeed(0); // лента на паузе при открытом развороте
     coverInner.scrollTop = 0;
     updateCoverClip();
 
@@ -1182,13 +1285,9 @@
      ============================================================ */
   if (!reduceMotion && hasGsap) {
 
-    /* --- Базовые reveal-ы (ТЗ v1): fade + сдвиг вверх --- */
-    document.querySelectorAll("[data-reveal]").forEach(function (el) {
-      gsap.to(el, {
-        opacity: 1, y: 0, duration: 0.9, ease: "power3.out",
-        scrollTrigger: { trigger: el, start: "top 85%", once: true }
-      });
-    });
+    /* Базовые reveal-ы [data-reveal] удалены (ТЗ «появление текста»
+       §8): их работу забрала система атрибутов data-gsap-* —
+       assets/js/reveal.js. */
 
     /* --- Hero: параллакс фона --- */
     /* Правка 30.07: строка-eyebrow удалена вместе с её интро-твином.
@@ -1222,46 +1321,11 @@
     /* САМ ЦИКЛ [data-bg] ПЕРЕЕХАЛ В КОНЕЦ — он обязан создаваться после
        всех пинов (иначе координаты считаются без пин-спейсеров). */
 
-    /* ============================================================
-       ТЗ2 §3 — построчное появление крупных текстов (SplitText).
-       mask:'lines' — «шторка», autoSplit — пересплит после догрузки
-       шрифтов, анимация создаётся только внутри onSplit.
-       ============================================================ */
-    if (window.SplitText) {
-      document.querySelectorAll(".js-lines").forEach(function (el) {
-        el.style.visibility = "hidden"; // скрыт до сплита — без мигания
-      });
-      document.fonts.ready.then(function () {
-        document.querySelectorAll(".js-lines").forEach(function (el) {
-          /* ГРАБЛИ (30.07): текст героя прижат к низу экрана и целиком
-             лежит НИЖЕ линии start:"top 78%" — со скролл-триггером он
-             оставался невидимым до прокрутки (капс-строка не появлялась
-             вовсе, была видна только янтарная линейка слева). Тексту
-             первого экрана триггер не нужен — он играет сразу. */
-          var inHero = !!el.closest(".hero");
-          SplitText.create(el, {
-            /* правка 17.07: mask:"lines" обрезал выносные элементы букв
-               («у», «р», курсивные em) — анимируем без маски, ничего не режется */
-            type: "lines", autoSplit: true,
-            onSplit: function (self) {
-              el.style.visibility = "";
-              var tw = {
-                yPercent: 110, opacity: 0,
-                duration: 0.9, ease: "power3.out", stagger: 0.1,
-                /* заголовок героя выходит после отрисовки логотипа (ТЗ4 §3.3) */
-                delay: el.classList.contains("hero__title") ? 0.35 : 0
-              };
-              /* ГРАБЛИ: ключ scrollTrigger со значением null gsap всё равно
-                 отдаёт плагину, и твин повисает в стартовом состоянии
-                 (строка так и оставалась с opacity 0). Ключа быть НЕ должно. */
-              if (!inHero) tw.scrollTrigger = { trigger: el, start: "top 78%", once: true };
-              return gsap.from(self.lines, tw);
-            }
-          });
-        });
-        ScrollTrigger.refresh();
-      });
-    }
+    /* Построчный выход .js-lines (ТЗ2 §3) удалён по ТЗ «появление
+       текста» §8. Заголовки первого экрана и финала теперь ведёт
+       assets/js/reveal.js: первый — посимвольно (data-gsap-title),
+       второй — по словам (data-gsap-big-copy-on-scroll). Там же и
+       ожидание document.fonts.ready, ради которого этот блок жил. */
 
     /* Осевой параллакс старых услуг (.svc-spread) удалён вместе с их
        вёрсткой: услуги пересобраны в блоки-слайдеры (см. ниже). */
@@ -1438,6 +1502,43 @@
         }
       });
 
+      /* Правка 03.08: проезд НЕ обрывается вместе с пином.
+         Пин отпускает секцию ровно тогда, когда последняя станция встала
+         в центр экрана, — и раньше в этот момент трек замирал, а страница
+         уезжала к следующему блоку с застывшими карточками. Теперь на
+         отрезке «пин кончился → секция ушла вверх» трек продолжает идти
+         влево: оставшиеся лица и подписи под ними доезжают до кромки,
+         пока снизу поднимается следующий блок.
+
+         Отдельный твин работает по xPercent, а НЕ по x, и это важно:
+         GSAP складывает обе составляющие в один transform, поэтому он не
+         конфликтует с основным твином, который держит x = −dist(). Если
+         вести оба по x, второй на прогрессе 0 сбрасывал бы позицию
+         первого во время самого проезда. */
+      /* Ход выхода задан явно, а не «остатком трека»: после центровки
+         последней станции справа от неё остаётся только паддинг (замер на
+         1440: трек 3570, проезд 2505, экран 1440 — остаток отрицательный).
+         0.4 экрана хватает, чтобы карточки заметно продолжили уходить
+         влево и при этом не улетели за кромку раньше самой секции. */
+      var exitDist = function () { return window.innerWidth * 0.4; };
+      gsap.to(track, {
+        xPercent: function () {
+          var w = track.offsetWidth;
+          return w ? -100 * exitDist() / w : 0;
+        },
+        ease: "none",
+        scrollTrigger: {
+          trigger: section, scrub: 1,
+          /* границы берём прямо у пина: строковый «top top-=dist» здесь
+             считается по распорке пина и прибавляет проезд ВТОРОЙ раз —
+             замер показал старт на 2505px позже, чем нужно */
+          start: function () { return tween.scrollTrigger.end; },
+          end: function () { return tween.scrollTrigger.end + window.innerHeight; },
+          invalidateOnRefresh: true,
+          refreshPriority: -1   /* пересчитываться после пина, чтобы .end был свежим */
+        }
+      });
+
       /* ТЗ6 §3: подсветка пути с мягким градиентным хвостом — маска-
          прямоугольник с fade-краем едет по X вместе с прогрессом.
          Правка 31.07 (пятая), два изменения против ТЗ16 §5.3:
@@ -1459,7 +1560,10 @@
                добавку и удвоил бы её. offsetWidth — чистая layout-ширина
                трека, переполнение детьми в неё не входит. */
             var svgW = track.offsetWidth + window.innerWidth;
-            var fracEnd = (dist() + window.innerWidth) / svgW;
+            /* + exitDist(): трек едет ещё и после пина (см. твин выше), и
+               без этой добавки конец сплошной части уезжал бы влево вместе
+               с линией — правый край подсветки тух на самом выходе */
+            var fracEnd = (dist() + exitDist() + window.innerWidth) / svgW;
             return 1500 * fracEnd - MASK_SOLID;
           }
         },
@@ -1676,10 +1780,8 @@
       window.addEventListener("load", sizeTail);
       sizeTail();
     }
-  } else {
-    /* reduced-motion или нет GSAP: показываем всё сразу */
-    document.querySelectorAll("[data-reveal]").forEach(function (el) {
-      el.style.opacity = "1"; el.style.transform = "none";
-    });
   }
+  /* Ветки else здесь больше нет: при reduced-motion и без GSAP текст
+     показывать вручную не нужно — reveal.js просто снимает с <html>
+     guard-класс js-reveal, на котором висит правило opacity:0. */
 })();

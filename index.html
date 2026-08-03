@@ -3,6 +3,11 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- Guard системы появления текста: правило opacity:0 висит на
+       html.js-reveal, поэтому при отключённом JS класс не появляется
+       и весь текст просто виден. reveal.js снимает класс сам, если
+       GSAP не загрузился или включён prefers-reduced-motion. -->
+  <script>document.documentElement.classList.add("js-reveal")</script>
   <title>BARPOINT — ателье барных и кофейных концепций. Консалтинг HoReCa с 2016 года</title>
   <meta name="description" content="BARPOINT создаёт бары, кофейни и напиточные бренды: от идеи и дизайна — до операционки, экономики и масштабирования. 80 000+ коктейлей в год, 11+ реализованных концепций, с 2016 года.">
   <!-- ТЗ4 §8.8: знак BARPOINT (монограмма из презентаций) -->
@@ -143,7 +148,9 @@
        и создаём»; янтарный акцент снят — весь заголовок одним цветом
        (выбран вариант Б из ТЗ15 §3.4). -->
   <div class="hero__content container">
-    <h1 class="hero__title js-lines"><span class="nw">С 2016 года</span> создаём и улучшаем кофейни, бары <span class="nw">и рестораны,</span> закрывая <span class="nw">полный цикл:</span> <span class="nw">от концепции</span> <span class="nw">до операционки</span></h1>
+    <!-- bigCopy здесь НЕ ставим: 91 знак и 17 слов — разлёт с поворотом
+         на таком объёме читается как шум, и это LCP-элемент страницы. -->
+    <h1 class="hero__title" data-gsap-title><span class="nw">С 2016 года</span> создаём и улучшаем кофейни, бары <span class="nw">и рестораны,</span> закрывая <span class="nw">полный цикл:</span> <span class="nw">от концепции</span> <span class="nw">до операционки</span></h1>
   </div>
 </section>
 
@@ -160,17 +167,17 @@
   <div class="marquee">
     <div class="marquee__track" data-marquee>
       <span class="marquee__item mq mq--logo">
-        <img class="mq__img mq__img--pims" src="assets/img/logo-pims.png" width="359" height="108" alt="PIMS" loading="lazy" decoding="async">
+        <img class="mq__img mq__img--pims" src="assets/img/logo-pims-light.png" width="359" height="108" alt="PIMS" loading="lazy" decoding="async">
       </span>
       <span class="marquee__item mq mq--duran">Duran Bar</span>
       <span class="marquee__item mq mq--logo">
-        <img class="mq__img mq__img--zoyka" src="assets/img/logo-zoyka.png" width="900" height="601" alt="Зойка" loading="lazy" decoding="async">
+        <img class="mq__img mq__img--zoyka" src="assets/img/logo-zoyka-light.png" width="900" height="601" alt="Зойка" loading="lazy" decoding="async">
       </span>
       <span class="marquee__item mq mq--logo">
-        <img class="mq__img mq__img--aina" src="assets/img/logo-aina.png" width="562" height="382" alt="АЙНА" loading="lazy" decoding="async">
+        <img class="mq__img mq__img--aina" src="assets/img/logo-aina-light.png" width="562" height="382" alt="АЙНА" loading="lazy" decoding="async">
       </span>
       <span class="marquee__item mq mq--logo">
-        <img class="mq__img mq__img--luwo" src="assets/img/logo-luwo.png" width="568" height="187" alt="Lúwo" loading="lazy" decoding="async">
+        <img class="mq__img mq__img--luwo" src="assets/img/logo-luwo-light.png" width="568" height="187" alt="Lúwo" loading="lazy" decoding="async">
       </span>
       <span class="marquee__item mq mq--buro">
         <span class="mq__lockup">
@@ -194,17 +201,17 @@
      Правка 29.07: наведение убрано целиком — карточки статичны, все три
      всегда в насыщенном состоянии, описание видно без ховера. Поэтому
      они больше не интерактивны: ни tabindex, ни aria-expanded. -->
-<section class="section section--black" id="about" data-bg="#1B1916">
+<section class="section section--black" id="about" data-bg="#100b06">
   <div class="container">
-    <div class="scn-head" data-reveal>
-      <h2 class="scn-head__title">Три сценария работы</h2>
+    <div class="scn-head">
+      <h2 class="scn-head__title" data-gsap-title-on-scroll>Три сценария работы</h2>
     </div>
 
     <div class="scn" data-scn>
       <article class="scn__card" data-scn-card data-scn-i="0">
         <span class="scn__frame" aria-hidden="true"></span>
-        <h3 class="scn__title">Открываете<br>с нуля</h3>
-        <p class="scn__desc">Помогаем спроектировать концепцию, карту напитков и запустить точку без типичных ошибок старта.</p>
+        <h3 class="scn__title" data-gsap-title-on-scroll>Открываете<br>с нуля</h3>
+        <p class="scn__desc" data-gsap-text-on-scroll data-gsap-delay="0.1">Помогаем спроектировать концепцию, карту напитков и запустить точку без типичных ошибок старта.</p>
         <figure class="scn__photo">
           <img src="assets/img/scenario-1-900.webp" width="900" height="1125" alt="Напиток наливают в бокал — старт нового проекта" loading="lazy" decoding="async">
         </figure>
@@ -212,8 +219,8 @@
 
       <article class="scn__card" data-scn-card data-scn-i="1">
         <span class="scn__frame" aria-hidden="true"></span>
-        <h3 class="scn__title">Упёрлись<br>в потолок</h3>
-        <p class="scn__desc">Разбираем, где теряются деньги и гости, и выстраиваем систему вместо ручного управления.</p>
+        <h3 class="scn__title" data-gsap-title-on-scroll>Упёрлись<br>в потолок</h3>
+        <p class="scn__desc" data-gsap-text-on-scroll data-gsap-delay="0.1">Разбираем, где теряются деньги и гости, и выстраиваем систему вместо ручного управления.</p>
         <figure class="scn__photo">
           <img src="assets/img/scenario-2-900.webp" width="900" height="1125" alt="Кофе с молоком — текстура вихря" loading="lazy" decoding="async">
         </figure>
@@ -221,8 +228,8 @@
 
       <article class="scn__card" data-scn-card data-scn-i="2">
         <span class="scn__frame" aria-hidden="true"></span>
-        <h3 class="scn__title">Хотите<br>масштабироваться</h3>
-        <p class="scn__desc">Готовим бренд, стандарты и экономику так, чтобы формат можно было тиражировать.</p>
+        <h3 class="scn__title" data-gsap-title-on-scroll>Хотите<br>масштабироваться</h3>
+        <p class="scn__desc" data-gsap-text-on-scroll data-gsap-delay="0.1">Готовим бренд, стандарты и экономику так, чтобы формат можно было тиражировать.</p>
         <figure class="scn__photo">
           <img src="assets/img/scenario-3-900.webp" width="900" height="1125" alt="Гости с фирменными напитками PIMS" loading="lazy" decoding="async">
         </figure>
@@ -251,9 +258,9 @@
      выходе слайды успевали оказаться на тёмном. Барный блок остаётся в
      bgflow: его data-bg совпадает и с его собственной темой, и с фоном
      соседей, поэтому там разнобоя быть не может. -->
-<section class="prs prs--coffee" id="coffee" data-bg="#E8DCC2" data-prs data-prs-side="right">
+<section class="prs prs--coffee" id="coffee" data-bg="#100b06" data-prs data-prs-side="right">
   <div class="prs__inner container">
-    <h2 class="prs__manifest">Coffee consulting</h2>
+    <h2 class="prs__manifest" data-gsap-big-copy-on-scroll>Coffee consulting</h2>
 
     <nav class="prs__nav" aria-label="Разделы: Coffee consulting" data-prs-nav>
       <span class="prs__line" aria-hidden="true"><span class="prs__fill" data-prs-fill></span></span>
@@ -266,8 +273,8 @@
     <div class="prs__stage">
       <article class="prs__slide" data-prs-slide>
         <div class="prs__text">
-          <h3 class="prs__title">Работаем со всем циклом кофейного бизнеса</h3>
-          <ul class="prs__list">
+          <h3 class="prs__title" data-gsap-title-on-scroll>Работаем со всем циклом кофейного бизнеса</h3>
+          <ul class="prs__list" data-gsap-slide-in-on-scroll data-gsap-stagger-scope data-gsap-delay="0.15">
             <li>Концепция и бренд</li>
             <li>Айдентика и визуальный язык</li>
             <li>Проектирование пространства и рабочих зон</li>
@@ -287,8 +294,8 @@
 
       <article class="prs__slide" data-prs-slide>
         <div class="prs__text">
-          <h3 class="prs__title">Menu engineering</h3>
-          <dl class="prs__defs">
+          <h3 class="prs__title" data-gsap-title-on-scroll>Menu engineering</h3>
+          <dl class="prs__defs" data-gsap-slide-in-on-scroll data-gsap-stagger-scope data-gsap-delay="0.15">
             <div><dt>Сенсорика</dt><dd>и тестирование ингредиентов</dd></div>
             <div><dt>Точные рецептуры</dt><dd>которые легко повторить</dd></div>
             <div><dt>Баланс</dt><dd>вкуса, скорости и себестоимости</dd></div>
@@ -303,8 +310,8 @@
 
       <article class="prs__slide" data-prs-slide>
         <div class="prs__text">
-          <h3 class="prs__title">Операционка. Экономика</h3>
-          <ul class="prs__list prs__list--two">
+          <h3 class="prs__title" data-gsap-title-on-scroll>Операционка. Экономика</h3>
+          <ul class="prs__list prs__list--two" data-gsap-slide-in-on-scroll data-gsap-stagger-scope data-gsap-delay="0.15">
             <li>Себестоимость и маржинальность</li>
             <li>Фудкост, списания, потери</li>
             <li>Отчёты и инвентаризация</li>
@@ -322,8 +329,8 @@
 
       <article class="prs__slide" data-prs-slide>
         <div class="prs__text">
-          <h3 class="prs__title">Прямые связи и честные условия</h3>
-          <div class="prs__pair">
+          <h3 class="prs__title" data-gsap-title-on-scroll>Прямые связи и честные условия</h3>
+          <div class="prs__pair" data-gsap-slide-in-on-scroll data-gsap-stagger-scope data-gsap-delay="0.15">
             <p>Подбираем оборудование не по каталогу, а под поток, формат и опыт гостя</p>
             <p>Закрываем поставки: зерно, молоко, альтернативы, сиропы, упаковка, техника</p>
           </div>
@@ -340,9 +347,9 @@
      цвета одной секции в цвет другой (сама анимация — в main.js). -->
 <div class="seam" aria-hidden="true"></div>
 
-<section class="prs prs--bar" id="services" data-bg="#1B1916" data-prs data-prs-side="left">
+<section class="prs prs--bar" id="services" data-bg="#100b06" data-prs data-prs-side="left">
   <div class="prs__inner container">
-    <h2 class="prs__manifest">Bar consulting</h2>
+    <h2 class="prs__manifest" data-gsap-big-copy-on-scroll>Bar consulting</h2>
 
     <nav class="prs__nav" aria-label="Разделы: Bar consulting" data-prs-nav>
       <span class="prs__line" aria-hidden="true"><span class="prs__fill" data-prs-fill></span></span>
@@ -356,16 +363,16 @@
         <div class="prs__text">
           <div class="prs__groups">
             <div class="prs__group">
-              <h3 class="prs__title">Проектирование и запуск</h3>
-              <ul class="prs__facts">
+              <h3 class="prs__title" data-gsap-title-on-scroll>Проектирование и запуск</h3>
+              <ul class="prs__facts" data-gsap-slide-in-on-scroll data-gsap-stagger-scope data-gsap-delay="0.15">
                 <li>Проектируем бары и рестораны под задачи бренда и трафик.</li>
                 <li>Формируем функциональный бар, где дизайн работает на скорость и логику.</li>
                 <li>Сопровождаем проект до полного запуска.</li>
               </ul>
             </div>
             <div class="prs__group">
-              <h3 class="prs__title">Управление и операционка</h3>
-              <ul class="prs__facts">
+              <h3 class="prs__title" data-gsap-title-on-scroll>Управление и операционка</h3>
+              <ul class="prs__facts" data-gsap-slide-in-on-scroll data-gsap-stagger-scope data-gsap-delay="0.15">
                 <li>Берём на себя операционку бара целиком: процессы, контроль, стандарты.</li>
                 <li>Строим систему управления, которая работает без ручного вмешательства.</li>
               </ul>
@@ -381,16 +388,16 @@
         <div class="prs__text">
           <div class="prs__groups">
             <div class="prs__group">
-              <h3 class="prs__title">Аналитика</h3>
-              <ul class="prs__facts">
+              <h3 class="prs__title" data-gsap-title-on-scroll>Аналитика</h3>
+              <ul class="prs__facts" data-gsap-slide-in-on-scroll data-gsap-stagger-scope data-gsap-delay="0.15">
                 <li>Управляем себестоимостью и фудкостом.</li>
                 <li>Внедряем систему точной инвентаризации и контроля остатков.</li>
                 <li>Даём прогнозы, корректируем меню и процессы на основе данных.</li>
               </ul>
             </div>
             <div class="prs__group">
-              <h3 class="prs__title">Партнёрские преимущества</h3>
-              <ul class="prs__facts">
+              <h3 class="prs__title" data-gsap-title-on-scroll>Партнёрские преимущества</h3>
+              <ul class="prs__facts" data-gsap-slide-in-on-scroll data-gsap-stagger-scope data-gsap-delay="0.15">
                 <li>Даём доступ к эксклюзивным условиям от производителей и контрагентов.</li>
                 <li>Предоставляем скидки, спецбюджеты и маркетинговые интеграции.</li>
                 <li>Включаем проверенных партнёров, экономим ресурсы и время.</li>
@@ -407,8 +414,8 @@
         <div class="prs__text">
           <div class="prs__groups">
             <div class="prs__group">
-              <h3 class="prs__title">Команда и кадровая экспертиза</h3>
-              <ul class="prs__facts">
+              <h3 class="prs__title" data-gsap-title-on-scroll>Команда и кадровая экспертиза</h3>
+              <ul class="prs__facts" data-gsap-slide-in-on-scroll data-gsap-stagger-scope data-gsap-delay="0.15">
                 <li>Подбираем и обучаем профессиональный кадровый состав.</li>
                 <li>Проводим регулярные аттестации, оценки и усиление команды.</li>
                 <li>Разрабатываем механики продаж под формат и аудиторию проекта.</li>
@@ -416,8 +423,8 @@
               </ul>
             </div>
             <div class="prs__group">
-              <h3 class="prs__title">Соответствие стандартам и безопасность</h3>
-              <ul class="prs__facts">
+              <h3 class="prs__title" data-gsap-title-on-scroll>Соответствие стандартам и безопасность</h3>
+              <ul class="prs__facts" data-gsap-slide-in-on-scroll data-gsap-stagger-scope data-gsap-delay="0.15">
                 <li>Контролируем выполнение требований Роспотребнадзора.</li>
                 <li>Создаём рабочую документацию и регламенты на каждый этап.</li>
               </ul>
@@ -440,13 +447,13 @@
 <div class="seam" aria-hidden="true"></div>
 
 <!-- ============ 6.8 Портфолио / кейсы ============ -->
-<section class="section section--ivory" id="cases" data-bg="#E8DCC2">
+<section class="section section--ivory" id="cases" data-bg="#100b06">
   <div class="container">
     <!-- Правка 31.07: пилюля «Портфолио» и фильтр «Все / Бар / Кофе» убраны;
          заголовок — капсом, прямым Roslindale, по центру. -->
-    <div class="sec-head cases-head" data-reveal>
-      <h2 class="h-serif h2">Наши проекты</h2>
-      <p class="lead">Собраны наиболее знаковые проекты, реализованные командой BARPOINT</p>
+    <div class="sec-head cases-head">
+      <h2 class="h-serif h2" data-gsap-title-on-scroll>Наши проекты</h2>
+      <p class="lead" data-gsap-text-on-scroll data-gsap-delay="0.1">Собраны наиболее знаковые проекты, реализованные командой BARPOINT</p>
     </div>
     <!-- ТЗ2 §6: бесконечная лента карточек с drag; при reduced-motion
          вместо ленты строится статичная сетка (fallback). Всё — из data.js -->
@@ -488,13 +495,13 @@
             <div class="cgal__slot" data-arrow-slot>
               <button class="carrow carrow--prev" type="button" data-photo-prev aria-label="Предыдущее фото">
                 <span class="carrow__bg"></span>
-                <span class="carrow__ico"><svg viewBox="0 0 23 15" aria-hidden="true" focusable="false"><path d="M15.5 0 14.1 1.4l5.1 5.1H0v2h19.2l-5.1 5.1L15.5 15 23 7.5z"/></svg></span>
+                <span class="carrow__ico"><svg viewBox="0 0 23 15" aria-hidden="true" focusable="false"><g fill="none" stroke="currentColor" stroke-width="3.9" stroke-linecap="round" stroke-linejoin="round"><path d="M1.95 7.5C5 7.2 8.4 7.1 11.7 7.2c1.8.05 3.6.16 5.4.3"/><path d="M13.9 2.3C15.6 3.8 17.8 5.6 20.5 7.5 17.9 9.5 15.7 11.2 13.9 12.7"/></g></svg></span>
               </button>
             </div>
             <div class="cgal__slot" data-arrow-slot>
               <button class="carrow carrow--next" type="button" data-photo-next aria-label="Следующее фото">
                 <span class="carrow__bg"></span>
-                <span class="carrow__ico"><svg viewBox="0 0 23 15" aria-hidden="true" focusable="false"><path d="M15.5 0 14.1 1.4l5.1 5.1H0v2h19.2l-5.1 5.1L15.5 15 23 7.5z"/></svg></span>
+                <span class="carrow__ico"><svg viewBox="0 0 23 15" aria-hidden="true" focusable="false"><g fill="none" stroke="currentColor" stroke-width="3.9" stroke-linecap="round" stroke-linejoin="round"><path d="M1.95 7.5C5 7.2 8.4 7.1 11.7 7.2c1.8.05 3.6.16 5.4.3"/><path d="M13.9 2.3C15.6 3.8 17.8 5.6 20.5 7.5 17.9 9.5 15.7 11.2 13.9 12.7"/></g></svg></span>
               </button>
             </div>
           </div>
@@ -515,33 +522,17 @@
           <div class="cinfo__subwrap"><p class="cinfo__sub" data-cover-sub></p></div>
         </div>
 
+        <!-- Правка 03.08: карточка «Факты» убрана целиком (категория и номер
+             в портфолио заказчику не нужны), а её место отдано описанию —
+             оно тянется до низа колонки. Строка перелистывания кейсов
+             переехала НАВЕРХ левой колонки, «Что сделали» в правой доросло
+             до кнопки: строка перелистывания и «Что сделали» стоят на одном
+             уровне, описание начинается под строкой. -->
         <div class="cboxes">
-          <!-- 1. Описание -->
-          <div class="cbox" data-cover-box>
-            <p class="cbox__title">Описание</p>
-            <p class="cbox__text" data-cover-desc></p>
-          </div>
 
-          <!-- 2. Что сделали (+ плавающий предмет, выходящий за карточку) -->
-          <div class="cbox" data-cover-box data-cover-worksbox>
-            <p class="cbox__title">Что сделали</p>
-            <ul class="cworks" data-cover-works></ul>
-            <div class="cbox__food" data-cover-food>
-              <div class="cfood" data-parallax-food data-parallax-speed="0.3">
-                <div class="cfood__inner" data-parallax-food-inner><img src="" alt="" decoding="async"></div>
-              </div>
-            </div>
-          </div>
-
-          <!-- 3. Факты -->
-          <div class="cbox" data-cover-box>
-            <p class="cbox__title">Факты</p>
-            <div class="cfacts" data-cover-facts></div>
-          </div>
-
-          <!-- 4. Действие: навигация по кейсам + главная кнопка -->
-          <div class="cact" data-cover-box>
-            <div class="cact__row">
+          <!-- левая колонка: перелистывание кейсов + описание -->
+          <div class="ccol">
+            <div class="cact__row" data-cover-box>
               <span class="cact__name" data-cover-name></span>
               <div class="cact__nav">
                 <button class="cact__navbtn" type="button" data-case-prev aria-label="Предыдущий кейс">
@@ -554,7 +545,29 @@
               </div>
             </div>
 
-            <button class="cbtn" type="button" data-cover-cta data-btn>
+            <div class="cbox cbox--desc" data-cover-box>
+              <p class="cbox__title">Описание</p>
+              <p class="cbox__text" data-cover-desc></p>
+            </div>
+          </div>
+
+          <!-- правая колонка: что сделали + главная кнопка -->
+          <div class="ccol">
+            <div class="cbox cbox--works" data-cover-box data-cover-worksbox>
+              <p class="cbox__title">Что сделали</p>
+              <ul class="cworks" data-cover-works></ul>
+              <!-- плавающий предмет, выходящий за карточку -->
+              <div class="cbox__food" data-cover-food>
+                <!-- амплитуда задана явно: у эталона предмет качался в открытом
+                     поле со случайным размахом, у нас он живёт внутри карточки
+                     и при размахе под 25% вылезал за её кромку -->
+                <div class="cfood" data-parallax-food data-parallax-speed="0.3" data-parallax-float-amplitude="0.3">
+                  <div class="cfood__inner" data-parallax-food-inner><img src="" alt="" decoding="async"></div>
+                </div>
+              </div>
+            </div>
+
+            <button class="cbtn" type="button" data-cover-cta data-btn data-cover-box>
               <span class="cbtn__bg" data-button-bg></span>
               <span class="cbtn__content">
                 <span class="clbl">
@@ -563,9 +576,9 @@
                   <span class="clbl__layer" data-text-second aria-hidden="true">Обсудить проект</span>
                 </span>
                 <span class="clbl clbl--right">
-                  <span class="clbl__ghost" aria-hidden="true"><svg class="cbtn__arrow" viewBox="0 0 23 15" focusable="false"><path d="M15.5 0 14.1 1.4l5.1 5.1H0v2h19.2l-5.1 5.1L15.5 15 23 7.5z"/></svg></span>
-                  <span class="clbl__layer" data-right-icon-first aria-hidden="true"><svg class="cbtn__arrow" viewBox="0 0 23 15" focusable="false"><path d="M15.5 0 14.1 1.4l5.1 5.1H0v2h19.2l-5.1 5.1L15.5 15 23 7.5z"/></svg></span>
-                  <span class="clbl__layer" data-right-icon-second aria-hidden="true"><svg class="cbtn__arrow" viewBox="0 0 23 15" focusable="false"><path d="M15.5 0 14.1 1.4l5.1 5.1H0v2h19.2l-5.1 5.1L15.5 15 23 7.5z"/></svg></span>
+                  <span class="clbl__ghost" aria-hidden="true"><svg class="cbtn__arrow" viewBox="0 0 23 15" focusable="false"><g fill="none" stroke="currentColor" stroke-width="3.9" stroke-linecap="round" stroke-linejoin="round"><path d="M1.95 7.5C5 7.2 8.4 7.1 11.7 7.2c1.8.05 3.6.16 5.4.3"/><path d="M13.9 2.3C15.6 3.8 17.8 5.6 20.5 7.5 17.9 9.5 15.7 11.2 13.9 12.7"/></g></svg></span>
+                  <span class="clbl__layer" data-right-icon-first aria-hidden="true"><svg class="cbtn__arrow" viewBox="0 0 23 15" focusable="false"><g fill="none" stroke="currentColor" stroke-width="3.9" stroke-linecap="round" stroke-linejoin="round"><path d="M1.95 7.5C5 7.2 8.4 7.1 11.7 7.2c1.8.05 3.6.16 5.4.3"/><path d="M13.9 2.3C15.6 3.8 17.8 5.6 20.5 7.5 17.9 9.5 15.7 11.2 13.9 12.7"/></g></svg></span>
+                  <span class="clbl__layer" data-right-icon-second aria-hidden="true"><svg class="cbtn__arrow" viewBox="0 0 23 15" focusable="false"><g fill="none" stroke="currentColor" stroke-width="3.9" stroke-linecap="round" stroke-linejoin="round"><path d="M1.95 7.5C5 7.2 8.4 7.1 11.7 7.2c1.8.05 3.6.16 5.4.3"/><path d="M13.9 2.3C15.6 3.8 17.8 5.6 20.5 7.5 17.9 9.5 15.7 11.2 13.9 12.7"/></g></svg></span>
                 </span>
               </span>
             </button>
@@ -592,7 +605,7 @@
      ТЗ2 §5: закреплённая горизонтальная прокрутка (десктоп ≥1024),
      свайп-лента со scroll-snap (мобайл и reduced-motion).
      Все 5 человек, порядок: Шустериовас, Бегляров, Маяков, Марушко, Гордышев -->
-<section class="hteam" id="team" data-hteam data-bg="#2B0E12">
+<section class="hteam" id="team" data-hteam data-bg="#100b06">
   <div class="hteam__viewport" data-hteam-viewport>
     <div class="hteam__track" data-hteam-track>
       <!-- ТЗ3 §3: волна пути перерисована под короткий трек из двух станций -->
@@ -629,15 +642,15 @@
            которая собирает систему…» убраны по просьбе заказчика —
            в интро-станции остаётся только заголовок. -->
       <div class="hstation hstation--intro">
-        <h2 class="h-serif h2">BARPOINT в лицах</h2>
+        <h2 class="h-serif h2" data-gsap-title-on-scroll>BARPOINT в лицах</h2>
       </div>
 
       <div class="hstation" data-hstation>
         <div class="hstation__card">
           <figure class="hstation__photo"><img src="assets/img/team-artur-800.webp" width="800" height="1200" alt="Артур Шустериовас" loading="eager" decoding="async"></figure>
           <span class="plaque"><span>Артур Шустериовас</span></span>
-          <p class="hstation__role">Co-founder BARPOINT · PIMS · Origin Group</p>
-          <p class="hstation__creds">Креативный директор PIMS. Маркетинг, дизайн, продуктовые стратегии, позиционирование, виральность, визуальный язык.</p>
+          <p class="hstation__role" data-gsap-text-on-scroll>Co-founder BARPOINT · PIMS · Origin Group</p>
+          <p class="hstation__creds" data-gsap-text-on-scroll data-gsap-delay="0.08">Креативный директор PIMS. Маркетинг, дизайн, продуктовые стратегии, позиционирование, виральность, визуальный язык.</p>
         </div>
       </div>
 
@@ -645,8 +658,8 @@
         <div class="hstation__card">
           <figure class="hstation__photo"><img src="assets/img/team-timur-800.webp" width="800" height="1200" alt="Тимур Бегляров" loading="eager" decoding="async"></figure>
           <span class="plaque"><span>Тимур Бегляров</span></span>
-          <p class="hstation__role">Co-founder BARPOINT · PIMS</p>
-          <p class="hstation__creds">Операционный менеджмент, продукт и процессы. Команда, стабильность вкуса, экономика и маржа.</p>
+          <p class="hstation__role" data-gsap-text-on-scroll>Co-founder BARPOINT · PIMS</p>
+          <p class="hstation__creds" data-gsap-text-on-scroll data-gsap-delay="0.08">Операционный менеджмент, продукт и процессы. Команда, стабильность вкуса, экономика и маржа.</p>
         </div>
       </div>
 
@@ -656,8 +669,8 @@
         <div class="hstation__card">
           <figure class="hstation__photo"><img src="assets/img/team-mayakov-800.webp" width="800" height="1067" alt="Владимир Маяков" loading="eager" decoding="async"></figure>
           <span class="plaque"><span>Владимир Маяков</span></span>
-          <p class="hstation__role">Co-owner BARPOINT RU / MENA</p>
-          <p class="hstation__creds">Экс-идеолог и директор INSADER BAR — #13 The World's 50 Best Bars 2021, GQ Bar Awards 2021. Экс-директор по напиткам GT.GROUP: ALICE и Vani — Michelin Guide 2021.</p>
+          <p class="hstation__role" data-gsap-text-on-scroll>Co-owner BARPOINT RU / MENA</p>
+          <p class="hstation__creds" data-gsap-text-on-scroll data-gsap-delay="0.08">Экс-идеолог и директор INSADER BAR — #13 The World's 50 Best Bars 2021, GQ Bar Awards 2021. Экс-директор по напиткам GT.GROUP: ALICE и Vani — Michelin Guide 2021.</p>
         </div>
       </div>
 
@@ -665,8 +678,8 @@
         <div class="hstation__card">
           <figure class="hstation__photo"><img src="assets/img/team-marushko-800.webp" width="800" height="1196" alt="Руслан Марушко" loading="eager" decoding="async"></figure>
           <span class="plaque"><span>Руслан Марушко</span></span>
-          <p class="hstation__role">Creative Head Bartender &amp; R&amp;D Lead</p>
-          <p class="hstation__creds">Авторские коктейли и концептуальные барные карты. Гастрономические коллаборации, лаборатория вкуса: тестирования, экспериментальные рецептуры, технологии.</p>
+          <p class="hstation__role" data-gsap-text-on-scroll>Creative Head Bartender &amp; R&amp;D Lead</p>
+          <p class="hstation__creds" data-gsap-text-on-scroll data-gsap-delay="0.08">Авторские коктейли и концептуальные барные карты. Гастрономические коллаборации, лаборатория вкуса: тестирования, экспериментальные рецептуры, технологии.</p>
         </div>
       </div>
 
@@ -674,8 +687,8 @@
         <div class="hstation__card">
           <figure class="hstation__photo"><img src="assets/img/team-gordyshev-800.webp" width="800" height="1200" alt="Александр Гордышев" loading="eager" decoding="async"></figure>
           <span class="plaque"><span>Александр Гордышев</span></span>
-          <p class="hstation__role">Operational Head Bartender</p>
-          <p class="hstation__creds">Процессы, стандарты и контроль качества. Аналитика, экономика и эффективность бара; подбор, обучение и аттестации команды.</p>
+          <p class="hstation__role" data-gsap-text-on-scroll>Operational Head Bartender</p>
+          <p class="hstation__creds" data-gsap-text-on-scroll data-gsap-delay="0.08">Процессы, стандарты и контроль качества. Аналитика, экономика и эффективность бара; подбор, обучение и аттестации команды.</p>
         </div>
       </div>
 
@@ -699,35 +712,35 @@
 <!-- ============ 6.14 FAQ ============
      [ЧЕРНОВИК вопросов по ТЗ 6.14 — согласовать с заказчиком] -->
 <!-- FAQ временно скрыт по просьбе заказчика (17.07.2026). Вернуть: раскомментировать до пометки КОНЕЦ FAQ.
-<section class="section section--black" id="faq" data-bg="#1B1916">
+<section class="section section--black" id="faq" data-bg="#100b06">
   <div class="container">
-    <div class="sec-head" data-reveal>
+    <div class="sec-head">
       <p class="pill">FAQ</p>
-      <h2 class="h-serif h2">Вопросы, которые нам задают</h2>
+      <h2 class="h-serif h2" data-gsap-title-on-scroll>Вопросы, которые нам задают</h2>
     </div>
-    <div class="faq" data-faq data-reveal>
+    <div class="faq" data-faq>
       <details>
-        <summary>Сколько стоят услуги и от чего зависит цена?<span class="ic" aria-hidden="true"></span></summary>
+        <summary data-gsap-text-on-scroll>Сколько стоят услуги и от чего зависит цена?<span class="ic" aria-hidden="true"></span></summary>
         <div class="faq__a"><p>Стоимость зависит от формата проекта: открытие с нуля, аудит действующей точки или сопровождение сети. После звонка-знакомства и брифа мы готовим предложение с прозрачным составом работ и расчётами.</p></div>
       </details>
       <details>
-        <summary>Работаете ли с небольшими кофейнями, а не только премиальными проектами?<span class="ic" aria-hidden="true"></span></summary>
+        <summary data-gsap-text-on-scroll>Работаете ли с небольшими кофейнями, а не только премиальными проектами?<span class="ic" aria-hidden="true"></span></summary>
         <div class="faq__a"><p>Да. Направление BARPOINT Coffee работает и с локальными форматами — например, Landy, кафе в жилом комплексе, выросло от 1 млн до 5 млн с линейкой напитков под аудиторию ЖК.</p></div>
       </details>
       <details>
-        <summary>Сколько времени занимает запуск концепции с нуля?<span class="ic" aria-hidden="true"></span></summary>
+        <summary data-gsap-text-on-scroll>Сколько времени занимает запуск концепции с нуля?<span class="ic" aria-hidden="true"></span></summary>
         <div class="faq__a"><p>Сроки зависят от масштаба проекта и готовности площадки — точный план по этапам (концепция, карта, запуск, обучение) фиксируем после брифа.</p></div>
       </details>
       <details>
-        <summary>Вы работаете только в Москве?<span class="ic" aria-hidden="true"></span></summary>
+        <summary data-gsap-text-on-scroll>Вы работаете только в Москве?<span class="ic" aria-hidden="true"></span></summary>
         <div class="faq__a"><p>Нет: наши проекты — от Москвы до Восточной Европы, а направление RU/MENA развивает работу и на Ближнем Востоке.</p></div>
       </details>
       <details>
-        <summary>Что входит в сопровождение после запуска?<span class="ic" aria-hidden="true"></span></summary>
+        <summary data-gsap-text-on-scroll>Что входит в сопровождение после запуска?<span class="ic" aria-hidden="true"></span></summary>
         <div class="faq__a"><p>Аналитика и экономика (себестоимость, фудкост, инвентаризация), контроль стандартов, работа с поставщиками, обучение и аттестации команды, корректировки меню на основе данных.</p></div>
       </details>
       <details>
-        <summary>Как вы относитесь к откатам от поставщиков?<span class="ic" aria-hidden="true"></span></summary>
+        <summary data-gsap-text-on-scroll>Как вы относитесь к откатам от поставщиков?<span class="ic" aria-hidden="true"></span></summary>
         <div class="faq__a"><p>Без коррупции, без откатов, без скрытых комиссий. Полное отсутствие коррупционных практик — принципиальная политика: мы работаем на прямых связях и честных условиях.</p></div>
       </details>
     </div>
@@ -737,12 +750,12 @@
 
 <!-- ============ 6.15 Финальный CTA + форма (возврат по ТЗ5 §7,
      состав полей — ТЗ v1 §6.15; входит в body-механику ТЗ5 §5) ============ -->
-<section class="section final" id="contact" data-bg="#2B0E12">
+<section class="section final" id="contact" data-bg="#100b06">
   <div class="container final__grid">
     <!-- Правка 31.07 (четвёртая): пилюля «Контакты» убрана — блок
          начинается сразу с фразы-приглашения. -->
-    <div data-reveal>
-      <h2 class="h-serif h2 final__title js-lines">Если вы чувствуете, что ваше заведение может стать больше, чем просто бар или кофейня, — <em>давайте создавать его вместе</em></h2>
+    <div>
+      <h2 class="h-serif h2 final__title" data-gsap-big-copy-on-scroll>Если вы чувствуете, что ваше заведение может стать больше, чем просто бар или кофейня, — <em>давайте создавать его вместе</em></h2>
       <!-- TODO (раздел 12 ТЗ v1): подтвердить контакты у заказчика.
            Значения — из презентации «Barpoint финально», сл.25 -->
       <div class="final__contacts">
@@ -755,7 +768,7 @@
     <!-- Правка 31.07 (четвёртая): карточка формы перекрашена в молочный
          (цвет «чернил» шапки над этим блоком), обводка карточки снята,
          поля получили толстую рамку по референсу buckssauce.com/shop. -->
-    <div class="form-card" data-reveal>
+    <div class="form-card" data-gsap-slide-in-on-scroll data-gsap-delay="0.1">
       <!-- Заголовок: было «Обсудить проект» — дублировало кнопку в шапке
            и обещало разговор, которого форма не запрашивает. Форма
            состоит из двух полей — имя и телефон, — поэтому честная и
@@ -822,7 +835,7 @@
 </main>
 
 <!-- ============ 6.16 Футер (компактный, возврат по ТЗ5 §7) ============ -->
-<footer class="footer" data-bg="#1B1916">
+<footer class="footer" data-bg="#100b06">
   <div class="container">
     <!-- Правка 31.07 (четвёртая): верхняя полоса футера (лого + подпись
          «Ателье барных концепций…» + дублирующая навигация) убрана
@@ -855,5 +868,8 @@
 <script src="assets/js/config.js" defer></script>
 <script src="assets/js/data.js" defer></script>
 <script src="assets/js/main.js" defer></script>
+<!-- строго после main.js: reveal.js переиспользует кривую bigCopy,
+     зарегистрированную там (плагин CustomEase в vendor не тянем) -->
+<script src="assets/js/reveal.js" defer></script>
 </body>
 </html>

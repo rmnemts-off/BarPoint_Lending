@@ -16,6 +16,11 @@
      контраст до 3.9; теперь 4.87:1 на ivory, 5.67:1 на кремовой карточке кейса */
   --bp-amber-text: #7A561B;
   --bp-burgundy: #2B0E12;
+  /* Правка 03.08: фон лендинга — ОДИН на всю страницу, чёрный как у
+     buckssauce (#100b06). Прежняя механика с перетеканием цвета от
+     секции к секции (графит → беж → бордо) снята: все data-bg теперь
+     одного значения, и body держит его постоянно. */
+  --bp-page: #100b06;
   --bp-graphite: #6E6A63;
   --bp-dark-text: #17140F;
   --bp-off-white: #EAE4D8;
@@ -98,8 +103,8 @@ body {
   font-family: var(--font-text);
   font-size: 17px;
   line-height: 1.6;
-  color: var(--bp-dark-text);
-  background: var(--bp-black);
+  color: var(--bp-off-white);
+  background: var(--bp-page);
   /* ТЗ5 §5: цвет фона живёт на body и перетекает по скроллу (как у PINEA).
      Правка 30.07: CSS-переход СНЯТ. Раньше цвет переключался скачком, а
      этот переход растягивал скачок во времени — он шёл сам по себе, не
@@ -135,9 +140,12 @@ ul, ol { list-style: none; }
 
 .section { padding-block: var(--s-12); }
 @media (min-width: 1024px) { .section { padding-block: var(--s-16); } }
-.section--ivory { background: var(--bp-ivory); color: var(--bp-dark-text); }
-.section--black { background: var(--bp-black); color: var(--bp-off-white); }
-.section--burgundy { background: var(--bp-burgundy); color: var(--bp-off-white); }
+/* Правка 03.08: секции больше не носят собственный цвет — фон один на
+   всю страницу (--bp-page). Модификаторы остались только ради тех
+   правил, что на них завязаны (лиды, обводки, контурные заголовки). */
+.section--ivory,
+.section--black,
+.section--burgundy { background: var(--bp-page); color: var(--bp-off-white); }
 
 /* Тонкая линия-разделитель (4.6) */
 .rule { border: 0; border-top: 1px solid var(--bp-amber); opacity: .6; }
@@ -204,7 +212,8 @@ ul, ol { list-style: none; }
   font-size: .74rem; font-weight: 600;
   letter-spacing: .16em; text-transform: uppercase;
 }
-.lead { font-size: 1.1rem; color: var(--bp-graphite); max-width: 46em; }
+/* фон везде тёмный, поэтому лид светлый по умолчанию (правка 03.08) */
+.lead { font-size: 1.1rem; color: color-mix(in srgb, var(--bp-off-white) 72%, transparent); max-width: 46em; }
 .section--black .lead, .section--burgundy .lead { color: color-mix(in srgb, var(--bp-off-white) 72%, transparent); }
 
 .sec-head { margin-bottom: var(--s-6); }
@@ -531,14 +540,15 @@ ul, ol { list-style: none; }
    оптической высоте.
    ============================================================ */
 .trust {
-  background: var(--bp-ivory); color: var(--bp-dark-text);
+  /* правка 03.08: полоса потеряла свой беж — фон общий, знаки светлые */
+  background: transparent; color: var(--bp-off-white);
   /* правка 30.07: полоса дважды понижена — сперва срезаны поля
      (172 → 124px), затем ещё на ~17% вместе с самими знаками
      (124 → ~104px): поля 24 → 20px, базовый кегль --mq 40 → 33.6px. */
   padding-block: clamp(12px, 1.6vw, 20px);
   overflow: hidden;
-  border-top: 1px solid color-mix(in srgb, var(--bp-dark-text) 16%, transparent);
-  border-bottom: 1px solid color-mix(in srgb, var(--bp-dark-text) 16%, transparent);
+  border-top: 1px solid color-mix(in srgb, var(--bp-off-white) 18%, transparent);
+  border-bottom: 1px solid color-mix(in srgb, var(--bp-off-white) 18%, transparent);
   /* базовый кегль полосы — от него считаются все начертания и логотипы */
   --mq: clamp(1.2rem, calc(2.55 * var(--vw-step)), 2.1rem);
 }
@@ -564,7 +574,7 @@ ul, ol { list-style: none; }
   white-space: nowrap;
   display: flex; align-items: center;
   gap: clamp(var(--s-3), 2.6vw, var(--s-6));
-  color: var(--bp-dark-text);
+  color: var(--bp-off-white);
 }
 /* разделитель — маленький амберовый ромб вместо точки */
 .marquee__item::after {
@@ -597,7 +607,7 @@ ul, ol { list-style: none; }
 .mq__tsum {
   margin-top: .3em;
   font-size: calc(var(--mq) * .44); letter-spacing: .42em; text-indent: .42em;
-  color: color-mix(in srgb, var(--bp-dark-text) 72%, transparent);
+  color: color-mix(in srgb, var(--bp-off-white) 72%, transparent);
 }
 
 /* ---------- знаки, извлечённые из презентации ----------
@@ -644,19 +654,17 @@ ul, ol { list-style: none; }
    и фон одинаков на всей длине блока, включая вход и выход. */
 /* --prs-stroke — цвет фона СОСЕДНЕГО блока: им обводится контурный
    заголовок (см. .prs__manifest) */
-.prs--coffee {
-  --prs-bg: var(--bp-ivory);
-  --prs-stroke: var(--bp-black);
-  --prs-accent: var(--bp-amber-text);
-  --prs-ink: var(--bp-dark-text);
-  background: var(--bp-ivory); color: var(--bp-dark-text);
-}
+/* Правка 03.08: кофейный блок был единственным светлым в этой паре —
+   с общим чёрным фоном он перекрашен по образцу барного. Обводка
+   контурного заголовка (--prs-stroke) у обоих теперь бежевая: цвет
+   «соседнего блока» потерял смысл, фон везде один. */
+.prs--coffee,
 .prs--bar {
-  --prs-bg: var(--bp-black);
+  --prs-bg: var(--bp-page);
   --prs-stroke: var(--bp-ivory);
   --prs-accent: var(--bp-amber);
   --prs-ink: var(--bp-off-white);
-  background: var(--bp-black); color: var(--bp-off-white);
+  background: transparent; color: var(--bp-off-white);
 }
 
 /* Правка 30.07: строки-eyebrow («Услуги · Кофе», «Услуги · Бар») удалены
@@ -1137,7 +1145,7 @@ ul, ol { list-style: none; }
   font-size: clamp(3.05rem, calc(7.4 * var(--vw-step)), 6.7rem);
   line-height: 1.02; letter-spacing: .012em;
   text-transform: uppercase;
-  color: var(--bp-dark-text);
+  color: var(--bp-off-white); /* правка 03.08: секция кейсов стала тёмной */
   /* «Жирнее» упирается в шрифт: у Roslindale Display Condensed объявлен
      диапазон 400–700, и 700 уже взято. Добавочный вес даёт обводка тем
      же цветом — она наращивает штрих, а не рисует контур. */
@@ -1153,7 +1161,7 @@ ul, ol { list-style: none; }
    AA требует 3:1, и приглушённый графит его держит (3.26:1). Ниже 1280
    цвет остаётся штатным .lead — иначе мелкий текст ушёл бы под порог. */
 @media (min-width: 1280px) {
-  .cases-head .lead { color: color-mix(in srgb, var(--bp-graphite) 88%, transparent); }
+  .cases-head .lead { color: color-mix(in srgb, var(--bp-off-white) 78%, transparent); }
 }
 .cases-grid { display: grid; gap: var(--s-3); margin-top: var(--s-6); }
 @media (min-width: 640px) { .cases-grid { grid-template-columns: repeat(2, 1fr); } }
@@ -1224,6 +1232,14 @@ ul, ol { list-style: none; }
   --cv-2xl: 18px;
   --cv-30: 24px;
   --cv-40: 28px;
+  /* Правка 03.08 (вторая): текст в обеих карточках — «Описание» и
+     «Что сделали» — набирается ОДНИМ кеглем, на два пункта крупнее
+     прежнего. Заголовки карточек при этом остаются как были. */
+  --cv-cardtext: 16px;
+  /* высота полосы под знак заведения в заголовке: у знаков очень
+     разные пропорции (Зойка 1.5, Marcelo 6.0), и от общей формулы
+     «Зойка» вырастала вдвое против соседей — фиксируем полосу */
+  --cv-mark-h: 62px;
 
   position: fixed; inset: 0; z-index: 200; /* выше шапки (100) */
   display: none;
@@ -1243,6 +1259,8 @@ ul, ol { list-style: none; }
     --cv-30:    clamp(1.3333rem, 2.0833vw, 2.5rem);
     --cv-40:    clamp(1.7778rem, 2.7778vw, 3.3333rem);
     --cv-100:   clamp(4.4444rem, 6.9444vw, 8.3333rem);
+    --cv-cardtext: clamp(1rem, 1.3vw, 1.25rem);
+    --cv-mark-h:   clamp(66px, 7.2vw, 112px);
   }
 }
 
@@ -1335,7 +1353,10 @@ ul, ol { list-style: none; }
   left: 4px; right: 4px; display: flex; justify-content: space-between; gap: 10px;
 }
 @media (min-width: 1024px) {
-  .cgal__arrows { left: auto; right: 20px; flex-direction: column; justify-content: flex-start; }
+  /* Правка 03.08: column-REVERSE — сверху стрелка «вперёд», снизу «назад».
+     Порядок в разметке при этом не трогаем: на мобильном стрелки стоят
+     строкой, и там «назад» обязана остаться слева. */
+  .cgal__arrows { left: auto; right: 20px; flex-direction: column-reverse; justify-content: flex-start; }
 }
 /* анимация «стрелки уезжают в scale 0» висит на обёртке, не на кнопке */
 .cgal__slot { will-change: transform; }
@@ -1382,22 +1403,71 @@ ul, ol { list-style: none; }
     flex-shrink: 0; font-size: var(--cv-100);
   }
 }
+/* Sixty, Duran Bar, Buro Tsum — знака нет, имя набирается прямой
+   антиквой смешанным регистром: так они стоят в презентации и на
+   плашке в ленте, капслок бы этот характер сломал */
+.cinfo__title--type {
+  text-transform: none; font-weight: 500;
+  font-family: "Roslindale Display Condensed", "Times New Roman", serif;
+  /* кегль считаем от той же полосы, что и у знаков: при line-height .9
+     строка встаёт ровно в --cv-mark-h, и заголовок у всех 13 кейсов
+     занимает одинаковую высоту независимо от того, знак это или набор */
+  font-size: calc(var(--cv-mark-h) / .9);
+}
+/* Правка 03.08: заголовок кейса — это ЗНАК заведения, а не набор.
+   Файлы -light.png те же, что на плашках в ленте.
+   Правка 03.08 (вторая): габарит задаёт не формула от пропорции знака,
+   а ФИКСИРОВАННАЯ полоса --cv-mark-h. Раньше высота считалась от --ar,
+   и «Зойка» (пропорция 1.5) выходила 254px против 77px у Marcelo —
+   заголовок прыгал от кейса к кейсу и утягивал за собой всю колонку.
+   object-fit: contain вписывает любой знак в полосу без искажений:
+   широкие упираются в ширину, высокие — в высоту. */
+.cinfo__title--mark {
+  height: var(--cv-mark-h);
+  display: flex; align-items: center; justify-content: center;
+}
+.cinfo__mark { display: block; width: 100%; height: 100%; object-fit: contain; }
 .cinfo__subwrap { width: 50%; }
 @media (min-width: 1024px) {
-  /* ширина w-col-3: у эталона тут 4 слова, у нас — предложение,
-     на w-col-2 оно вставало в 8 строк */
+  /* Правка 03.08 (вторая): w-col-3 → w-col-4, вровень с заголовком.
+     На узкой колонке подзаголовки разной длины давали то 2, то 4
+     строки, шапка «дышала» от кейса к кейсу и утягивала блоки вниз. */
   .cinfo__subwrap {
-    width: calc(((var(--cv-col) - var(--cv-ggap)) * 3) + (var(--cv-ggap) * 2));
+    width: calc(((var(--cv-col) - var(--cv-ggap)) * 4) + (var(--cv-ggap) * 3));
     flex-shrink: 0;
   }
 }
-.cinfo__sub { font-size: 18px; font-weight: 700; text-transform: uppercase; line-height: 1.15; }
+.cinfo__sub { font-size: 16px; font-weight: 700; text-transform: uppercase; line-height: 1.2; }
 
-/* ============ сетка карточек ============ */
+/* ============ сетка карточек ============
+   Правка 03.08: было 2×2 (Описание / Что сделали / Факты / Действие),
+   стало две колонки-стопки.
+     слева  — строка перелистывания кейсов, под ней описание до низа;
+     справа — «Что сделали» до самого низа, под ним кнопка.
+   Строка перелистывания и «Что сделали» начинаются на одном уровне,
+   описание — на строку ниже. Карточка «Факты» убрана целиком. */
 .cboxes { display: grid; grid-template-columns: minmax(0, 1fr); gap: 10px; margin-top: 40px; }
 @media (min-width: 1024px) {
-  .cboxes { grid-template-columns: repeat(2, minmax(0, 1fr)); grid-template-rows: auto auto; margin-top: 0; }
+  /* Правка 03.08 (вторая): высота блока ФИКСИРОВАНА и одинакова у всех
+     кейсов. Раньше её задавала длина описания, и карточки прыгали от
+     кейса к кейсу (у Landy текст короткий, у Aina втрое длиннее), а на
+     длинных приходилось подкручивать разворот вниз.
+     560px — потолок по самому длинному описанию; calc(100vh - 260px)
+     оставляет место шапке, чтобы разворот влезал в экран целиком и на
+     ноутбучных 800px; 470px — пол, ниже которого длинное описание уже
+     не помещается в карточку. */
+  .cboxes {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    /* minmax(0, 1fr) обязателен: у строки по умолчанию размер auto, и
+       фиксированная высота контейнера её не удерживает — колонки
+       вырастали по содержимому и вылезали за разворот на 4…52px */
+    grid-template-rows: minmax(0, 1fr);
+    margin-top: 0;
+    height: min(560px, max(470px, calc(100vh - 260px)));
+  }
 }
+/* колонка-стопка: тянущийся элемент внутри растёт, остальные по контенту */
+.ccol { display: flex; flex-direction: column; gap: 10px; min-width: 0; min-height: 0; }
 .cbox {
   position: relative; border-radius: 10px;
   background: var(--cv-bg); border: 1px solid var(--cv-fg);
@@ -1413,49 +1483,43 @@ ul, ol { list-style: none; }
 }
 .cbox__text { font-size: var(--cv-base); line-height: 1.5; }
 
+/* «Описание» заняло место снятых «Фактов» и тянется до низа колонки.
+   Кегль у него ТОТ ЖЕ, что у списка в «Что сделали» (--cv-cardtext):
+   заголовки карточек остаются крупными, а тексты под ними одинаковы. */
+.cbox--desc { flex: 1 1 auto; min-height: 0; }
+.cbox--desc .cbox__text {
+  flex: 1 1 auto; min-height: 0;
+  display: flex; align-items: center;
+  font-size: var(--cv-cardtext); line-height: 1.45;
+  /* страховка для узких окон (1024, где колонка всего ~200px под текст):
+     самое длинное описание прокрутится ВНУТРИ карточки, а не растянет
+     разворот — высота блоков остаётся одинаковой у всех кейсов */
+  overflow-y: auto; overscroll-behavior: contain;
+}
+/* «Что сделали» дотягивается до кнопки «Обсудить проект» */
+.cbox--works { flex: 1 1 auto; min-height: 0; }
+
 /* «Что сделали» */
 .cworks li { display: flex; align-items: flex-start; gap: 4px; width: 100%; }
 .cworks__bullet { flex: 0 0 auto; width: 12px; height: 12px; margin-top: 4px; }
 .cworks__bullet svg { width: 100%; height: 100%; display: block; fill: var(--cv-theme); }
-.cworks__text { font-size: var(--cv-base); line-height: 1.25; }
+.cworks li + li { margin-top: 6px; }
+.cworks__text { font-size: var(--cv-cardtext); line-height: 1.3; }
 
-/* «Факты»: 2–4 колонки в ряд */
-.cfacts {
-  display: flex; flex-direction: row; flex-wrap: wrap;
-  align-items: center; justify-content: space-around;
-  gap: 10px; height: 100%;
-}
-@media (min-width: 1280px) { .cfacts { gap: 24px; } }
-.cfact {
-  display: flex; flex-direction: column; align-items: center; justify-content: center;
-  gap: 20px; width: 60px; height: 100%; text-align: center;
-}
-@media (min-width: 1280px) { .cfact { width: 80px; } }
-.cfact__val {
-  font-family: var(--cv-serif); font-weight: 700; font-style: normal;
-  font-size: var(--cv-2xl); line-height: 1.05; text-align: center;
-  overflow-wrap: anywhere;
-}
-.cfact__cap {
-  font-size: var(--cv-small); text-transform: uppercase;
-  letter-spacing: -.025em; font-weight: 500; line-height: 1; text-align: center;
-}
+/* Карточка «Факты» (категория / метрика / номер в портфолио) снята
+   целиком по правке 03.08 — её место отдано описанию. Правила .cfacts
+   и .cfact удалены, а не закомментированы. */
 
-/* ============ ячейка «Действие» ============
-   Своё внутреннее устройство: рамки несут внутренние строки,
-   обычного оформления карточки у неё нет. */
-.cact {
-  display: grid; grid-template-columns: minmax(0, 1fr);
-  grid-template-rows: repeat(2, minmax(0, 1fr));
-  gap: 10px; width: 100%; height: 100%;
-  order: -1; padding-bottom: 40px;   /* на мобильном стоит первой */
-}
-@media (min-width: 1024px) { .cact { order: 1; padding-bottom: 0; } }
+/* ============ строка перелистывания кейсов ============
+   Стоит сверху левой колонки, на одном уровне с «Что сделали»;
+   высота держится в пару к кнопке «Обсудить проект» справа. */
 .cact__row {
+  flex: 0 0 auto;
   display: flex; align-items: center; gap: 10px;
   background: var(--cv-bg); border-radius: 10px; border: 1px solid var(--cv-fg);
   overflow: hidden;
 }
+@media (min-width: 1024px) { .cact__row { min-height: 72px; } }
 /* ниже 1440 колонка карточек всего ~240px, и при полных отступах
    эталона на само название оставалось 42px — поджимаем поля и кегль */
 .cact__name {
@@ -1483,6 +1547,7 @@ ul, ol { list-style: none; }
 
 /* ---------- главная кнопка ---------- */
 .cbtn {
+  flex: 0 0 auto;
   position: relative; display: flex; align-items: center; justify-content: center;
   width: 100%; border-radius: 10px;
   font-family: var(--cv-serif); font-weight: 700; font-style: normal;
@@ -1516,21 +1581,34 @@ ul, ol { list-style: none; }
 /* ---------- плавающий предмет ---------- */
 .cbox__food { display: none; }
 @media (min-width: 1024px) {
-  /* В ТЗ вынос задан как top: -75%, но карточка «Что сделали» у нас
-     втрое выше эталонной (описания кейсов длиннее), и от процента
-     предмет улетал за верх экрана, а на промежуточных значениях
-     ложился прямо на название карточки. Привязываем его к ВЕРХНЕЙ
-     кромке карточки: bottom: calc(100% - 12px) — предмет стоит над
-     карточкой, заходя на неё уголком на 12px, как в эталоне.
-     Ширина уменьшается на узких десктопах, иначе предмет накрывает
-     подзаголовок (он у нас шире эталонного). */
+  /* Правка 03.08. В ТЗ предмет вынесен НАД карточкой (top: -75%), но
+     после снятия «Фактов» карточка «Что сделали» доросла до кнопки, и
+     сверху её подпирают знак и подзаголовок — предмет ложился прямо на
+     них. Зато внизу карточки освободилось место, туда его и ставим.
+     Габарит задаём ВЫСОТОЙ, а не шириной: вырезки сняты в разных
+     пропорциях (float-invasion-1 — 278×640), и при фиксированной
+     ширине предмет вырастал вдвое против соседних кейсов. */
+  /* Не абсолют и не проценты от карточки: предмет — обычный элемент
+     потока, который забирает ВСЮ оставшуюся высоту под списком. Так он
+     физически не может на него наехать, а высота карточки у кейсов
+     разная (её задаёт длина описания в соседней колонке: у Landy оно
+     короткое, и при height:52% предмет ложился на пункты). */
   .cbox__food {
-    display: block; position: absolute;
-    bottom: calc(100% - 12px); right: 0; width: 120px; height: auto;
+    display: block; position: static;
+    flex: 1 1 auto; min-height: 0;
+    margin-right: -6px; margin-bottom: -8px;
+    pointer-events: none;
+  }
+  .cbox__food .cfood,
+  .cbox__food .cfood__inner { width: auto; height: 100%; }
+  /* селектор с .cfood обязателен: базовое правило .cfood img объявлено
+     НИЖЕ по файлу и при равной специфичности перебивало бы width:auto,
+     растягивая предмет на всю ширину карточки */
+  .cbox__food .cfood img {
+    height: 100%; max-height: 240px; width: auto;
+    display: block; margin-left: auto;
   }
 }
-@media (min-width: 1280px) { .cbox__food { width: 150px; } }
-@media (min-width: 1440px) { .cbox__food { width: 180px; } }
 .cinfo__foodmob { position: relative; width: calc(((var(--cv-col) - var(--cv-ggap)) * 4) + (var(--cv-ggap) * 3)); height: auto; }
 @media (min-width: 1024px) { .cinfo__foodmob { display: none; } }
 .cfood {
@@ -1626,9 +1704,22 @@ ul, ol { list-style: none; }
 /* было display:none — см. комментарий у .form-card__stack выше */
 form.is-hidden { visibility: hidden; }
 
-/* ---------- Reveal-анимации (раздел 8) ---------- */
+/* ---------- система появления текста (assets/js/reveal.js) ----------
+   Правило прячет только помеченные элементы и только при включённом JS:
+   класс js-reveal ставится строкой в <head>, а reveal.js снимает его,
+   если GSAP не загрузился или включён prefers-reduced-motion. Прежнее
+   [data-reveal] { opacity: 0 } удалено вместе со своей механикой. */
 @media (prefers-reduced-motion: no-preference) {
-  [data-reveal] { opacity: 0; transform: translateY(26px); }
+  html.js-reveal [data-gsap-title],    html.js-reveal [data-gsap-title-on-scroll],
+  html.js-reveal [data-gsap-text],     html.js-reveal [data-gsap-text-on-scroll],
+  html.js-reveal [data-gsap-big-copy], html.js-reveal [data-gsap-big-copy-on-scroll],
+  html.js-reveal [data-gsap-appear],   html.js-reveal [data-gsap-appear-on-scroll],
+  html.js-reveal [data-gsap-slide-in], html.js-reveal [data-gsap-slide-in-on-scroll],
+  html.js-reveal [data-gsap-scale-up], html.js-reveal [data-gsap-scale-up-on-scroll] {
+    opacity: 0;
+    will-change: opacity;
+  }
+  html.js-reveal .char, html.js-reveal .word { will-change: transform, opacity; }
 }
 
 /* ---------- 404 / служебные страницы ---------- */
@@ -1806,10 +1897,15 @@ form.is-hidden { visibility: hidden; }
   padding-top: clamp(46px, calc(4.4 * var(--vw-step)), 64px);
   padding-bottom: 46px;
   cursor: grab;
+  /* при протяжке мышью не должно выделяться подписи карточек */
+  user-select: none; -webkit-user-select: none;
 }
 .crail.is-dragging { cursor: grabbing; }
 .crail__track {
-  display: flex; gap: 20px;
+  /* зазор 20 → 12px (правка 03.08): карточки стоят плотнее, как отзывы
+     на buckssauce. Ширину карточки при этом не трогаем — делитель в
+     .ccard считает от вычета 40px, и он остаётся прежним. */
+  display: flex; gap: 12px;
   width: max-content;
   touch-action: pan-y;
   will-change: transform;
@@ -2047,3 +2143,17 @@ form.is-hidden { visibility: hidden; }
   .form-card .consent { margin-bottom: var(--s-2); }
   .footer { padding-block: var(--s-2); }
 }
+
+/* ============================================================
+   Плашка «поиск по картинке» Яндекс Браузера (правка 03.08)
+   Панель с иконками лупы/глаза/камеры рисует сам браузер, и только
+   тогда, когда курсор попадает в <img> как в цель событий мыши.
+   Замер (Яндекс 26.4.0.0): обычный <img> — плашка есть; та же
+   картинка с pointer-events:none — плашки нет; на buckssauce.com
+   плашки нет ни на одной картинке.
+   Все клики, hover и жесты лендинга висят на РОДИТЕЛЬСКИХ элементах
+   (карточка кейса, рамка галереи, лента), поэтому картинкам события
+   мыши не нужны. Цена: по картинке не сработает правый клик
+   «Сохранить изображение» и перетаскивание мышью.
+   ============================================================ */
+img { pointer-events: none; }
