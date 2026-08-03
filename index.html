@@ -64,14 +64,17 @@
       <!-- Правка 31.07: набор пунктов заменён на «Услуги · Кофейни · Бары ·
            Кейсы · Команда». Порядок совпадает с порядком блоков на
            странице: «Услуги» ведут на блок с тремя сценариями работы —
-           он открывает раздел услуг, дальше кофейный и барный блоки.
-           «Контакты» из строки убраны: на них ведёт кнопка справа. -->
+           он открывает раздел услуг.
+           «Контакты» из строки убраны: на них ведёт кнопка справа.
+           Правка 03.08 (третья): «Кофейни» и «Бары» вели на два отдельных
+           блока-консалтинга, которых больше нет — вместо пары один пункт
+           «Что делаем» на общий блок услуг (#services сохранён, чтобы не
+           ломать внешние ссылки на старый барный якорь). -->
       <!-- data-ink: элемент сам подбирает цвет по фону под собой, см.
            «чернила шапки» в main.js. -->
       <nav class="header__nav" aria-label="Основная навигация">
         <a href="#about" data-ink>Услуги</a>
-        <a href="#coffee" data-ink>Кофейни</a>
-        <a href="#services" data-ink>Бары</a>
+        <a href="#services" data-ink>Что делаем</a>
         <a href="#cases" data-ink>Кейсы</a>
         <a href="#team" data-ink>Команда</a>
       </nav>
@@ -99,8 +102,7 @@
 </header>
 <nav class="mnav" id="mnav" aria-label="Мобильная навигация">
   <a href="#about">Услуги</a>
-  <a href="#coffee">Кофейни</a>
-  <a href="#services">Бары</a>
+  <a href="#services">Что делаем</a>
   <a href="#cases">Кейсы</a>
   <a href="#team">Команда</a>
   <a class="btn btn--primary" href="#contact">Обсудить проект</a>
@@ -244,206 +246,183 @@
      цвета одной секции в цвет другой (сама анимация — в main.js). -->
 <div class="seam" aria-hidden="true"></div>
 
-<!-- ============ 6.5 Услуги — два блока-слайдера ============
-     Механика по референсу bonito-flakes-for-pets.com: секция пинится,
-     прокрутка перелистывает слайды, у края экрана — вертикальная полоска
-     с точками (линия + кружки, активный крупнее и залит, пройденные
-     закрашены), по ней можно перепрыгнуть к слайду. Полоска живёт ТОЛЬКО
-     внутри своего блока: у кофе справа, у бара слева.
-     Фото — по одному на слайд, все уникальные: кадры case-* убраны,
-     они уже стоят в галереях кейсов ниже.
-     ФОН: у кофейного блока НЕТ data-bg — он специально выведен из
-     механики bgflow и красит себя сам (.prs--coffee). Иначе цвет вёл бы
-     body, а он переключается за 495px до кромки блока — на входе и
-     выходе слайды успевали оказаться на тёмном. Барный блок остаётся в
-     bgflow: его data-bg совпадает и с его собственной темой, и с фоном
-     соседей, поэтому там разнобоя быть не может. -->
-<section class="prs prs--coffee" id="coffee" data-bg="#100b06" data-prs data-prs-side="right">
-  <div class="prs__inner container">
-    <h2 class="prs__manifest" data-gsap-big-copy-on-scroll>Coffee consulting</h2>
+<!-- ============ 6.5 Услуги — стопка карточек «тёмная часть ↔ цветная панель» ============
+     Референс: buckssauce.com/wholesale, блок who / what / why. Разобран по
+     чанку 600d175e16e55ce6.js (модуль 83386) и обмерен живьём на 1440×900.
 
-    <nav class="prs__nav" aria-label="Разделы: Coffee consulting" data-prs-nav>
-      <span class="prs__line" aria-hidden="true"><span class="prs__fill" data-prs-fill></span></span>
-      <button type="button" class="prs__dot" data-prs-go="0" aria-label="Слайд 1: Работаем со всем циклом кофейного бизнеса"></button>
-      <button type="button" class="prs__dot" data-prs-go="1" aria-label="Слайд 2: Menu engineering"></button>
-      <button type="button" class="prs__dot" data-prs-go="2" aria-label="Слайд 3: Операционка. Экономика"></button>
-      <button type="button" class="prs__dot" data-prs-go="3" aria-label="Слайд 4: Прямые связи и честные условия"></button>
-    </nav>
+     ГЛАВНОЕ, ЧЕГО НЕ ХВАТАЛО В ПЕРВЫХ ДВУХ ЗАХОДАХ: у референса это не
+     колонка карточек, а СТОПКА. Секция ровно в один экран (h-screen,
+     min-height 880), ряды из неё вываливаются (overflow: visible) и
+     наезжают друг на друга по скраб-таймлайну запиненной секции —
+     см. [data-wcards] в main.js. Ряд непрозрачен, поэтому следующий
+     закрывает предыдущий, оставляя сверху полоску в 64px.
 
-    <div class="prs__stage">
-      <article class="prs__slide" data-prs-slide>
-        <div class="prs__text">
-          <h3 class="prs__title" data-gsap-title-on-scroll>Работаем со всем циклом кофейного бизнеса</h3>
-          <ul class="prs__list" data-gsap-slide-in-on-scroll data-gsap-stagger-scope data-gsap-delay="0.15">
-            <li>Концепция и бренд</li>
-            <li>Айдентика и визуальный язык</li>
-            <li>Проектирование пространства и рабочих зон</li>
-            <li>Кофейные карты и авторские напитки</li>
-            <li>Завтраки и десертные напитки</li>
-            <li>Обучение, база знаний, стандарты</li>
-            <li>Операционные процессы, регламенты, контроль</li>
-            <li>Экономика: себестоимость, маржинальность, фудкост</li>
-            <li>Оборудование, поставки, упаковка</li>
-            <li>Системы для масштабирования</li>
-          </ul>
-        </div>
-        <figure class="prs__media">
-          <img src="assets/img/approach-4-900.webp" width="900" height="1054" alt="Рабочая зона кофейни" loading="lazy" decoding="async">
+     Метрики ряда (1440): две равные колонки, зазор 10px, поля 10px
+     сверху и снизу, разделитель dashed 1px; панель — padding 40, gap 40,
+     радиус 10, min-height 480, содержимое прижато к краям (space-between);
+     заголовок 80px/1.0, трекинг −0.02em; крупное слово тёмной части
+     180px/1.0; пункт 18px/27px, иконка и текст в 20px друг от друга,
+     поля по 5px. На экранах ниже 720px у референса своя ступень (sh:) —
+     она перенесена в style.css один в один.
+
+     ГРАБЛИ: текст пункта ОБЯЗАН лежать в <span>. У <li> display:flex, и
+     без обёртки браузер делает из «<strong>зачин</strong> — пояснение»
+     ДВА анонимных флекс-элемента: зачин уезжает в свою колонку, а тире с
+     пояснением — в соседнюю. Именно так выглядел прошлый заход.
+
+     Правка 03.08 (третья): деление на Coffee consulting и Bar consulting
+     снято вместе с двумя запиненными блоками-слайдерами. Услуга у нас
+     одна и та же — для бара, ресторана и кофейни, а деление надвое ещё
+     и не оставляло места ресторанам.
+     Стороны чередуются (--flip у нечётных), цвет панели идёт по кругу
+     янтарь → айвори → вино, как index%3 у референса.
+     Тёмная часть бывает трёх видов:
+       --head  полный заголовок карточки;
+       --word  одно короткое слово, как “WHY?” у референса;
+       --media кадр из проектов.
+     Слова тёмной части намеренно короткие (4–5 знаков): кегль 180px
+     референса живёт ровно до тех пор, пока слово влезает в половину ряда.
+     Появление — общей лентой на карточку, см. playCard в reveal.js;
+     data-gsap-* внутри карточек НЕ ставим, иначе отыграет дважды. -->
+<section class="section wcards" id="services" data-bg="#100b06">
+  <div class="container">
+    <div class="sec-head wcards-head">
+      <h2 class="h-serif h2" data-gsap-title-on-scroll>Бары, рестораны, кофейни — система одна</h2>
+      <p class="lead" data-gsap-text-on-scroll data-gsap-delay="0.1">От дизайна к вкусу, от вкуса к операционке, от операционки к экономике, от экономики к масштабированию. Формат разный — маршрут один.</p>
+    </div>
+  </div>
+
+  <div class="wcards__stack" data-wcards>
+
+    <article class="wcard wcard--amber">
+      <div class="wcard__aside wcard__aside--head">
+        <h3 class="wcard__q">Работаем со всем циклом заведения</h3>
+      </div>
+      <div class="wcard__panel">
+        <p class="wcard__title">Система, а не один напиток</p>
+        <ul class="wcard__list">
+          <li><span><strong>Концепция и бренд</strong> — позиционирование, имя и характер места</span></li>
+          <li><span><strong>Айдентика и пространство</strong> — от знака и посуды до зала и рабочих зон</span></li>
+          <li><span><strong>Карты и кухня</strong> — напитки, завтраки, десерты</span></li>
+          <li><span><strong>Обучение и стандарты</strong> — база знаний, регламенты, аттестации</span></li>
+          <li><span><strong>Операционка и экономика</strong> — процессы и себестоимость</span></li>
+          <li><span><strong>Масштабирование</strong> — формат, который можно повторить</span></li>
+        </ul>
+      </div>
+    </article>
+
+    <article class="wcard wcard--ivory wcard--flip">
+      <div class="wcard__aside wcard__aside--media">
+        <figure class="wcard__media">
+          <img src="assets/img/approach-4-900.webp" width="900" height="1054" alt="Рабочая зона за стойкой" loading="lazy" decoding="async">
         </figure>
-      </article>
+      </div>
+      <div class="wcard__panel">
+        <p class="wcard__title">Пространство и стойка</p>
+        <ul class="wcard__list">
+          <li><span><strong>Проект под задачу</strong> — бары, рестораны и кофейни под бренд и трафик</span></li>
+          <li><span><strong>Функциональная стойка</strong> — дизайн работает на скорость и логику</span></li>
+          <li><span><strong>Эргономика против ФОТ</strong> — верная стойка экономит состав смены</span></li>
+          <li><span><strong>Ведём до открытия</strong> — цикл от старта до запуска 3–4 месяца</span></li>
+        </ul>
+      </div>
+    </article>
 
-      <article class="prs__slide" data-prs-slide>
-        <div class="prs__text">
-          <h3 class="prs__title" data-gsap-title-on-scroll>Menu engineering</h3>
-          <dl class="prs__defs" data-gsap-slide-in-on-scroll data-gsap-stagger-scope data-gsap-delay="0.15">
-            <div><dt>Сенсорика</dt><dd>и тестирование ингредиентов</dd></div>
-            <div><dt>Точные рецептуры</dt><dd>которые легко повторить</dd></div>
-            <div><dt>Баланс</dt><dd>вкуса, скорости и себестоимости</dd></div>
-            <div><dt>Авторские позиции</dt><dd>которые становятся «героями» меню</dd></div>
-            <div><dt>Визуал</dt><dd>язык и подача</dd></div>
-          </dl>
-        </div>
-        <figure class="prs__media">
-          <img src="assets/img/svc-coffee-a-800.webp" width="800" height="1000" alt="Фирменный напиток навынос" loading="lazy" decoding="async">
-        </figure>
-      </article>
+    <article class="wcard wcard--wine">
+      <div class="wcard__aside wcard__aside--word">
+        <p class="wcard__q">Меню</p>
+      </div>
+      <div class="wcard__panel">
+        <p class="wcard__title">Menu engineering</p>
+        <ul class="wcard__list">
+          <li><span><strong>Сенсорика</strong> — тестирование ингредиентов и поставщиков</span></li>
+          <li><span><strong>Точные рецептуры</strong> — которые повторит любая смена</span></li>
+          <li><span><strong>Баланс</strong> — вкуса, скорости отдачи и себестоимости</span></li>
+          <li><span><strong>Авторские позиции</strong> — те, что становятся «героями» карты</span></li>
+          <li><span><strong>Визуал подачи</strong> — посуда, язык кадра, соцсети</span></li>
+          <li><span><strong>ТТК и калькуляция</strong> — на каждую позицию карты</span></li>
+          <li><span><strong>Вся линейка</strong> — коктейли, кофе, чай, шейки, лимонады, сезонное</span></li>
+        </ul>
+      </div>
+    </article>
 
-      <article class="prs__slide" data-prs-slide>
-        <div class="prs__text">
-          <h3 class="prs__title" data-gsap-title-on-scroll>Операционка. Экономика</h3>
-          <ul class="prs__list prs__list--two" data-gsap-slide-in-on-scroll data-gsap-stagger-scope data-gsap-delay="0.15">
-            <li>Себестоимость и маржинальность</li>
-            <li>Фудкост, списания, потери</li>
-            <li>Отчёты и инвентаризация</li>
-            <li>Закупки</li>
-            <li>Поставщики</li>
-            <li>Фонд оплаты труда</li>
-            <li>Загрузка смен</li>
-            <li>Прогнозирование спроса</li>
-          </ul>
-        </div>
-        <figure class="prs__media">
-          <img src="assets/img/svc-coffee-1-1000.webp" width="1000" height="1250" alt="Бариста заваривает кофе в воронке" loading="lazy" decoding="async">
-        </figure>
-      </article>
+    <article class="wcard wcard--amber wcard--flip">
+      <div class="wcard__aside wcard__aside--word">
+        <p class="wcard__q">Цифры</p>
+      </div>
+      <div class="wcard__panel">
+        <p class="wcard__title">Операционка и экономика</p>
+        <ul class="wcard__list">
+          <li><span><strong>Операционка целиком</strong> — процессы, контроль и стандарты на нас</span></li>
+          <li><span><strong>Себестоимость и маржа</strong> — по каждой позиции, а не «в среднем»</span></li>
+          <li><span><strong>Фудкост, списания, потери</strong> — видно, где утекают деньги</span></li>
+          <li><span><strong>Отчёты и инвентаризация</strong> — контроль остатков без сюрпризов</span></li>
+          <li><span><strong>Закупки и поставщики</strong> — условия, сроки, замены</span></li>
+          <li><span><strong>ФОТ и загрузка смен</strong> — состав смены под реальный поток</span></li>
+          <li><span><strong>Ежемесячный отчёт</strong> — план и факт по продажам, разработке и костам</span></li>
+        </ul>
+      </div>
+    </article>
 
-      <article class="prs__slide" data-prs-slide>
-        <div class="prs__text">
-          <h3 class="prs__title" data-gsap-title-on-scroll>Прямые связи и честные условия</h3>
-          <div class="prs__pair" data-gsap-slide-in-on-scroll data-gsap-stagger-scope data-gsap-delay="0.15">
-            <p>Подбираем оборудование не по каталогу, а под поток, формат и опыт гостя</p>
-            <p>Закрываем поставки: зерно, молоко, альтернативы, сиропы, упаковка, техника</p>
-          </div>
-        </div>
-        <figure class="prs__media">
+    <article class="wcard wcard--ivory">
+      <div class="wcard__aside wcard__aside--word">
+        <p class="wcard__q">Люди</p>
+      </div>
+      <div class="wcard__panel">
+        <p class="wcard__title">Обучение и стандарты</p>
+        <ul class="wcard__list">
+          <li><span><strong>Техника приготовления</strong> — и настройка оборудования</span></li>
+          <li><span><strong>Сервис и скорость</strong> — отдавать быстро, не теряя качество</span></li>
+          <li><span><strong>Санитарные нормы</strong> — и ежедневная инвентаризация</span></li>
+          <li><span><strong>Аттестации</strong> — регулярно, а не раз в год перед проверкой</span></li>
+          <li><span><strong>База знаний</strong> — всё в одном месте и под рукой у смены</span></li>
+          <li><span><strong>Механики продаж</strong> — под формат и аудиторию проекта</span></li>
+          <li><span><strong>Помощь с подбором</strong> — анкета, критерии, финальное собеседование</span></li>
+        </ul>
+      </div>
+    </article>
+
+    <article class="wcard wcard--wine wcard--flip">
+      <div class="wcard__aside wcard__aside--media">
+        <figure class="wcard__media">
           <img src="assets/img/svc-coffee-2-1400.webp" width="1400" height="933" alt="Модульная кофейная точка PIMS" loading="lazy" decoding="async">
         </figure>
-      </article>
-    </div>
-  </div>
-</section>
+      </div>
+      <div class="wcard__panel">
+        <p class="wcard__title">Поставки и оборудование</p>
+        <ul class="wcard__list">
+          <li><span><strong>Оборудование под поток</strong> — не по каталогу, а под формат</span></li>
+          <li><span><strong>Поставки под ключ</strong> — зерно, молоко, сиропы, алкоголь, упаковка</span></li>
+          <li><span><strong>Условия напрямую</strong> — от производителей и контрагентов</span></li>
+          <li><span><strong>Скидки и спецбюджеты</strong> — включая маркетинговые интеграции</span></li>
+          <li><span><strong>Без коррупции</strong> — без откатов и скрытых комиссий, это принцип</span></li>
+        </ul>
+      </div>
+    </article>
 
-<!-- Тихая зона стыка: пустая проставка, в которой фон перетекает из
-     цвета одной секции в цвет другой (сама анимация — в main.js). -->
-<div class="seam" aria-hidden="true"></div>
+    <article class="wcard wcard--amber">
+      <div class="wcard__aside wcard__aside--word">
+        <p class="wcard__q">Нормы</p>
+      </div>
+      <div class="wcard__panel">
+        <p class="wcard__title">Документы и безопасность</p>
+        <ul class="wcard__list">
+          <li><span><strong>Роспотребнадзор</strong> — контролируем выполнение требований</span></li>
+          <li><span><strong>Рабочая документация</strong> — регламенты на каждый этап</span></li>
+          <li><span><strong>Рабочие бланки</strong> — чек-листы, стоп-листы, бланки заказа, go-list</span></li>
+          <li><span><strong>Оценочные листы</strong> — аттестация персонала по прозрачным критериям</span></li>
+        </ul>
+      </div>
+    </article>
 
-<section class="prs prs--bar" id="services" data-bg="#100b06" data-prs data-prs-side="left">
-  <div class="prs__inner container">
-    <h2 class="prs__manifest" data-gsap-big-copy-on-scroll>Bar consulting</h2>
-
-    <nav class="prs__nav" aria-label="Разделы: Bar consulting" data-prs-nav>
-      <span class="prs__line" aria-hidden="true"><span class="prs__fill" data-prs-fill></span></span>
-      <button type="button" class="prs__dot" data-prs-go="0" aria-label="Слайд 1: Проектирование и запуск. Управление и операционка"></button>
-      <button type="button" class="prs__dot" data-prs-go="1" aria-label="Слайд 2: Аналитика. Партнёрские преимущества"></button>
-      <button type="button" class="prs__dot" data-prs-go="2" aria-label="Слайд 3: Команда и кадровая экспертиза. Соответствие стандартам и безопасность"></button>
-    </nav>
-
-    <div class="prs__stage">
-      <article class="prs__slide" data-prs-slide>
-        <div class="prs__text">
-          <div class="prs__groups">
-            <div class="prs__group">
-              <h3 class="prs__title" data-gsap-title-on-scroll>Проектирование и запуск</h3>
-              <ul class="prs__facts" data-gsap-slide-in-on-scroll data-gsap-stagger-scope data-gsap-delay="0.15">
-                <li>Проектируем бары и рестораны под задачи бренда и трафик.</li>
-                <li>Формируем функциональный бар, где дизайн работает на скорость и логику.</li>
-                <li>Сопровождаем проект до полного запуска.</li>
-              </ul>
-            </div>
-            <div class="prs__group">
-              <h3 class="prs__title" data-gsap-title-on-scroll>Управление и операционка</h3>
-              <ul class="prs__facts" data-gsap-slide-in-on-scroll data-gsap-stagger-scope data-gsap-delay="0.15">
-                <li>Берём на себя операционку бара целиком: процессы, контроль, стандарты.</li>
-                <li>Строим систему управления, которая работает без ручного вмешательства.</li>
-              </ul>
-            </div>
-          </div>
-        </div>
-        <figure class="prs__media">
-          <img src="assets/img/svc-bar-1-749.webp" width="749" height="999" alt="Руки в белых перчатках готовят коктейль" loading="lazy" decoding="async">
-        </figure>
-      </article>
-
-      <article class="prs__slide" data-prs-slide>
-        <div class="prs__text">
-          <div class="prs__groups">
-            <div class="prs__group">
-              <h3 class="prs__title" data-gsap-title-on-scroll>Аналитика</h3>
-              <ul class="prs__facts" data-gsap-slide-in-on-scroll data-gsap-stagger-scope data-gsap-delay="0.15">
-                <li>Управляем себестоимостью и фудкостом.</li>
-                <li>Внедряем систему точной инвентаризации и контроля остатков.</li>
-                <li>Даём прогнозы, корректируем меню и процессы на основе данных.</li>
-              </ul>
-            </div>
-            <div class="prs__group">
-              <h3 class="prs__title" data-gsap-title-on-scroll>Партнёрские преимущества</h3>
-              <ul class="prs__facts" data-gsap-slide-in-on-scroll data-gsap-stagger-scope data-gsap-delay="0.15">
-                <li>Даём доступ к эксклюзивным условиям от производителей и контрагентов.</li>
-                <li>Предоставляем скидки, спецбюджеты и маркетинговые интеграции.</li>
-                <li>Включаем проверенных партнёров, экономим ресурсы и время.</li>
-              </ul>
-            </div>
-          </div>
-        </div>
-        <figure class="prs__media">
-          <img src="assets/img/svc-bar-2-1000.webp" width="1000" height="1136" alt="Красный коктейль в гранёном бокале" loading="lazy" decoding="async">
-        </figure>
-      </article>
-
-      <article class="prs__slide" data-prs-slide>
-        <div class="prs__text">
-          <div class="prs__groups">
-            <div class="prs__group">
-              <h3 class="prs__title" data-gsap-title-on-scroll>Команда и кадровая экспертиза</h3>
-              <ul class="prs__facts" data-gsap-slide-in-on-scroll data-gsap-stagger-scope data-gsap-delay="0.15">
-                <li>Подбираем и обучаем профессиональный кадровый состав.</li>
-                <li>Проводим регулярные аттестации, оценки и усиление команды.</li>
-                <li>Разрабатываем механики продаж под формат и аудиторию проекта.</li>
-                <li>Полное отсутствие коррупционных практик — принципиальная политика.</li>
-              </ul>
-            </div>
-            <div class="prs__group">
-              <h3 class="prs__title" data-gsap-title-on-scroll>Соответствие стандартам и безопасность</h3>
-              <ul class="prs__facts" data-gsap-slide-in-on-scroll data-gsap-stagger-scope data-gsap-delay="0.15">
-                <li>Контролируем выполнение требований Роспотребнадзора.</li>
-                <li>Создаём рабочую документацию и регламенты на каждый этап.</li>
-              </ul>
-            </div>
-          </div>
-        </div>
-        <figure class="prs__media">
-          <img src="assets/img/ethics-735.webp" width="735" height="1362" alt="Рабочая документация и регламенты бара" loading="lazy" decoding="async">
-        </figure>
-      </article>
-    </div>
   </div>
 </section>
 
 
 <!-- Тихая зона стыка: пустая проставка, в которой фон перетекает из
      цвета одной секции в цвет другой (сама анимация — в main.js). -->
-<!-- Правка 31.07 (третья): обычная тихая зона, ровно как перед кофейным
-     блоком — переход «бары → кейсы» должен быть в точности таким же. -->
+<!-- Правка 31.07 (третья): обычная тихая зона, ровно такая же, как перед
+     блоком услуг — переход «услуги → кейсы» должен быть в точности таким. -->
 <div class="seam" aria-hidden="true"></div>
 
 <!-- ============ 6.8 Портфолио / кейсы ============ -->

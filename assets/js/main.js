@@ -255,8 +255,8 @@
   });
   mnav.querySelectorAll("a").forEach(function (a) { a.addEventListener("click", closeMenu); });
 
-  /* Табы «Бар/Кофе» удалены — услуги стали редакционным коллажем
-     с прямыми якорями #services и #coffee (ТЗ4 §4) */
+  /* Табы «Бар/Кофе» удалены (ТЗ4 §4). Правка 03.08 (третья): деления на
+     бар и кофе не осталось и в самих услугах — один блок #services. */
 
   /* ============================================================
      6.8 Кейсы: данные и общая логика фильтра
@@ -1384,151 +1384,85 @@
        ожидание document.fonts.ready, ради которого этот блок жил. */
 
     /* Осевой параллакс старых услуг (.svc-spread) удалён вместе с их
-       вёрсткой: услуги пересобраны в блоки-слайдеры (см. ниже). */
+       вёрсткой. Правка 03.08 (третья): следом удалены и сменившие его
+       блоки-слайдеры #coffee / #services — услуги пересобраны в карточки
+       .wcard. Их собственная механика — стопка, см. ниже. */
 
     /* Брейкпоинты — через gsap.matchMedia (ТЗ2 §7) */
     var mm = gsap.matchMedia();
 
     /* ============================================================
-       Блоки-презентации #coffee и #services — полоса-навигация.
-       Механика по референсу bonito-flakes-for-pets.com: секция пинится,
-       прокрутка перелистывает пойнты, полоса у края показывает список,
-       подсвечивает активный и заполняется линией-прогрессом; клик по
-       пункту — переход к пойнту через Lenis.
-       JS НЕ анимирует содержимое (железное правило запиненных секций):
-       только считает активный индекс от progress и переставляет классы.
-       ПОРЯДОК: блок создаётся ДО пинов команды и «Этапов» — обе секции
-       ниже по документу, и их start считается с учётом этих пинов.
+       УСЛУГИ — СТОПКА КАРТОЧЕК (правка 03.08, четвёртая)
+       Референс: buckssauce.com/wholesale, чанк 600d175e16e55ce6.js,
+       модуль 83386. Перенесены и механика, и обе константы (64 и 115.2);
+       единственная правка — ограничитель, см. ниже.
+
+       Контейнер [data-wcards] высотой в экран пинится, ряды из него
+       вываливаются наружу (overflow: visible) и по скрабу наезжают друг
+       на друга. Шаг i делает две вещи одновременно:
+         — ряды с i-го и дальше уезжают вверх так, чтобы ряд i встал
+           ровно на WC_TOP·i от верха стопки;
+         — все ряды до i-го уползают ещё на WC_SHIFT вверх.
+       Ряд непрозрачен и стоит в position:relative, поэтому очередной
+       закрывает предыдущие, оставляя сверху полоску в WC_TOP.
+
+       Значения y — функции: их пересчитывает invalidateOnRefresh после
+       ресайза и подгрузки шрифтов. offsetTop берётся у неподвижной
+       раскладки и трансформами не портится.
+
+       ЕДИНСТВЕННОЕ ОТСТУПЛЕНИЕ ОТ РЕФЕРЕНСА — и оно вынужденное.
+       У референса карточек три, и полоска нарастает без оглядки: 64·i.
+       У нас их семь, и на седьмом шаге верх ряда ушёл бы на 64·6 = 384px
+       вниз — вместе с высотой ряда это 950px, то есть ниже кромки экрана,
+       и хвост списка обрезало бы. Поэтому нарастание ограничено сверху
+       через stepCap(): после его порога очередной ряд встаёт на то же
+       место, что и предыдущий. Порог считается из живых замеров (сколько полосок
+       помещается над самым высоким рядом), при трёх карточках формула
+       даёт ровно поведение референса. Сползание предыдущих рядов на
+       WC_SHIFT не ограничено ничем — стопка над рядом остаётся живой.
+
+       ГРАБЛИ §10.1 (правило записано ниже, у пина команды): анимировать
+       по скроллу содержимое запиненной секции можно ТОЛЬКО её
+       собственным пин-таймлайном. Здесь так и есть — этот таймлайн
+       единственный, кто трогает .wcard. Появление внутри карточки
+       (playCard в reveal.js) идёт по IntersectionObserver, без скролла,
+       и работает с другими свойствами других узлов — не конфликтует.
        ============================================================ */
+    var WC_TOP = 64;      /* px — полоска, на которую встаёт очередной ряд */
+    var WC_SHIFT = 115.2; /* px — насколько уползают все предыдущие за шаг */
     mm.add("(min-width: 1024px)", function () {
-      var offClicks = [];
-      gsap.utils.toArray("[data-pres]").forEach(function (sec) {
-        var points = sec.querySelectorAll("[data-pres-point]");
-        var items = sec.querySelectorAll("[data-pres-go]");
-        var fill = sec.querySelector("[data-pres-fill]");
-        var N = points.length;
-        if (!N) return;
+      var stack = document.querySelector("[data-wcards]");
+      if (!stack) return;
+      var rows = gsap.utils.toArray(".wcard", stack);
+      if (rows.length < 2) return;
 
-        var current = -1;
-        function setPoint(i) {
-          if (i === current) return;
-          current = i;
-          points.forEach(function (p, k) { p.classList.toggle("is-active", k === i); });
-          items.forEach(function (b, k) {
-            if (k === i) b.setAttribute("aria-current", "true");
-            else b.removeAttribute("aria-current");
-          });
-          if (fill) fill.style.height = ((i + 1) / N * 100).toFixed(2) + "%";
-          sec.classList.toggle("is-accent", points[i].hasAttribute("data-pres-accent"));
+      /* сколько полосок влезает над самым высоким рядом, см. комментарий */
+      var stepCap = function () {
+        var tallest = 0, i;
+        for (i = 0; i < rows.length; i++) tallest = Math.max(tallest, rows[i].offsetHeight);
+        var fits = Math.floor((window.innerHeight - WC_TOP - tallest) / WC_TOP);
+        return Math.max(1, Math.min(rows.length - 1, fits));
+      };
+
+      var tl = gsap.timeline({
+        scrollTrigger: {
+          trigger: stack,
+          start: "top-=" + WC_TOP + "px top",
+          end: function () { return "+=" + (rows.length - 1) * rows[0].offsetHeight; },
+          pin: true, scrub: true, invalidateOnRefresh: true
         }
-        setPoint(0);
-
-        var st = ScrollTrigger.create({
-          trigger: sec, pin: true, scrub: true,
-          start: "top top",
-          end: function () { return "+=" + Math.round(window.innerHeight * 0.85 * N); },
-          anticipatePin: 1, invalidateOnRefresh: true,
-          onUpdate: function (self) {
-            setPoint(Math.min(N - 1, Math.floor(self.progress * N)));
-          },
-          onLeaveBack: function () { setPoint(0); }
-        });
-
-        items.forEach(function (b) {
-          function go() {
-            var i = parseInt(b.dataset.presGo, 10);
-            var y = st.start + (st.end - st.start) * ((i + 0.5) / N);
-            if (lenis) lenis.scrollTo(y);
-            else window.scrollTo(0, y);
-          }
-          b.addEventListener("click", go);
-          offClicks.push(function () { b.removeEventListener("click", go); });
-        });
       });
 
-      return function () {
-        offClicks.forEach(function (off) { off(); });
-        document.querySelectorAll("[data-pres]").forEach(function (sec) {
-          sec.classList.remove("is-accent");
-          sec.querySelectorAll("[data-pres-point]").forEach(function (p) { p.classList.remove("is-active"); });
-          sec.querySelectorAll("[data-pres-go]").forEach(function (b) { b.removeAttribute("aria-current"); });
-          var f = sec.querySelector("[data-pres-fill]");
-          if (f) f.style.height = "";
-        });
-      };
-    });
-
-    /* ============================================================
-       Услуги — два блока-слайдера с вертикальной полоской.
-       Референс: bonito-flakes-for-pets.com. Секция пинится, прокрутка
-       перелистывает слайды, полоска подсвечивает активную точку и
-       заполняется линией-прогрессом; клик по точке — переход к слайду.
-       JS НЕ анимирует содержимое (правило запиненных секций): он только
-       считает индекс от progress и переставляет классы.
-       ПОРЯДОК: создаётся ДО пина команды — она ниже по документу.
-       ============================================================ */
-    mm.add("(min-width: 1024px)", function () {
-      var off = [];
-      gsap.utils.toArray("[data-prs]").forEach(function (sec) {
-        var slides = sec.querySelectorAll("[data-prs-slide]");
-        var dots = sec.querySelectorAll("[data-prs-go]");
-        var fill = sec.querySelector("[data-prs-fill]");
-        var N = slides.length;
-        if (!N) return;
-
-        var cur = -1;
-        function show(i) {
-          if (i === cur) return;
-          cur = i;
-          slides.forEach(function (sl, k) { sl.classList.toggle("is-active", k === i); });
-          dots.forEach(function (d, k) {
-            d.classList.toggle("is-current", k === i);
-            d.classList.toggle("is-done", k < i);
-            if (k === i) d.setAttribute("aria-current", "true");
-            else d.removeAttribute("aria-current");
+      for (var i = 1; i < rows.length; i++) {
+        /* var, а не let: замыкание на шаге собираем сами */
+        (function (i) {
+          tl.to(rows.slice(i), {
+            y: function () { return -rows[i].offsetTop + WC_TOP * Math.min(i, stepCap()); },
+            ease: "none", duration: 1
           });
-          /* линия-прогресс: до центра активной точки */
-          if (fill) fill.style.height = (N < 2 ? 100 : i / (N - 1) * 100).toFixed(2) + "%";
-        }
-        show(0);
-
-        var st = ScrollTrigger.create({
-          trigger: sec, pin: true, scrub: true,
-          start: "top top",
-          /* по ~0.8 вьюпорта на слайд; длина — функцией, поэтому
-             invalidateOnRefresh обязателен */
-          end: function () { return "+=" + Math.round(window.innerHeight * 0.8 * N); },
-          anticipatePin: 1, invalidateOnRefresh: true,
-          onUpdate: function (self) { show(Math.min(N - 1, Math.floor(self.progress * N))); },
-          /* полоска появляется вместе с блоком и исчезает вместе с ним */
-          onToggle: function (self) { sec.classList.toggle("is-live", self.isActive); },
-          onLeaveBack: function () { show(0); }
-        });
-
-        dots.forEach(function (d) {
-          function go() {
-            var i = parseInt(d.dataset.prsGo, 10);
-            var y = st.start + (st.end - st.start) * ((i + 0.5) / N);
-            if (lenis) lenis.scrollTo(y);
-            else window.scrollTo(0, y);
-          }
-          d.addEventListener("click", go);
-          off.push(function () { d.removeEventListener("click", go); });
-        });
-      });
-
-      return function () {
-        off.forEach(function (f) { f(); });
-        document.querySelectorAll("[data-prs]").forEach(function (sec) {
-          sec.classList.remove("is-live");
-          sec.querySelectorAll("[data-prs-slide]").forEach(function (sl) { sl.classList.remove("is-active"); });
-          sec.querySelectorAll("[data-prs-go]").forEach(function (d) {
-            d.classList.remove("is-current", "is-done"); d.removeAttribute("aria-current");
-          });
-          var f = sec.querySelector("[data-prs-fill]");
-          if (f) f.style.height = "";
-        });
-      };
+          tl.to(rows.slice(0, i), { y: "-=" + WC_SHIFT, ease: "none", duration: 1 }, "<");
+        })(i);
+      }
     });
 
     /* ============================================================

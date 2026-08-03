@@ -8,10 +8,10 @@
    Шесть анимаций — три текстовые (посимвольно / построчно / по словам)
    и три блочные (проявление / выезд снизу / рост из нуля).
 
-   Запуск — IntersectionObserver, НЕ ScrollTrigger: секции #coffee и
-   #services запинены, и scrub-трансформы на их содержимом сдвигают
-   собственные замеры пина (правило записано в main.js). Срабатывает
-   один раз, как в референсе.
+   Запуск — IntersectionObserver, НЕ ScrollTrigger: на странице есть
+   запиненные секции (команда, этапы), и scrub-трансформы на их
+   содержимом сдвигают собственные замеры пина (правило записано в
+   main.js). Срабатывает один раз, как в референсе.
 
    Зависимости: gsap 3.13 + SplitText — уже подключены в vendor.
    ============================================================ */
@@ -107,12 +107,14 @@
 
   /* ---------- 1. title: заголовок посимвольно (ТЗ §3.1) ----------
      На мобильном знаки не режем вовсе — единицей становится слово
-     (ТЗ §6): 91 <span> на строку там и лишний, и заметно дороже. */
-  function playTitle(el, delay) {
+     (ТЗ §6): 91 <span> на строку там и лишний, и заметно дороже.
+     Вынесено в отдельную ленту, чтобы её можно было вложить в чужую:
+     карточкам услуг нужен ОДИН таймлайн на всю карточку (см. playCard). */
+  function titleTl(el) {
     var mob = isMobile();
     var sp = splitOf(el, mob ? "lines,words" : "lines,words,chars");
     var units = mob ? sp.words : sp.chars;
-    gsap.timeline({ delay: delay })
+    return gsap.timeline()
       .set(units, { opacity: 0, y: 60, scaleX: .8, scaleY: .5, transformOrigin: "50% 100%" })
       .set(el, { opacity: 1 }, "<")
       .to(units, {
@@ -122,6 +124,9 @@
         ease: E.back.base,
         onComplete: finish(el, sp)
       }, "<");
+  }
+  function playTitle(el, delay) {
+    gsap.timeline({ delay: delay }).add(titleTl(el));
   }
 
   /* ---------- 2. text: абзац построчно (ТЗ §3.2) ---------- */
@@ -199,6 +204,66 @@
     run(el, parseFloat(el.getAttribute("data-gsap-delay")) || 0);
   }
 
+  /* ---------- карточки услуг (правка 03.08, третья) ----------
+     Лента снята с референса buckssauce.com/wholesale (чанк 83386,
+     компонент ряда) и повторена по значениям:
+       вопрос   из opacity 0, y 80, случайного угла ±20° и scale .6
+                приезжает к ±3° за .8 с на back.out(2.5);
+       панель   из opacity 0 и scale .8 за .7 с на power4.out — С НУЛЯ,
+                одновременно с вопросом;
+       заголовок обычный посимвольный каскад, но старт сдвинут на
+                −0.35 с к концу предыдущего;
+       пункты   из opacity 0 и yPercent 50, шаг .12 с, ease power3.out,
+                старт на 0.3 с раньше конца заголовка.
+     Именно ОДНА лента, а не четыре отдельных наблюдателя с задержками:
+     у референса части связаны относительными метками, и на медленном
+     шрифте/длинном заголовке они не разъезжаются.
+     Порог наблюдателя .15 — тоже как у него. */
+  function playCard(row, i) {
+    var q = row.querySelector(".wcard__q");
+    var panel = row.querySelector(".wcard__panel");
+    var title = row.querySelector(".wcard__title");
+    var items = row.querySelectorAll(".wcard__list li");
+    var tl = gsap.timeline();
+
+    if (q) {
+      tl.set(q, { opacity: 0, y: 80, rotation: "random(-20, 20)", scale: .6 }, 0)
+        .to(q, {
+          opacity: 1, y: 0, rotation: i % 2 === 0 ? -3 : 3, scale: 1,
+          duration: .8, ease: E.back.medium
+        }, 0);
+    }
+    if (panel) {
+      tl.set(panel, { opacity: 0, scale: .8 }, 0)
+        .to(panel, { opacity: 1, scale: 1, duration: .7, ease: "power4.out" }, 0);
+    }
+    if (title) tl.add(titleTl(title), ">-0.35");
+    if (items.length) {
+      tl.set(items, { opacity: 0, yPercent: 50 }, ">-0.3")
+        .to(items, {
+          opacity: 1, yPercent: 0, duration: .8, stagger: .12, ease: E.copy
+        }, "<");
+    }
+    return tl;
+  }
+
+  function initCards() {
+    var rows = document.querySelectorAll(".wcards .wcard");
+    Array.prototype.forEach.call(rows, function (row, i) {
+      var io = new IntersectionObserver(function (entries) {
+        for (var k = 0; k < entries.length; k++) {
+          if (!entries[k].isIntersecting) continue;
+          io.disconnect();
+          if (played.has(row)) return;
+          played.add(row);
+          playCard(row, i);
+          return;
+        }
+      }, { threshold: .15 });
+      io.observe(row);
+    });
+  }
+
   /* ---------- ГРАБЛИ §10.2: лента команды — горизонтальный скроллер ----
      На мобильном .hteam__viewport это overflow-x:auto, а карточки лежат
      правее экрана. Наблюдатель с root:null для них не срабатывает
@@ -226,23 +291,13 @@
     io.observe(target || el);
   }
 
-  /* ---------- ГРАБЛИ §10.1: слайды запиненных секций ----------
-     Неактивные слайды лежат под opacity:0; visibility:hidden — из
-     геометрии они НЕ выпадают, и наблюдатель считает их видимыми.
-     Текст третьего слайда отыграл бы вхолостую задолго до того, как
-     пользователь до него долистает. На десктопе ждём не въезда в экран,
-     а появления класса is-active. Первый слайд активен изначально —
-     для него ориентир прежний, въезд самой секции. */
-  function armSlide(el, run, slide) {
-    var section = slide.closest("[data-prs]") || slide.parentElement;
-    var mo = new MutationObserver(function () {
-      if (!slide.classList.contains("is-active")) return;
-      mo.disconnect();
-      fire(el, run);
-    });
-    mo.observe(section, { subtree: true, attributes: true, attributeFilter: ["class"] });
-    if (slide.classList.contains("is-active")) armObserver(el, run, section);
-  }
+  /* ГРАБЛИ §10.1 (снято 03.08). Здесь жила ветка armSlide: у запиненных
+     блоков #coffee / #services неактивные слайды лежали под opacity:0 +
+     visibility:hidden, из геометрии не выпадали, и наблюдатель считал их
+     видимыми — текст третьего слайда отыгрывал вхолостую задолго до
+     того, как до него долистают. Ждали не въезда в экран, а класса
+     is-active. Слайдеров больше нет, узлов [data-prs-slide] в разметке
+     тоже: ветка стала недостижимой и удалена вместе с ними. */
 
   /* ГРАБЛИ (замерено, ТЗ §13.9): LCP страницы браузер записывает не в
      момент, когда заголовок первого экрана СТАНОВИТСЯ ВИДЕН, а в момент
@@ -256,8 +311,6 @@
      свойство метрики, а не скорости отрисовки. */
   function arm(el, run, onScroll) {
     if (!onScroll) { gsap.delayedCall(.1, function () { fire(el, run); }); return; }
-    var slide = el.closest("[data-prs-slide]");
-    if (slide && !isMobile()) { armSlide(el, run, slide); return; }
     armObserver(el, run);
   }
 
@@ -273,6 +326,7 @@
       document.querySelectorAll("[" + m[0] + "]").forEach(function (el) { arm(el, m[1], false); });
       document.querySelectorAll("[" + m[0] + "-on-scroll]").forEach(function (el) { arm(el, m[1], true); });
     });
+    initCards();
   }
 
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(init);

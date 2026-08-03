@@ -627,329 +627,253 @@ ul, ol { list-style: none; }
    «Три сценария» (id=about) занял место PAS сразу после трастстрипа */
 
 /* ============================================================
-   6.5 Услуги — два блока-слайдера с вертикальной полоской.
-   Референс механики: bonito-flakes-for-pets.com. Полоска = тонкая
-   линия + кружки: активный крупнее и залит, пройденные закрашены,
-   будущие контурные; поверх базовой линии растёт линия-прогресс.
-   Полоска у кофе справа, у бара слева; живёт только внутри своего
-   блока и появляется/исчезает вместе с ним.
-   JS не анимирует — считает активный слайд и переставляет классы.
+   6.5 Услуги — СТОПКА карточек «тёмная часть ↔ цветная панель».
+   Референс: buckssauce.com/wholesale, блок who / what / why; разобран
+   по чанку 600d175e16e55ce6.js (модуль 83386) и обмерен живьём.
+
+   ГЛАВНОЕ: это не колонка карточек, а стопка. Контейнер [data-wcards]
+   ровно в один экран (height:100vh, min-height:880px), ряды из него
+   вываливаются наружу и по скрабу запиненной секции наезжают друг на
+   друга — см. main.js. Отсюда два обязательных требования к ряду:
+   он НЕПРОЗРАЧЕН (иначе сквозь него виден предыдущий) и стоит в
+   position:relative — порядок наложения тогда равен порядку в DOM,
+   и каждый следующий ряд закрывает все предыдущие.
+
+   ЧИСЛА СНЯТЫ С РЕФЕРЕНСА ЖИВЬЁМ (1440×900, getComputedStyle):
+     ряд      2 равные колонки, gap 10px, поля 10px сверху и снизу,
+              разделитель — dashed 1px, 30% от цвета текста;
+     панель   padding 40, gap 40, радиус 10, min-height 480,
+              содержимое разнесено по краям (space-between);
+     заголовок 80px, интерлиньяж 1.0, трекинг −0.02em, капс;
+     слово    180px, интерлиньяж 1.0, трекинг −0.02em, наклон ±3°;
+     пункт    18px / 27px, иконка и текст в 20px друг от друга,
+              поля по 5px, галочка 16×16 с отступом 4px сверху.
+   На экранах ниже 720px у референса своя ступень (класс sh:, реально
+   «(min-width:64rem) and (max-height:719px)»): поля ряда 8, панель
+   28/24, min-height 400, заголовок 60, пункт 16/4. Перенесена дословно.
+
+   Цвет панели идёт по кругу янтарь → айвори → вино, как index%3.
+   Появление карточки — общей лентой (playCard в reveal.js).
    ============================================================ */
-.prs {
-  --prs-nav-w: 40px;
-  --prs-dot: 13px;
-  --prs-dot-active: 21px;
-  --prs-step: 52px;          /* шаг между точками, как в референсе */
-  /* --prs-bg — фон блока: им же заливаются кружки полоски, чтобы линия
-     не просвечивала сквозь них; --prs-accent — цвет акцентов, свой для
-     светлой и тёмной темы (на светлом амбер #C6963C не проходит по
-     контрасту, поэтому там тёмный янтарь #7A561B). */
-  position: relative;
-  overflow: clip;
-  isolation: isolate;
+.wcards {
+  /* Третий тон панели. Янтарь и айвори уже есть в палитре (4.1), вино —
+     добавочный: --bp-burgundy #2B0E12 почти чёрный и на странице цвета
+     #100b06 панелью не читается вовсе. */
+  --wc-wine: #7A2B2E;
+  /* Полоска, на которую встаёт очередной ряд стопки, — та же величина,
+     что у референса (64px). Используется и в CSS, и в main.js. */
+  --wc-top: 64px;
+  /* Галочка — маска, а не <svg> в разметке: красится currentColor и на
+     светлой панели, и на винной, а список остаётся чистым текстом.
+     Штрих тонкий (1.7): у референса галочка лёгкая, жирная «птица»
+     спорит с жирным зачином пункта. */
+  --wc-tick: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M2.6 8.7l3.7 3.7L13.4 3.9' fill='none' stroke='%23000' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
 }
-/* Правка 29.07: кофейный блок — СВЕТЛЫЙ на всех слайдах, барный — тёмный.
-   Кофейный красит себя САМ: у него снят data-bg, поэтому правило
-   .bgflow section[data-bg] { background: transparent } его не задевает
-   и фон одинаков на всей длине блока, включая вход и выход. */
-/* --prs-stroke — цвет фона СОСЕДНЕГО блока: им обводится контурный
-   заголовок (см. .prs__manifest) */
-/* Правка 03.08: кофейный блок был единственным светлым в этой паре —
-   с общим чёрным фоном он перекрашен по образцу барного. Обводка
-   контурного заголовка (--prs-stroke) у обоих теперь бежевая: цвет
-   «соседнего блока» потерял смысл, фон везде один. */
-.prs--coffee,
-.prs--bar {
-  --prs-bg: var(--bp-page);
-  --prs-stroke: var(--bp-ivory);
-  --prs-accent: var(--bp-amber);
-  --prs-ink: var(--bp-off-white);
-  background: transparent; color: var(--bp-off-white);
+.wcards-head { text-align: center; }
+/* Заголовок секции — тот же приём, что у «НАШИ ПРОЕКТЫ» (6.8): прямой
+   Roslindale капсом по центру. */
+.wcards-head .h2 {
+  max-width: none;
+  font-family: "Roslindale Display Condensed", "Times New Roman", serif;
+  font-style: normal; font-weight: 700;
+  font-size: clamp(2.5rem, calc(6 * var(--vw-step)), 5.4rem);
+  line-height: 1.04; letter-spacing: .012em;
+  text-transform: uppercase;
+  color: var(--bp-off-white);
+  -webkit-text-stroke: max(1px, .0135em) currentColor;
+}
+.wcards-head .lead {
+  max-width: 38em; margin-inline: auto; margin-top: var(--s-3);
+  font-family: var(--font-serif); font-style: italic;
+  font-size: clamp(1.08rem, calc(1.5 * var(--vw-step)), 1.5rem);
+  line-height: 1.35;
 }
 
-/* Правка 30.07: строки-eyebrow («Услуги · Кофе», «Услуги · Бар») удалены
-   из разметки. Манифест — крупная надпись по центру, ПРЯМЫМ Roslindale
-   (курсив снят), в одну строку; кегль в настоящих vw, как у «ТРИ СЦЕНАРИЯ
-   РАБОТЫ» — строка держит постоянную долю ширины экрана.
-   Откат: font-family var(--font-serif), font-size 4 × --vw-step, без
-   text-align/white-space. */
-/* Правка 31.07: заголовок контурный — только тонкий штрих цветом фона
-   СОСЕДНЕГО блока (у кофейного графит, у барного беж).
-   Правка 31.07 (вторая): заливка стала ПРОЗРАЧНОЙ вместо «цвета своего
-   фона». Разница видна во время перетекания фона: сквозь буквы
-   просвечивает сам переливающийся фон, а не зафиксированный цвет блока.
-   Штрих сильно тоньше — .05em → .014em (волосяная линия), кегль +5%.
-   ВАЖНО: заливки нет вообще, поэтому без обводки текст был бы невидим —
-   на движках без -webkit-text-stroke возвращаем обычный цвет через
-   @supports ниже. */
-.prs__manifest {
-  margin-top: 0;
+/* ---------- контейнер стопки ---------- */
+.wcards__stack {
+  position: relative;
+  display: flex; flex-direction: column;
+  padding-inline: var(--gutter);
+  overflow: visible;      /* ряды обязаны вываливаться наружу */
+}
+@media (min-width: 1024px) {
+  .wcards__stack { height: 100vh; min-height: 880px; }
+}
+
+/* ---------- ряд ---------- */
+.wcard {
+  /* position + непрозрачный фон — механика стопки, см. шапку раздела */
+  position: relative;
+  background: var(--bp-page);
+  display: grid;
+  gap: 10px;
+  padding-block: 10px;
+  border-bottom: 1px dashed rgba(234, 228, 216, .3);
+}
+.wcard:first-child { border-top: 1px dashed rgba(234, 228, 216, .3); }
+@media (min-width: 1024px) {
+  /* ГРАБЛИ: именно minmax(0,1fr), а не 1fr. У 1fr нижняя граница —
+     min-content, и одно длинное слово тёмной части крупным кеглем
+     раздувало свою колонку, отбирая ширину у панели: ряд переставал
+     делиться пополам и выпадал из общего ритма. */
+  .wcard { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: stretch; }
+  /* чередование сторон: у нечётных карточек тёмная часть уходит вправо */
+  .wcard--flip .wcard__aside { order: 2; }
+  .wcard { will-change: transform; }
+}
+
+/* ---------- тёмная часть ---------- */
+.wcard__aside {
+  display: flex; align-items: center; justify-content: center;
   text-align: center;
+}
+@media (max-width: 1023.98px) { .wcard__aside { padding: var(--s-3) 0; } }
+
+/* Крупная надпись тёмной части. Наклон ±3° — конечное состояние твина
+   (см. playCard); здесь он же прописан в CSS как состояние без JS. */
+.wcard__q {
+  margin: 0; /* у --word это <p>: заголовком служит .wcard__title в панели */
   font-family: "Roslindale Display Condensed", "Times New Roman", serif;
   font-style: normal; font-weight: 700;
-  font-size: clamp(2.48rem, 10.2vw, 14.2rem);
-  line-height: .96; letter-spacing: .01em;
   text-transform: uppercase;
-  white-space: nowrap;
-  color: transparent;
-  /* нижний предел: на мобильном доля от кегля даёт полпикселя — волосок
-     рассыпается на неретиновых экранах. Правка 31.07: штрих наращивали
-     дважды — .014 → .0165em (+18%) → .0248em (ещё +50%), предел
-     1 → 1.2 → 1.8px. */
-  -webkit-text-stroke-color: var(--prs-stroke);
-  -webkit-text-stroke-width: max(1.8px, .0248em);
+  line-height: 1; letter-spacing: -.02em;
+  color: var(--bp-off-white);
+  transform: rotate(-3deg);
 }
-@supports not (-webkit-text-stroke: 1px #000) {
-  .prs__manifest { color: var(--prs-ink); }
+.wcard--flip .wcard__q { transform: rotate(3deg); }
+/* 180px на 1440 — ровно text-180 референса. Кегль держится ровно до тех
+   пор, пока слово влезает в половину ряда, поэтому слова взяты короткие
+   (4–5 знаков, как “WHY?”). Ступени: 1024 → 146px при колонке 481
+   («ЦИФРЫ» просит 454), 1280 → 179px при колонке 615 (просит 557),
+   1440 → 180px при колонке 688. «СТАНДАРТЫ» в 9 знаков не поместились
+   бы и вдвое мельче — отсюда «НОРМЫ». Проверено замером самого широкого
+   слова на каждой ступени. */
+.wcard__aside--word .wcard__q {
+  font-size: clamp(4rem, calc(11.4 * var(--vw-step)), 180px);
 }
-
-/* ---------- полоска-навигация ---------- */
-.prs__nav {
-  position: absolute; top: 50%; transform: translateY(-50%);
-  z-index: 5;
-  width: var(--prs-nav-w);
-  display: flex; flex-direction: column; align-items: center;
-  gap: calc(var(--prs-step) - var(--prs-dot));
-  opacity: 0;                       /* появляется вместе с блоком (JS) */
-  transition: opacity .4s var(--ease);
-}
-.prs.is-live .prs__nav { opacity: 1; }
-.prs[data-prs-side="right"] .prs__nav { right: var(--s-4); }
-.prs[data-prs-side="left"]  .prs__nav { left: var(--s-4); }
-
-/* базовая линия сквозь все точки + линия-прогресс поверх неё */
-.prs__line {
-  position: absolute; top: 6px; bottom: 6px; left: 50%;
-  width: 2px; margin-left: -1px;
-  background: color-mix(in srgb, var(--prs-ink) 26%, transparent);
-}
-.prs__fill {
-  position: absolute; top: 0; left: 0; width: 100%; height: 0;
-  background: var(--prs-accent);
-  transition: height .3s var(--ease);
+@media (min-width: 1280px) { .wcard__aside--word .wcard__q { font-size: calc(14 * var(--vw-step)); } }
+@media (min-width: 1440px) { .wcard__aside--word .wcard__q { font-size: 180px; } }
+/* Полный заголовок на тёмной части — своя, куда более мелкая ступень:
+   тут не одно слово, а фраза в несколько строк. */
+.wcard__aside--head .wcard__q {
+  font-size: clamp(2rem, calc(4.6 * var(--vw-step)), 4.6rem);
+  letter-spacing: .01em;
+  /* 9em, а не вся колонка: наклон в 3° раздувает габарит строки, и на
+     полной ширине фраза упиралась в край ряда */
+  max-width: 9em;
 }
 
-/* кружки: непрозрачный фон, чтобы линия не просвечивала насквозь */
-.prs__dot {
-  position: relative; z-index: 2;
-  flex: 0 0 auto;
-  width: var(--prs-dot); height: var(--prs-dot);
-  border-radius: 50%;
-  background: var(--prs-bg);
-  border: 2px solid color-mix(in srgb, var(--prs-ink) 42%, transparent);
-  padding: 0; cursor: pointer;
-  transition: width .3s var(--ease), height .3s var(--ease),
-              background-color .3s var(--ease), border-color .3s var(--ease);
+/* Кадр в тёмной части заполняет свою половину целиком — так же, как
+   панель заполняет свою: обе половины ряда одной высоты.
+   ГРАБЛИ: кадр вынут из потока (absolute + inset). Высота ряда обязана
+   определяться ТОЛЬКО панелью: у картинки 900×1054 в колонке 687px своя
+   высота — 805px, и ряд раздувало до 826 при соседях в 500–650. */
+.wcard__media {
+  width: 100%; margin: 0;
+  border-radius: 10px; overflow: hidden;
 }
-.prs__dot:hover { border-color: var(--prs-accent); }
-/* пройденные — закрашены амбером */
-.prs__dot.is-done { background: var(--prs-accent); border-color: var(--prs-accent); }
-/* активный — крупнее и залит (главный приём референса) */
-.prs__dot.is-current {
-  width: var(--prs-dot-active); height: var(--prs-dot-active);
-  background: var(--prs-accent); border-color: var(--prs-accent);
-  box-shadow: 0 0 0 4px color-mix(in srgb, var(--prs-accent) 22%, transparent);
+@media (min-width: 1024px) {
+  .wcard__aside--media { position: relative; }
+  .wcard__aside--media .wcard__media { position: absolute; inset: 0; width: auto; }
 }
+@media (max-width: 1023.98px) { .wcard__media { aspect-ratio: 4 / 3; } }
+.wcard__media img { width: 100%; height: 100%; object-fit: cover; display: block; }
 
-/* ---------- слайды ---------- */
-.prs__stage { position: relative; }
-.prs__slide {
-  display: grid; gap: var(--s-4);
-  opacity: 0; visibility: hidden;
-  transform: translateY(16px);
-  transition: opacity .45s var(--ease), transform .5s var(--ease), visibility .45s;
+/* ---------- цветная панель ---------- */
+.wcard__panel {
+  display: flex; flex-direction: column;
+  justify-content: space-between;   /* заголовок вверху, список внизу */
+  gap: var(--s-3);
+  padding: var(--s-3);
+  border-radius: 10px;
+  min-height: 440px;
 }
-.prs__slide.is-active { opacity: 1; visibility: visible; transform: none; }
+@media (min-width: 1024px) { .wcard__panel { padding: 40px; gap: 40px; min-height: 480px; } }
+.wcard--amber .wcard__panel { background: var(--bp-amber); color: var(--bp-dark-text); }
+.wcard--ivory .wcard__panel { background: var(--bp-ivory); color: var(--bp-dark-text); }
+.wcard--wine  .wcard__panel { background: var(--wc-wine);  color: var(--bp-off-white); }
 
-/* .prs__num (01/02/…) удалён из разметки по правке 30.07 */
-.prs__title {
-  margin-top: 0;
-  /* курсив снят: тот же прямой Roslindale, что в манифесте и сценариях */
-  font-family: "Roslindale Display Condensed", "Times New Roman", serif;
-  font-style: normal; font-weight: 700;
-  font-size: clamp(1.9rem, calc(3.6 * var(--vw-step)), 3.2rem); line-height: 1.04;
-  text-transform: uppercase;
-}
-.prs__lead {
-  margin-top: var(--s-3);
-  font-family: var(--font-text); font-size: clamp(1rem, calc(1.25 * var(--vw-step)), 1.2rem);
-  line-height: 1.5; max-width: 30em;
-  color: color-mix(in srgb, var(--prs-ink) 84%, transparent);
-}
-/* ---------- наполнение слайдов (структуры из презентации) ----------
-   Правка 30.07: цифры-счётчики убраны, их место занял янтарный ромб —
-   тот же знак, что разделяет проекты в бежевой полосе, так список
-   держит фирменный ритм и без нумерации. Кегль поднят (+16%), строки
-   разрежены — набор стал заметно читаемее. */
-.prs__list { margin-top: var(--s-4); display: grid; gap: 0; }
-.prs__list li {
-  display: grid; grid-template-columns: 7px minmax(0, 1fr); gap: 14px;
-  align-items: start;
-  padding: 12px 0;
-  border-bottom: 1px solid color-mix(in srgb, var(--prs-ink) 18%, transparent);
-  font-family: var(--font-grotesk);
-  font-size: clamp(.84rem, calc(1.08 * var(--vw-step)), 1.08rem); font-weight: 700;
-  letter-spacing: .07em; text-transform: uppercase;
-  line-height: 1.3;
-}
-.prs__list li::before {
-  content: ""; width: 7px; height: 7px; margin-top: .5em;
-  background: var(--prs-accent); transform: rotate(45deg);
-}
-
-/* пары «термин — уточнение»: крупный термин слева, пояснение справа */
-.prs__defs { margin-top: var(--s-4); display: grid; }
-.prs__defs > div {
-  display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, .86fr);
-  gap: var(--s-3); align-items: baseline;
-  padding: 15px 0;
-  border-bottom: 1px solid color-mix(in srgb, var(--prs-ink) 18%, transparent);
-}
-.prs__defs dt {
-  /* курсив снят вместе с заголовками (правка 30.07) */
-  font-family: "Roslindale Display Condensed", "Times New Roman", serif;
-  font-style: normal; font-weight: 700;
-  font-size: clamp(1.25rem, calc(2.05 * var(--vw-step)), 2rem); line-height: 1.02;
-  text-transform: uppercase;
-}
-.prs__defs dd {
+/* Несущий якорь панели: у референса это единственная крупная строка
+   сверху, и без неё панель выглядит пустой. Стоит в КАЖДОЙ карточке. */
+.wcard__title {
   margin: 0;
-  font-family: var(--font-text); font-size: clamp(.95rem, calc(1.15 * var(--vw-step)), 1.15rem); line-height: 1.4;
-  color: color-mix(in srgb, var(--prs-ink) 78%, transparent);
+  font-family: "Roslindale Display Condensed", "Times New Roman", serif;
+  font-style: normal; font-weight: 700;
+  text-transform: uppercase;
+  /* 80px на 1440 — ровно text-80 референса при колонке ~697px. Ниже
+     кегль идёт ступенями: колонка сжимается быстрее, чем --vw-step, и
+     длинное русское слово («ПРОСТРАНСТВО» — 12 знаков против английских
+     5–6) вылезает за её край. Границы проверены замером самого широкого
+     слова каждого заголовка на 1024 / 1280 / 1440. */
+  font-size: clamp(2rem, calc(4.4 * var(--vw-step)), 3.5rem);
+  line-height: 1; letter-spacing: -.02em;
+  color: inherit;
+  max-width: 13em;
+}
+@media (min-width: 1280px) { .wcard__title { font-size: calc(5.4 * var(--vw-step)); } }
+@media (min-width: 1440px) { .wcard__title { font-size: 5rem; } }
+
+.wcard__list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; width: 100%; }
+.wcard__list li {
+  display: flex; align-items: flex-start; gap: 20px;
+  padding-block: 5px;
+  font-size: 1.125rem; line-height: 1.5;
+  border-bottom: 1px dashed;
+}
+.wcard__list li:first-child { border-top: 1px dashed; }
+/* ГРАБЛИ: текст пункта лежит в <span> НЕ ДЛЯ КРАСОТЫ. У li display:flex,
+   и без обёртки «<strong>зачин</strong> — пояснение» распадается на два
+   анонимных флекс-элемента: зачин встаёт отдельной узкой колонкой, а
+   тире с пояснением — рядом. Ровно так выглядел предыдущий заход. */
+.wcard__list li > span { min-width: 0; }
+.wcard__list strong { font-weight: 700; }
+/* Цвет пунктира внутри панели — от её собственных чернил, а не общий:
+   на янтаре и айвори он тёмный, на вине светлый. */
+.wcard--amber .wcard__list li,
+.wcard--ivory .wcard__list li { border-color: rgba(23, 20, 15, .3); }
+.wcard--wine  .wcard__list li { border-color: rgba(234, 228, 216, .3); }
+
+.wcard__list li::before {
+  content: ""; flex: 0 0 auto;
+  width: 16px; height: 16px; margin-top: 4px;
+  background: currentColor; opacity: .85;
+  -webkit-mask: var(--wc-tick) center / contain no-repeat;
+          mask: var(--wc-tick) center / contain no-repeat;
 }
 
-/* Два раздела на одном слайде — разворот «Наши сильные стороны».
-   Правка 30.07: вместо двух блоков друг под другом, разделённых линейкой,
-   они разведены по диагонали — первый прижат к одному краю колонки,
-   второй к противоположному, и с каждым слайдом стороны меняются
-   местами. Разделительную линейку заменил короткий янтарный штрих над
-   заголовком (с той стороны, к которой прижат раздел).
-   Откат: снять justify-self/text-align, вернуть border-top у второго. */
-.prs__groups { margin-top: var(--s-4); display: grid; gap: var(--s-6); }
-.prs__group .prs__title {
-  position: relative;
-  margin-top: 0; padding-top: 14px;
-  font-size: clamp(1.55rem, calc(2.7 * var(--vw-step)), 2.6rem); line-height: 1.04;
+/* ---------- низкие экраны ----------
+   Ступень sh: референса — «(min-width:64rem) and (max-height:719px)»;
+   значения внутри перенесены с него один в один. Порог поднят до 860px
+   осознанно: русский пункт длиннее английского и чаще уходит в две
+   строки, из-за чего на ноутбучных 1280×720 и 1440×800 ряд переставал
+   помещаться в экран целиком — а стопка требует, чтобы помещался. */
+@media (min-width: 1024px) and (max-height: 860px) {
+  .wcards__stack { min-height: 0; }
+  .wcard { padding-block: 8px; }
+  .wcard__panel { padding: 28px; gap: 24px; min-height: 400px; }
+  /* 60px референса, но не шире колонки: на 1024 она всего ~487px */
+  .wcard__title { font-size: min(3.75rem, calc(4.4 * var(--vw-step))); }
+  .wcard__list li { gap: 16px; padding-block: 4px; }
 }
-.prs__group .prs__title::before {
-  content: ""; position: absolute; top: 0; left: 0;
-  width: 48px; height: 2px; background: var(--prs-accent);
-}
-.prs__facts { margin-top: var(--s-2); display: grid; gap: 9px; }
-.prs__facts li {
-  font-family: var(--font-text);
-  font-size: clamp(1.05rem, calc(1.38 * var(--vw-step)), 1.45rem); line-height: 1.45;
-  color: color-mix(in srgb, var(--prs-ink) 88%, transparent);
+/* Планшетная ступень 1024–1279: колонка всего ~480px, и пункт в 18px
+   уходит в две строки почти везде — ряд переставал помещаться в экран.
+   Кегль пункта здесь на ступень ниже, у референса такой ступени нет
+   просто потому, что английская фраза в ту же колонку укладывается. */
+@media (min-width: 1024px) and (max-width: 1279.98px) {
+  .wcard__list li { font-size: 1rem; line-height: 1.5; gap: 16px; }
 }
 
-/* два самостоятельных утверждения рядом: каждое под янтарной линейкой */
-.prs__pair { margin-top: var(--s-6); display: grid; gap: var(--s-6); }
-.prs__pair p {
-  padding-top: var(--s-2);
-  border-top: 2px solid var(--prs-accent);
-  font-family: var(--font-text); font-size: clamp(1.05rem, calc(1.35 * var(--vw-step)), 1.4rem); line-height: 1.5;
-  color: color-mix(in srgb, var(--prs-ink) 88%, transparent);
-}
-
-.prs__media { margin: 0; overflow: hidden; border-radius: 8px; }
-.prs__media img { width: 100%; height: 100%; object-fit: cover; }
-
-/* ---------- десктоп: пин + раскладка ---------- */
-@media (min-width: 1024px) and (prefers-reduced-motion: no-preference) {
-  .prs { height: 100svh; }
-  /* Правка 30.07: манифест стоит В ПОТОКЕ, а не абсолютом с магическим
-     отступом 12vh у сцены. Он стал крупным (8vw), и при абсолютном
-     позиционировании пришлось бы вручную пересчитывать зазор под каждый
-     кегль; теперь высоту делит flex: заголовок по содержимому, сцена
-     забирает остаток. */
-  .prs__inner {
-    height: 100%;
-    display: flex; flex-direction: column;
-    padding-block: var(--s-6);
-  }
-  .prs__stage { flex: 1; display: grid; align-items: center; margin-top: var(--s-4); }
-  .prs__slide {
-    grid-area: 1 / 1;
-    grid-template-columns: minmax(0, 1fr) minmax(0, .85fr);
-    align-items: center; gap: var(--s-8);
-  }
-  /* контент отодвинут от той кромки, где стоит полоска */
-  .prs[data-prs-side="right"] .prs__inner { padding-right: calc(var(--prs-nav-w) + var(--s-6)); }
-  .prs[data-prs-side="left"]  .prs__inner { padding-left: calc(var(--prs-nav-w) + var(--s-6)); }
-  /* …но манифест центрируем по ЭКРАНУ, а не по отодвинутой колонке —
-     иначе крупная надпись съезжает на 44px от середины */
-  .prs[data-prs-side="right"] .prs__manifest { margin-right: calc(-1 * (var(--prs-nav-w) + var(--s-6))); }
-  .prs[data-prs-side="left"]  .prs__manifest { margin-left:  calc(-1 * (var(--prs-nav-w) + var(--s-6))); }
-  /* у барного блока фото слева, текст справа — зеркально кофейному;
-     колонки тоже зеркалим, иначе тексту (а он тут из двух разделов)
-     достаётся узкая доля и строки ломаются пополам */
-  .prs[data-prs-side="left"] .prs__slide { grid-template-columns: minmax(0, .85fr) minmax(0, 1fr); }
-  .prs[data-prs-side="left"] .prs__text  { order: 2; }
-  .prs[data-prs-side="left"] .prs__media { order: 1; }
-  .prs__media { height: min(58svh, 560px); }
-  .prs__list--two { grid-template-columns: 1fr 1fr; column-gap: var(--s-6); }
-  .prs__pair { grid-template-columns: 1fr 1fr; gap: var(--s-6); }
-
-  /* ---- потолок по ВЫСОТЕ экрана ----
-     Слайды живут в запиненном экране: связывающее ограничение здесь не
-     ширина, а высота. После увеличения кеглей на окне 1024×680 самый
-     плотный слайд («Команда и кадровая экспертиза» + «Соответствие
-     стандартам») перерастал экран на 190px и обрезался. Поэтому каждый
-     кегль и вертикальный отступ берут МЕНЬШЕЕ из двух: своей ширинной
-     вилки и доли высоты экрана. На 1440×900 работает вилка — размеры
-     ровно те, что задуманы; ужимается только низкое окно. */
-  /* сверху отступ считается от ВЫСОТЫ ШАПКИ: манифест стоит в потоке
-     первым, и при обычном отступе его верхушку срезала фиксированная
-     панель (замер: заходила на буквы на 12px) */
-  .prs__inner { padding-block: calc(var(--header-h) + 10px) min(var(--s-6), 5svh); }
-  .prs__stage { margin-top: min(var(--s-4), 2svh); }
-  .prs__manifest { font-size: min(clamp(2.48rem, 10.2vw, 14.2rem), 15.4svh); }
-  .prs__title { font-size: min(clamp(1.9rem, calc(3.6 * var(--vw-step)), 3.2rem), 5.4svh); }
-  .prs__list { margin-top: min(var(--s-4), 3svh); }
-  .prs__list li {
-    font-size: min(clamp(.84rem, calc(1.08 * var(--vw-step)), 1.08rem), 1.92svh);
-    padding-block: min(12px, 1svh);
-  }
-  .prs__defs { margin-top: min(var(--s-4), 3svh); }
-  .prs__defs > div { padding-block: min(15px, 1.8svh); }
-  .prs__defs dt { font-size: min(clamp(1.25rem, calc(2.05 * var(--vw-step)), 2rem), 3.4svh); }
-  .prs__defs dd { font-size: min(clamp(.95rem, calc(1.15 * var(--vw-step)), 1.15rem), 2svh); }
-  .prs__pair { margin-top: min(var(--s-6), 4.4svh); }
-  .prs__pair p { font-size: min(clamp(1.05rem, calc(1.35 * var(--vw-step)), 1.4rem), 2.4svh); }
-  .prs__groups { margin-top: min(var(--s-4), 2.9svh); gap: min(var(--s-6), 3.5svh); }
-  .prs__group .prs__title {
-    font-size: min(clamp(1.55rem, calc(2.7 * var(--vw-step)), 2.6rem), 4.05svh);
-    padding-top: min(14px, 1.7svh);
-  }
-  .prs__facts { margin-top: min(var(--s-2), 1.9svh); gap: min(9px, 1.2svh); }
-  .prs__facts li { font-size: min(clamp(1.05rem, calc(1.38 * var(--vw-step)), 1.45rem), 2svh); }
-
-  /* диагональ: раздел 1 у одного края колонки, раздел 2 у другого;
-     на каждом следующем слайде стороны меняются местами */
-  .prs__group { max-width: 88%; }
-  .prs__slide:nth-of-type(odd)  .prs__group:nth-child(1),
-  .prs__slide:nth-of-type(even) .prs__group:nth-child(2) { justify-self: start; text-align: left; }
-  .prs__slide:nth-of-type(odd)  .prs__group:nth-child(2),
-  .prs__slide:nth-of-type(even) .prs__group:nth-child(1) { justify-self: end; text-align: right; }
-  /* янтарный штрих над заголовком встаёт с той же стороны, что и раздел */
-  .prs__slide:nth-of-type(odd)  .prs__group:nth-child(2) .prs__title::before,
-  .prs__slide:nth-of-type(even) .prs__group:nth-child(1) .prs__title::before { left: auto; right: 0; }
-}
-
-/* Список из десяти пунктов идёт в одну колонку — так он читается лучше
-   всего. Но на невысоком окне десять строк подряд не помещаются в экран,
-   поэтому там он складывается в две колонки. */
-@media (min-width: 1024px) and (max-height: 880px) {
-  .prs__list { grid-template-columns: 1fr 1fr; column-gap: var(--s-6); }
-}
-
-/* ---------- мобильные и reduced-motion: обычный поток ---------- */
-@media (max-width: 1023.98px), (prefers-reduced-motion: reduce) {
-  .prs { height: auto; overflow: visible; padding-block: var(--s-12); }
-  .prs__nav { display: none; }
-  .prs__stage { display: grid; gap: var(--s-12); margin-top: var(--s-8); }
-  .prs__slide { opacity: 1; visibility: visible; transform: none; grid-template-columns: 1fr; }
-  .prs__media { aspect-ratio: 4 / 3; }
+/* ---------- мобильные ----------
+   У референса тёмная часть на узком экране скрыта совсем. Нам так
+   нельзя: у варианта --head там лежит заголовок карточки, у --media —
+   единственный кадр ряда. Поэтому оставляем её сверху и уменьшаем.
+   Стопки на мобильном нет — ряды идут обычным потоком (как у референса,
+   там сцепка тоже только с 1024). */
+@media (max-width: 1023.98px) {
+  .wcard__aside--word .wcard__q { font-size: clamp(3.5rem, 22vw, 8rem); }
+  .wcard__aside--head .wcard__q { font-size: clamp(1.75rem, 8vw, 2.4rem); max-width: none; }
+  .wcard__list li { font-size: 1rem; gap: 14px; }
+  .wcard__panel { min-height: 0; }
 }
 
 /* ============================================================
@@ -1720,6 +1644,13 @@ form.is-hidden { visibility: hidden; }
     will-change: opacity;
   }
   html.js-reveal .char, html.js-reveal .word { will-change: transform, opacity; }
+  /* Карточки услуг помечены не атрибутом, а классом: их ведёт своя
+     общая лента (playCard), а не карта атрибутов. Прятать нужно те же
+     два узла, что она поднимает с нуля, — иначе они успевают мигнуть. */
+  html.js-reveal .wcard__q, html.js-reveal .wcard__panel {
+    opacity: 0;
+    will-change: opacity, transform;
+  }
 }
 
 /* ---------- 404 / служебные страницы ---------- */
