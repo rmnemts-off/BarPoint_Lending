@@ -60,94 +60,28 @@
     });
   });
 
-  /* ---------- 6.0 Шапка: чернила по фону под каждым элементом ----------
-     Правка 31.07. Раньше шапка пряталась при скролле вниз и наращивала
-     тёмную подложку — заказчик попросил зафиксировать её насовсем и
-     сделать полностью прозрачной. Вместо подложки читаемость держат
-     «чернила»: каждый помеченный data-ink элемент замеряет фон В СВОЕЙ
-     точке (не в центре экрана) и переключается между тёмным и светлым.
-     Учитывается ТОЛЬКО фон: background-color элементов под шапкой,
-     смешанные сверху вниз до непрозрачности. Картинки и текст под
-     шапкой не читаем — так просил заказчик. */
-  var header = document.getElementById("header");
-  var inkNodes = [].slice.call(document.querySelectorAll("[data-ink]"));
+  /* ---------- 6.0 Шапка: «чернила» по фону — МЕХАНИЗМ УДАЛЁН ----------
+     ПРАВКА 04.08 (вторая). Здесь жил расчёт цвета шапки: каждый элемент
+     с data-ink замерял композитный фон под собой (elementsFromPoint,
+     смешение слоёв по остатку прозрачности, плашки кейсов пропускались)
+     и переключался между кремовым и charcoal-начертанием — тем, что даёт
+     больший контраст. Пересчёт шёл на scroll, resize, load, на каждом
+     кадре полёта логотипа, при открытии мобильной шторки и на смене
+     фона body.
 
-  /* Два начертания шапки. Числа обязаны совпадать с палитрой в style.css:
-     здесь они только СРАВНИВАЮТСЯ с фоном под элементом, чтобы выбрать
-     класс, а сам цвет ставит CSS (--hdr-ink). Разъедутся — шапка начнёт
-     выбирать не тот вариант. Правка 04.08: перебиты под новую палитру,
-     было [234,228,216] / [23,20,15]. */
-  var INK_LIGHT = [230, 226, 218]; // --bp-cream
-  var INK_DARK = [16, 17, 17];     // --bp-charcoal
-  var relLum = function (c) {
-    var f = function (v) {
-      v /= 255;
-      return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4);
-    };
-    return 0.2126 * f(c[0]) + 0.7152 * f(c[1]) + 0.0722 * f(c[2]);
-  };
-  var contrast = function (a, b) {
-    return (Math.max(a, b) + 0.05) / (Math.min(a, b) + 0.05);
-  };
-  var L_LIGHT = relLum(INK_LIGHT), L_DARK = relLum(INK_DARK);
+     Заказчик попросил убрать переключение: «пусть шапка всегда будет в
+     своём цвете». Цвет теперь один и живёт целиком в CSS — переменная
+     --hdr-ink у .header. Вместе с расчётом ушли: header, inkNodes,
+     INK_LIGHT/INK_DARK, relLum, contrast, INK_SKIP, bgAt, updateInk,
+     requestInk и три вызова requestInk по месту (полёт логотипа, шторка
+     меню, перелив фона).
 
-  /* Правка 31.07 (пятая): плашки с названиями — это НАДПИСЬ поверх блока,
-     а не его фон. Пока их читали наравне с фоном, пункты шапки над
-     чёрной плашкой кейса вспыхивали светлым посреди светлой секции —
-     заказчик просил в этот момент оставаться тёмными. Пропускаем их, и
-     цвет считается по настоящей подложке секции (кремовой у кейсов,
-     бордовой у команды). Список расширяемый. */
-  var INK_SKIP = ".plaque";
-
-  /* Композитный цвет фона в точке экрана. elementsFromPoint отдаёт стопку
-     сверху вниз, поэтому смешиваем «по остатку прозрачности»: каждый
-     следующий слой красит только то, что ещё не закрашено. */
-  var bgAt = function (x, y) {
-    var stack = document.elementsFromPoint(x, y);
-    var r = 0, g = 0, b = 0, a = 0, i, m, ca, k;
-    for (i = 0; i < stack.length && a < 0.995; i++) {
-      if (header.contains(stack[i])) continue; // свою же шапку не читаем
-      if (stack[i].closest && stack[i].closest(INK_SKIP)) continue;
-      m = getComputedStyle(stack[i]).backgroundColor.match(/[\d.]+/g);
-      if (!m) continue;
-      ca = m.length > 3 ? parseFloat(m[3]) : 1;
-      if (!ca) continue;
-      k = (1 - a) * ca;
-      r += +m[0] * k; g += +m[1] * k; b += +m[2] * k; a += k;
-    }
-    if (a < 0.995) { /* добираем цветом body — он лежит под всем */
-      m = getComputedStyle(document.body).backgroundColor.match(/[\d.]+/g) || ["16", "17", "17"];
-      k = 1 - a;
-      r += +m[0] * k; g += +m[1] * k; b += +m[2] * k;
-    }
-    return [r, g, b];
-  };
-
-  var updateInk = function () {
-    for (var i = 0; i < inkNodes.length; i++) {
-      var el = inkNodes[i];
-      var box = el.getBoundingClientRect();
-      if (!box.width || !box.height) continue; // спрятан брейкпоинтом
-      /* точка замера — центр самого элемента, зажатый в границы окна:
-         во время полёта знак вылезает далеко за пределы шапки */
-      var x = Math.min(Math.max(box.left + box.width / 2, 1), window.innerWidth - 2);
-      var y = Math.min(Math.max(box.top + box.height / 2, 1), window.innerHeight - 2);
-      var lum = relLum(bgAt(x, y));
-      /* выбираем то из двух начертаний, что даёт больший контраст */
-      el.classList.toggle("is-on-light", contrast(lum, L_DARK) > contrast(lum, L_LIGHT));
-    }
-  };
-
-  var inkQueued = false;
-  function requestInk() {
-    if (inkQueued) return;
-    inkQueued = true;
-    requestAnimationFrame(function () { inkQueued = false; updateInk(); });
-  }
-  window.addEventListener("scroll", requestInk, { passive: true });
-  window.addEventListener("resize", requestInk);
-  window.addEventListener("load", requestInk);
-  requestInk();
+     ЦЕНА РЕШЕНИЯ — замер по всей странице шагом 40px, 1440×900: пункты
+     навигации и знак уходят ниже нормы 3:1 на 1160px прокрутки из 12640,
+     кнопка «Обсудить проект» — на 2760px. По-настоящему слепой участок
+     один: 7600…8120, шапка идёт по кремовой карточке ленты кейсов, 1:1.
+     Разбор по элементам и пути лечения — у .header в style.css.
+     Вернуть: код целиком в истории git, последний коммит с ним 7fc5d36. */
 
   /* ---------- ТЗ4 §3: полёт логотипа из центра героя в слот шапки ---------- */
   var heroLogo = document.querySelector(".js-herologo");
@@ -214,10 +148,9 @@
           onUpdate: function (self) {
             /* в полёте логотип не кликабелен (ТЗ4 §3.2) */
             heroLogo.style.pointerEvents = self.progress > 0.9 ? "" : "none";
-            /* Подложка шапки по прогрессу полёта убрана 31.07 — шапка
-               прозрачна всегда. Но знак в полёте проезжает по разным
-               участкам фона, поэтому чернила пересчитываем каждый кадр. */
-            requestInk();
+            /* Здесь стоял покадровый пересчёт «чернил»: знак в полёте
+               проезжает по разным участкам фона и раньше на них
+               перекрашивался. Механизм снят 04.08 — цвет у шапки один. */
           }
         }
       });
@@ -255,7 +188,6 @@
     document.documentElement.classList.toggle("menu-open", open);
     burger.setAttribute("aria-expanded", String(open));
     burger.setAttribute("aria-label", open ? "Закрыть меню" : "Открыть меню");
-    requestInk(); /* под шапкой теперь тёмная шторка меню — пересчитать */
     if (open) lenisStop(); else lenisStart();
   });
   mnav.querySelectorAll("a").forEach(function (a) { a.addEventListener("click", closeMenu); });
@@ -1787,7 +1719,7 @@
       if (css !== lastBg) {
         lastBg = css;
         document.body.style.backgroundColor = css;
-        requestInk(); /* фон поехал — чернила шапки могут смениться */
+        /* здесь был пересчёт «чернил» шапки — механизм снят 04.08 */
       }
     };
 
