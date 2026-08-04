@@ -150,9 +150,16 @@
        и создаём»; янтарный акцент снят — весь заголовок одним цветом
        (выбран вариант Б из ТЗ15 §3.4). -->
   <div class="hero__content container">
-    <!-- bigCopy здесь НЕ ставим: 91 знак и 17 слов — разлёт с поворотом
-         на таком объёме читается как шум, и это LCP-элемент страницы. -->
-    <h1 class="hero__title" data-gsap-title><span class="nw">С 2016 года</span> создаём и улучшаем кофейни, бары <span class="nw">и рестораны,</span> закрывая <span class="nw">полный цикл:</span> <span class="nw">от концепции</span> <span class="nw">до операционки</span></h1>
+    <!-- Правка 04.08: заголовок переведён с посимвольного title на bigCopy
+         — приём абзаца «For retailers and restaurants…» с
+         buckssauce.com/wholesale, прямая просьба клиента. Раньше здесь
+         стояла оговорка «bigCopy не ставим: 17 слов, и это LCP-элемент»;
+         решение клиента её отменяет, но сама плата никуда не делась:
+         лента длиннее (1.25с + 17 шагов по 33мс против .48с + посимвольного
+         каскада), а LCP страницы засчитывается в момент SplitText.revert()
+         в конце ленты — то есть отметка сдвигается примерно на полсекунды.
+         Разбор механики и все замеры — в playBigCopy (assets/js/reveal.js). -->
+    <h1 class="hero__title" data-gsap-big-copy><span class="nw">С 2016 года</span> создаём и улучшаем кофейни, бары <span class="nw">и рестораны,</span> закрывая <span class="nw">полный цикл:</span> <span class="nw">от концепции</span> <span class="nw">до операционки</span></h1>
   </div>
 </section>
 
@@ -206,13 +213,22 @@
 <section class="section section--black" id="about" data-bg="#100b06">
   <div class="container">
     <div class="scn-head">
-      <h2 class="scn-head__title" data-gsap-title-on-scroll>Три сценария работы</h2>
+      <h2 class="scn-head__title" data-gsap-big-copy-on-scroll>Три сценария работы</h2>
     </div>
 
+    <!-- Правка 04.08: три заголовка сценариев переведены с посимвольного
+         title на bigCopy — приём с buckssauce.com/wholesale (слова
+         вылетают снизу сплющенными и под случайным углом ±30°, разбор и
+         замеры в playBigCopy, assets/js/reveal.js). Клиент попросил
+         «анимацию как в buckssauce, выбери подходящий момент»: из всего,
+         что там есть, этот приём самый заметный, а заголовки здесь
+         короткие (2–3 слова) — на них разлёт читается, а не сыплется.
+         Описания под ними намеренно оставлены построчными: два разлёта
+         подряд в одной карточке спорят друг с другом. -->
     <div class="scn" data-scn>
       <article class="scn__card" data-scn-card data-scn-i="0">
         <span class="scn__frame" aria-hidden="true"></span>
-        <h3 class="scn__title" data-gsap-title-on-scroll>Открываете<br>с нуля</h3>
+        <h3 class="scn__title" data-gsap-big-copy-on-scroll>Открываете<br>с нуля</h3>
         <p class="scn__desc" data-gsap-text-on-scroll data-gsap-delay="0.1">Помогаем спроектировать концепцию, карту напитков и запустить точку без типичных ошибок старта.</p>
         <figure class="scn__photo">
           <img src="assets/img/scenario-1-900.webp" width="900" height="1125" alt="Напиток наливают в бокал — старт нового проекта" loading="lazy" decoding="async">
@@ -221,7 +237,7 @@
 
       <article class="scn__card" data-scn-card data-scn-i="1">
         <span class="scn__frame" aria-hidden="true"></span>
-        <h3 class="scn__title" data-gsap-title-on-scroll>Упёрлись<br>в потолок</h3>
+        <h3 class="scn__title" data-gsap-big-copy-on-scroll>Упёрлись<br>в потолок</h3>
         <p class="scn__desc" data-gsap-text-on-scroll data-gsap-delay="0.1">Разбираем, где теряются деньги и гости, и выстраиваем систему вместо ручного управления.</p>
         <figure class="scn__photo">
           <img src="assets/img/scenario-2-900.webp" width="900" height="1125" alt="Кофе с молоком — текстура вихря" loading="lazy" decoding="async">
@@ -230,7 +246,7 @@
 
       <article class="scn__card" data-scn-card data-scn-i="2">
         <span class="scn__frame" aria-hidden="true"></span>
-        <h3 class="scn__title" data-gsap-title-on-scroll>Хотите<br>масштабироваться</h3>
+        <h3 class="scn__title" data-gsap-big-copy-on-scroll>Хотите<br>масштабироваться</h3>
         <p class="scn__desc" data-gsap-text-on-scroll data-gsap-delay="0.1">Готовим бренд, стандарты и экономику так, чтобы формат можно было тиражировать.</p>
         <figure class="scn__photo">
           <img src="assets/img/scenario-3-900.webp" width="900" height="1125" alt="Гости с фирменными напитками PIMS" loading="lazy" decoding="async">
@@ -289,8 +305,10 @@
 <section class="section wcards" id="services" data-bg="#100b06">
   <div class="container">
     <div class="sec-head wcards-head">
-      <h2 class="h-serif h2" data-gsap-title-on-scroll>Бары, рестораны, кофейни — система одна</h2>
-      <p class="lead" data-gsap-text-on-scroll data-gsap-delay="0.1">От дизайна к вкусу, от вкуса к операционке, от операционки к экономике, от экономики к масштабированию. Формат разный — маршрут один.</p>
+      <!-- Правка 04.08: подзаголовок («От дизайна к вкусу…») снят по просьбе
+           клиента, заголовок обязан стоять В ОДНУ СТРОКУ — см. кегль
+           .wcards-head .h2 в style.css, он считается от ширины окна. -->
+      <h2 class="h-serif h2" data-gsap-big-copy-on-scroll>Бары, рестораны, кофейни — система одна</h2>
     </div>
   </div>
 
@@ -314,9 +332,23 @@
     </article>
 
     <article class="wcard wcard--ivory wcard--flip">
+      <!-- ПРАВКА 04.08 — loading: lazy → eager (просьба клиента: «картинки
+           появляются не сразу, получается чёрный экран на полэкрана»).
+           Причина ровно в lazy, и она не общая для сайта, а своя у этого
+           блока: ряды стопки лежат в потоке ДАЛЕКО внизу страницы, а на
+           экран их выводит не прокрутка, а трансформ пин-таймлайна. Для
+           браузера они всё это время остаются глубоко за кадром, отложенная
+           загрузка не стартует, и картинка начинает грузиться только в тот
+           момент, когда ряд уже встал на место. Замер (1512×877, отдача
+           картинок придержана на 1.2с): карточка стоит 128…786, а её
+           медиа-половина в 637px пуста — это и есть «чёрный экран».
+           Таких картинок в стопке всего две, поэтому eager здесь дешёвый:
+           на первый экран они не влияют, а к стопке приезжают готовыми.
+           Остальным картинкам сайта lazy НЕ трогаем — там обычный поток,
+           и отложенная загрузка работает как задумано. -->
       <div class="wcard__aside wcard__aside--media">
         <figure class="wcard__media">
-          <img src="assets/img/approach-4-900.webp" width="900" height="1054" alt="Рабочая зона за стойкой" loading="lazy" decoding="async">
+          <img src="assets/img/approach-4-900.webp" width="900" height="1054" alt="Рабочая зона за стойкой" loading="eager" fetchpriority="low" decoding="async">
         </figure>
       </div>
       <div class="wcard__panel">
@@ -387,7 +419,9 @@
     <article class="wcard wcard--wine wcard--flip">
       <div class="wcard__aside wcard__aside--media">
         <figure class="wcard__media">
-          <img src="assets/img/svc-coffee-2-1400.webp" width="1400" height="933" alt="Модульная кофейная точка PIMS" loading="lazy" decoding="async">
+          <!-- eager по той же причине, что и у карточки «Пространство и
+               стойка» выше: ряд выводит на экран трансформ, а не прокрутка -->
+          <img src="assets/img/svc-coffee-2-1400.webp" width="1400" height="933" alt="Модульная кофейная точка PIMS" loading="eager" fetchpriority="low" decoding="async">
         </figure>
       </div>
       <div class="wcard__panel">
@@ -427,7 +461,7 @@
     <!-- Правка 31.07: пилюля «Портфолио» и фильтр «Все / Бар / Кофе» убраны;
          заголовок — капсом, прямым Roslindale, по центру. -->
     <div class="sec-head cases-head">
-      <h2 class="h-serif h2" data-gsap-title-on-scroll>Наши проекты</h2>
+      <h2 class="h-serif h2" data-gsap-big-copy-on-scroll>Наши проекты</h2>
       <p class="lead" data-gsap-text-on-scroll data-gsap-delay="0.1">Собраны наиболее знаковые проекты, реализованные командой BARPOINT</p>
     </div>
     <!-- ТЗ2 §6: бесконечная лента карточек с drag; при reduced-motion
@@ -626,7 +660,7 @@
            которая собирает систему…» убраны по просьбе заказчика —
            в интро-станции остаётся только заголовок. -->
       <div class="hstation hstation--intro">
-        <h2 class="h-serif h2" data-gsap-title-on-scroll>BARPOINT в лицах</h2>
+        <h2 class="h-serif h2" data-gsap-big-copy-on-scroll>BARPOINT в лицах</h2>
       </div>
 
       <div class="hstation" data-hstation>
@@ -703,7 +737,7 @@
   <div class="container">
     <div class="sec-head">
       <p class="pill">FAQ</p>
-      <h2 class="h-serif h2" data-gsap-title-on-scroll>Вопросы, которые нам задают</h2>
+      <h2 class="h-serif h2" data-gsap-big-copy-on-scroll>Вопросы, которые нам задают</h2>
     </div>
     <div class="faq" data-faq>
       <details>
