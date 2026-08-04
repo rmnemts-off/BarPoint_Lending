@@ -913,8 +913,13 @@ ul, ol { list-style: none; }
      поровну, а заголовок со списком стоят вплотную друг к другу через
      свой gap. Пустота у края читается как поле, пустота в середине — как
      ошибка вёрстки; места столько же, вид другой.
-     Откат к референсу: justify-content: space-between. */
-  justify-content: center;
+     ПРАВКА 05.08: содержимое прижато к ВЕРХУ панели. Заказчик уточнил по
+     скриншотам референса: список стоит не у нижней кромки, а на одном и
+     том же небольшом расстоянии под заголовком — сколько бы пунктов в нём
+     ни было; весь остаток высоты копится внизу. Поэтому не center (было
+     04.08) и не space-between (был до того и полдня 05.08), а flex-start
+     с фиксированным gap между заголовком и списком. */
+  justify-content: flex-start;
   gap: var(--s-3);
   padding: var(--s-3);
   border-radius: 10px;
@@ -938,13 +943,19 @@ ul, ol { list-style: none; }
    опускаться некуда), сверху 760 — иначе на мониторе в 1440 точек между
    заголовком панели и списком разверзается полтысячи пикселей пустоты. */
 @media (min-width: 1024px) {
-  .wcard__panel { padding: 40px; gap: 40px; min-height: clamp(480px, calc(100vh - 240px), 760px); }
+  /* gap 40 → 80: это и есть тот самый просвет «заголовок → список».
+     Снят с референса по присланным скриншотам: там между нижней кромкой
+     заголовка и первым пунктом ~86px при панели в 688px. */
+  .wcard__panel { padding: 40px; gap: var(--s-10); min-height: clamp(480px, calc(100vh - 240px), 760px); }
 }
 /* Классы-модификаторы остались прежними (amber / ivory / wine) — они лишь
    отмечают позицию в цикле index%3, а разметка на них завязана в семи
    местах. Значения — три акцента новой палитры. На золоте чернила тёмные
    (charcoal, 6.5:1), на изумруде и вине — кремовые (9.1:1 и 8.3:1). */
-.wcard--amber .wcard__panel { background: var(--bp-gold);  color: var(--bp-charcoal); }
+/* Правка 05.08: чернила во ВСЕХ панелях светлые — просьба заказчика.
+   На золоте они дают 2.75:1 (на изумруде 8.77, на вине 9.72); у референса
+   ровно так же — кремовый текст на золотой панели. */
+.wcard--amber .wcard__panel { background: var(--bp-gold);  color: var(--bp-cream); }
 .wcard--ivory .wcard__panel { background: var(--bp-green); color: var(--bp-cream); }
 .wcard--wine  .wcard__panel { background: var(--bp-wine);  color: var(--bp-cream); }
 
@@ -963,12 +974,11 @@ ul, ol { list-style: none; }
   font-size: clamp(2rem, calc(4.4 * var(--vw-step)), 3.5rem);
   line-height: 1; letter-spacing: -.02em;
   color: inherit;
-  /* Правка 04.08: заголовок панели выключен ПО ЦЕНТРУ (просьба клиента).
-     Одного text-align мало: max-width делает из заголовка узкий блок, и
-     без margin-inline: auto он остался бы прижат к левому краю панели —
-     по центру выключились бы только строки внутри него. */
-  max-width: 13em; margin-inline: auto;
-  text-align: center;
+  /* ПРАВКА 05.08: заголовок снова по ЛЕВОМУ краю — как на референсе,
+     скриншот которого прислал заказчик. Центровка (max-width 13em +
+     margin-inline auto + text-align center) держалась ровно один день,
+     с правки 04.08. Откат — вернуть эти три строки. */
+  text-align: left;
 }
 @media (min-width: 1280px) { .wcard__title { font-size: calc(5.4 * var(--vw-step)); } }
 @media (min-width: 1440px) { .wcard__title { font-size: 5rem; } }
@@ -987,9 +997,8 @@ ul, ol { list-style: none; }
    тире с пояснением — рядом. Ровно так выглядел предыдущий заход. */
 .wcard__list li > span { min-width: 0; }
 .wcard__list strong { font-weight: 700; }
-/* Цвет пунктира внутри панели — от её собственных чернил, а не общий:
-   на золоте он тёмный, на изумруде и вине светлый. */
-.wcard--amber .wcard__list li { border-color: color-mix(in srgb, var(--bp-charcoal) 30%, transparent); }
+/* Пунктир — от чернил панели; с правкой 05.08 они светлые во всех трёх */
+.wcard--amber .wcard__list li,
 .wcard--ivory .wcard__list li,
 .wcard--wine  .wcard__list li { border-color: color-mix(in srgb, var(--bp-cream) 30%, transparent); }
 
