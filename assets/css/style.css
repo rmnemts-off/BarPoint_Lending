@@ -2230,16 +2230,51 @@ form.is-hidden { visibility: hidden; }
 /* компактификация финала для низких экранов — в КОНЦЕ файла (ТЗ12 §4),
    иначе базовые .footer/.form-card ниже по файлу перебивают её */
 .final__grid { display: grid; gap: var(--s-8); }
-@media (min-width: 1024px) { .final__grid { grid-template-columns: 6fr 5fr; align-items: start; } }
-.final__title { max-width: 15em; }
-.final__title em { font-style: italic; color: var(--bp-amber); }
-.final__contacts { margin-top: var(--s-4); display: grid; gap: var(--s-2); }
-.final__contacts a { text-decoration: none; }
-.final__contacts .lbl {
-  font-family: var(--font-grotesk); font-size: .7rem; font-weight: 600; letter-spacing: .16em;
-  text-transform: uppercase; color: var(--bp-amber); display: block; margin-bottom: 2px;
+/* Правка 04.08: колонки выровнены ПО ЦЕНТРУ, было align-items:start.
+   Левая колонка ниже карточки формы (замер 1440×900: 390 против 529), и
+   при выравнивании по верху весь остаток — 139px — копился одним пустым
+   пятном под подписью. Теперь он делится поровну сверху и снизу: текст
+   стоит против середины карточки, а раз карточку main.js доводит до
+   центра экрана (см. data-final-tail), то и против середины экрана. */
+@media (min-width: 1024px) { .final__grid { grid-template-columns: 6fr 5fr; align-items: center; } }
+/* Правка 04.08: фраза до тире — ПРЯМАЯ, курсив остался только у выделенного
+   хвоста «давайте создавать его вместе». ГРАБЛИ те же, что у заголовка блока
+   команды: курсив здесь даёт не font-style, а сама гарнитура — --font-serif
+   это алиас «Roslindale Italic» (см. fonts.css), отдельное семейство, и
+   font-style:normal его не выпрямит. Поэтому прямое начертание — это смена
+   семейства на «Roslindale Display Condensed», а <em> возвращает алиас
+   обратно. Начертание и трекинг подобраны как у остальных прямых
+   заголовков проекта (.hstation--intro .h2, .cases-head .h2). */
+.final__title {
+  max-width: 15em;
+  font-family: "Roslindale Display Condensed", "Times New Roman", serif;
+  font-style: normal; font-weight: 700; letter-spacing: .012em;
 }
-.final__contacts .value { font-size: 1.15rem; }
+.final__title em {
+  font-family: var(--font-serif); font-style: italic; font-weight: 600;
+  letter-spacing: -.01em; color: var(--bp-amber);
+}
+/* Шаг между строками ужат с 16 до 8px: сами строки подросли до 44px ради
+   пальца (см. .final__contact), и при прежнем шаге просвет между номером и
+   ником доходил бы до 34px — вдвое больше прежнего. */
+.final__contacts { margin-top: var(--s-4); display: grid; gap: var(--s-1); justify-items: start; }
+.final__contacts a { text-decoration: none; }
+/* Строка контакта: янтарный глиф + светлое значение. Прежнее правило
+   .final__contacts .lbl (капс-подпись «ТЕЛЕФОН»/«TELEGRAM») удалено вместе
+   с самими подписями — их заменили иконки. Правило и не работало: в
+   разметке у подписей стоял класс clbl (он же занят «ярлыком кейса» —
+   .clbl около строки 1650), а стиль был написан на .lbl, поэтому слово
+   «Телефон» шло базовым кеглем и вплотную к номеру. */
+.final__contact {
+  display: inline-flex; align-items: center; gap: 12px;
+  color: inherit; min-height: 44px; /* палец: минимальная цель нажатия */
+}
+.final__ico {
+  width: 22px; height: 22px; flex: none;
+  fill: var(--bp-amber); transition: fill .25s var(--ease);
+}
+.final__contacts .value { font-size: 1.15rem; transition: color .25s var(--ease); }
+.final__contact:hover .value, .final__contact:focus-visible .value { color: var(--bp-amber); }
 .final__sig { width: 120px; margin-top: var(--s-2); opacity: .8; }
 
 /* Правка 31.07 (четвёртая): карточка формы МОЛОЧНАЯ.
