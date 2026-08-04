@@ -97,7 +97,11 @@
     <!-- Правка 30.07 (третья): наклон снят по просьбе заказчика — кнопка
          снова прямая, и метка вернулась в ОДНУ строку (в две её ломал
          только наклон: под 16° габарит по высоте не влезал в шапку). -->
-    <a class="btn btn--primary header__cta" href="#contact">Обсудить проект</a>
+    <!-- data-ink добавлен 04.08 вместе с новой палитрой: кнопка стала
+         кремовой, а под шапкой проезжают кремовые поверхности (лента
+         кейсов, карточка формы) — без этого она на них исчезает.
+         См. .header__cta.is-on-light в style.css. -->
+    <a class="btn btn--primary header__cta" href="#contact" data-ink>Обсудить проект</a>
   </div>
 </header>
 <nav class="mnav" id="mnav" aria-label="Мобильная навигация">
@@ -210,7 +214,7 @@
      Правка 29.07: наведение убрано целиком — карточки статичны, все три
      всегда в насыщенном состоянии, описание видно без ховера. Поэтому
      они больше не интерактивны: ни tabindex, ни aria-expanded. -->
-<section class="section section--black" id="about" data-bg="#100b06">
+<section class="section section--black" id="about" data-bg="#101111">
   <div class="container">
     <div class="scn-head">
       <h2 class="scn-head__title" data-gsap-big-copy-on-scroll>Три сценария работы</h2>
@@ -302,7 +306,7 @@
      референса живёт ровно до тех пор, пока слово влезает в половину ряда.
      Появление — общей лентой на карточку, см. playCard в reveal.js;
      data-gsap-* внутри карточек НЕ ставим, иначе отыграет дважды. -->
-<section class="section wcards" id="services" data-bg="#100b06">
+<section class="section wcards" id="services" data-bg="#101111">
   <div class="container">
     <div class="sec-head wcards-head">
       <!-- Правка 04.08: подзаголовок («От дизайна к вкусу…») снят по просьбе
@@ -456,7 +460,7 @@
 
 
 <!-- ============ 6.8 Портфолио / кейсы ============ -->
-<section class="section section--ivory" id="cases" data-bg="#100b06">
+<section class="section section--ivory" id="cases" data-bg="#101111">
   <div class="container">
     <!-- Правка 31.07: пилюля «Портфолио» и фильтр «Все / Бар / Кофе» убраны;
          заголовок — капсом, прямым Roslindale, по центру. -->
@@ -623,7 +627,7 @@
      разбор GT.GROUP по заведениям (ALICE и Vani, Michelin 2021).
      Понадобится вернуть — придётся уменьшать фотографию, а не добавлять
      строку. -->
-<section class="hteam" id="team" data-hteam data-bg="#100b06">
+<section class="hteam" id="team" data-hteam data-bg="#101111">
   <div class="hteam__viewport" data-hteam-viewport>
     <div class="hteam__track" data-hteam-track>
       <!-- ТЗ3 §3: волна пути перерисована под короткий трек из двух станций -->
@@ -733,7 +737,7 @@
 <!-- ============ 6.14 FAQ ============
      [ЧЕРНОВИК вопросов по ТЗ 6.14 — согласовать с заказчиком] -->
 <!-- FAQ временно скрыт по просьбе заказчика (17.07.2026). Вернуть: раскомментировать до пометки КОНЕЦ FAQ.
-<section class="section section--black" id="faq" data-bg="#100b06">
+<section class="section section--black" id="faq" data-bg="#101111">
   <div class="container">
     <div class="sec-head">
       <p class="pill">FAQ</p>
@@ -771,7 +775,7 @@
 
 <!-- ============ 6.15 Финальный CTA + форма (возврат по ТЗ5 §7,
      состав полей — ТЗ v1 §6.15; входит в body-механику ТЗ5 §5) ============ -->
-<section class="section final" id="contact" data-bg="#100b06">
+<section class="section final" id="contact" data-bg="#101111">
   <div class="container final__grid">
     <!-- Правка 31.07 (четвёртая): пилюля «Контакты» убрана — блок
          начинается сразу с фразы-приглашения. -->
@@ -847,7 +851,7 @@
           <input type="checkbox" name="consent" required>
           <span>Согласен(на) на обработку персональных данных в соответствии с <a href="privacy.html">политикой обработки персональных данных</a> (152-ФЗ)</span>
         </label>
-        <p class="err" data-consent-err style="display:none; color:#A2321E; font-size:.78rem; margin:-8px 0 16px">Для отправки нужно согласие на обработку данных</p>
+        <p class="err" data-consent-err style="display:none; color:#5D1E21; font-size:.78rem; margin:-8px 0 16px">Для отправки нужно согласие на обработку данных</p>
         <!-- Правка 31.07 (четвёртая): главная кнопка формы вынесена в
              собственный класс .btn--send — крупнее кегль, выше габарит,
              стрелка-указатель (референс buckssauce.com/shop). Подпись
@@ -881,7 +885,7 @@
 </main>
 
 <!-- ============ 6.16 Футер (компактный, возврат по ТЗ5 §7) ============ -->
-<footer class="footer" data-bg="#100b06">
+<footer class="footer" data-bg="#101111">
   <div class="container">
     <!-- Правка 31.07 (четвёртая): верхняя полоса футера (лого + подпись
          «Ателье барных концепций…» + дублирующая навигация) убрана

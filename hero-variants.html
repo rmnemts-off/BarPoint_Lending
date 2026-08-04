@@ -26,7 +26,10 @@
     .hv__media img { width: 100%; height: 100%; object-fit: cover; }
     .hv__media::after {
       content: ""; position: absolute; inset: 0;
-      background: linear-gradient(180deg, rgba(11,10,8,.55) 0%, rgba(11,10,8,.15) 40%, rgba(11,10,8,.82) 100%);
+      background: linear-gradient(180deg,
+        color-mix(in srgb, var(--bp-charcoal) 55%, transparent) 0%,
+        color-mix(in srgb, var(--bp-charcoal) 15%, transparent) 40%,
+        color-mix(in srgb, var(--bp-charcoal) 82%, transparent) 100%);
     }
     .hv__tag {
       position: absolute; top: 18px; left: var(--gutter); z-index: 3;
@@ -39,7 +42,7 @@
     .hv__content { position: relative; z-index: 2; padding: 0 var(--gutter) var(--s-6); max-width: var(--container); margin-inline: auto; width: 100%; }
     .hv__title { font-family: var(--font-serif); font-weight: 600; font-size: clamp(1.3rem, 2.6vw, 2.2rem); line-height: 1.15; max-width: 16em; }
     .hv__title em { font-style: italic; color: var(--bp-amber); }
-    .hv__sub { margin-top: 12px; max-width: 36em; color: rgba(242,239,231,.82); font-size: .95rem; }
+    .hv__sub { margin-top: 12px; max-width: 36em; color: color-mix(in srgb, var(--bp-cream) 82%, transparent); font-size: .95rem; }
   </style>
 </head>
 <body>

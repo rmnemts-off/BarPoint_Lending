@@ -3,27 +3,71 @@
    Дизайн-токены и структура — строго по ТЗ (раздел 4)
    ============================================================ */
 
-/* ---------- 4.1 Цветовая палитра ---------- */
+/* ---------- 4.1 Цветовая палитра ----------
+   ПРАВКА 04.08 — ПОЛНАЯ СМЕНА ПАЛИТРЫ. Заказчик прислал набор из пяти
+   цветов, и других на странице быть не должно:
+
+     Charcoal Black #101111 — фон всего сайта;
+     Soft Cream    #E6E2DA — весь текст на тёмном, светлые поверхности,
+                             карточка формы и главные CTA;
+     Emerald Green #154230 ┐
+     Deep Burgundy #5D1E21 ├ акценты: панели услуг, карточки сценариев,
+     Antique Gold  #A6824A ┘ иконки, обводки, мелкие знаки.
+
+   ПРАВИЛО ФАЙЛА: любой цвет в CSS — это одна из пяти переменных ниже.
+   Полутона (тени, пунктиры, приглушённый текст) набираются ТОЛЬКО
+   прозрачностью этих же пяти через color-mix (…, transparent); новых
+   значений не заводить, в том числе подмешкой одного цвета к другому —
+   она даёт шестой сплошной тон.
+
+   ПРОВЕРЕНО 04.08 двумя проходами:
+   1) по исходнику — во всём CSSOM (fonts.css + style.css, 524 правила)
+      ровно пять цветовых литералов, ни одного rgb()/hsl();
+   2) по ВЫЧИСЛЕННЫМ стилям — обход каждого элемента и псевдоэлемента с
+      разбором color / background / border / outline / box-shadow /
+      text-shadow / fill / stroke, на 1440×900, 1280×720 и 375×812, во
+      всех состояниях: прокрутка от начала до конца с шагом 300px,
+      открытый разворот кейса, мобильное меню, светлые «чернила» шапки,
+      ошибки формы, экран благодарности, раскрытый FAQ. Найдено пять
+      значений, посторонних — ноль.
+   Одноцветная графика (знаки заведений -light.png, подписи, фавиконка,
+   apple-touch-icon) перекрашена под палитру отдельно, скриптом: она
+   несла старые #EAE4D8 / #F2EFE7 / #0B0A08 запечёнными в пиксели.
+   Фотографии, разумеется, не трогали.
+
+   Прежняя палитра (графит #1B1916, беж #E8DCC2, янтарь #C6963C,
+   тёмный янтарь #7A561B, бордо #2B0E12, страница #100b06, графитовый
+   текст #6E6A63/#17140F, молочный #EAE4D8) удалена целиком. */
 :root {
-  /* ТЗ11 §2: «супер-чёрный» → глубокий тёплый графит (барная лаунж-эстетика);
-     off-white чуть приглушён, чтобы мягче стыковаться с тёмным (меньше «звенит»).
-     Откат: --bp-black #0B0A08, --bp-off-white #F2EFE7. */
-  --bp-black: #1B1916;
-  --bp-ivory: #E8DCC2; /* притемнён по правке заказчика 17.07 (был #F6F2E9); тёплый беж гармонирует с графитом */
-  --bp-amber: #C6963C;
-  /* тёмный янтарь для мелкого текста на светлом фоне — WCAG 4.5:1 (ТЗ 9.3).
-     ТЗ11 §2.3: углублён #8C6420 → #7A561B, т.к. притемнённый ivory снизил
-     контраст до 3.9; теперь 4.87:1 на ivory, 5.67:1 на кремовой карточке кейса */
-  --bp-amber-text: #7A561B;
-  --bp-burgundy: #2B0E12;
-  /* Правка 03.08: фон лендинга — ОДИН на всю страницу, чёрный как у
-     buckssauce (#100b06). Прежняя механика с перетеканием цвета от
-     секции к секции (графит → беж → бордо) снята: все data-bg теперь
-     одного значения, и body держит его постоянно. */
-  --bp-page: #100b06;
-  --bp-graphite: #6E6A63;
-  --bp-dark-text: #17140F;
-  --bp-off-white: #EAE4D8;
+  --bp-charcoal: #101111;
+  --bp-cream:    #E6E2DA;
+  --bp-green:    #154230;
+  --bp-wine:     #5D1E21;
+  --bp-gold:     #A6824A;
+
+  /* Прежние имена оставлены ПСЕВДОНИМАМИ новых: на них завязано под сотню
+     правил по всему файлу, и переименование ради переименования дало бы
+     диф, в котором не видно смысловых изменений. Каждое имя ниже — это
+     роль, а не оттенок, и роли сохранились.
+     --bp-black / --bp-page — обе роли («тёмная плашка» и «фон страницы»)
+     схлопнулись в charcoal: фон один на всю страницу.
+     --bp-ivory — светлая поверхность; отдельного бежевого больше нет.
+     --bp-amber-text — акцент для МЕЛКОГО текста на светлом. Золото для
+     этой роли не годится: #A6824A на креме даёт 2.75:1 при норме 4.5
+     (замер), бордо — 9.7:1. Поэтому здесь вино, а не золото. */
+  --bp-page: var(--bp-charcoal);
+  --bp-black: var(--bp-charcoal);
+  --bp-dark-text: var(--bp-charcoal);
+  --bp-off-white: var(--bp-cream);
+  --bp-ivory: var(--bp-cream);
+  --bp-amber: var(--bp-gold);
+  --bp-burgundy: var(--bp-wine);
+  --bp-amber-text: var(--bp-wine);
+  /* приглушённый тёмный текст на светлом (бывший графит #6E6A63) — тот же
+     charcoal, просто тише. Именно ПРОЗРАЧНОСТЬЮ, а не подмешкой крема:
+     подмешка дала бы шестой сплошной цвет, а полупрозрачный charcoal на
+     кремовой подложке выглядит так же и палитру не расширяет. */
+  --bp-graphite: color-mix(in srgb, var(--bp-charcoal) 62%, transparent);
 
   /* 4.2 Типографика — правка заказчика 26.07: три роли —
      - заголовки/крупные тексты: Roslindale Cyrillic Display Condensed
@@ -181,7 +225,7 @@ ul, ol { list-style: none; }
    воздух ПЕРЕТЕКАНИЮ ФОНА (см. одноимённый блок в main.js) — цвет body
    менялся от секции к секции, и менять его поверх плотного содержимого
    было нельзя. С правки 03.08 фон на всей странице один (--bp-page, все
-   data-bg = #100b06), перетекать нечему, а 234 лишних пикселя на экране
+   data-bg = #101111), перетекать нечему, а 234 лишних пикселя на экране
    900px остались. Отсюда и жалоба заказчика на «большие промежутки».
    Ритм стыков теперь целиком на паддингах .section — см. выше.
    Откат: вернуть правило и три <div class="seam"> в index.html.
@@ -237,8 +281,13 @@ ul, ol { list-style: none; }
   border-radius: 2px;
   transition: background-color .25s var(--ease), color .25s var(--ease), border-color .25s var(--ease), transform .25s var(--ease);
 }
-.btn--primary { background: var(--bp-amber); color: var(--bp-black); }
-.btn--primary:hover { background: #D9AC55; transform: translateY(-1px); }
+/* ПРАВКА 04.08: главная кнопка — КРЕМОВАЯ (просьба заказчика: «для CTA
+   используй soft cream»). Была золотая. Наведение уводит её в золото —
+   акцент никуда не делся, он стал реакцией; тот же приём, что у
+   .btn--send. Прежние подсветки #D9AC55 / #DDB25E были осветлённым
+   янтарём и в новой палитре лишние. */
+.btn--primary { background: var(--bp-cream); color: var(--bp-charcoal); }
+.btn--primary:hover { background: var(--bp-gold); transform: translateY(-1px); }
 .btn--ghost { border: 1px solid var(--bp-off-white); color: var(--bp-off-white); }
 .btn--ghost:hover { border-color: var(--bp-amber); color: var(--bp-amber); }
 .btn--ghost-dark { border: 1px solid var(--bp-dark-text); color: var(--bp-dark-text); }
@@ -258,14 +307,14 @@ ul, ol { list-style: none; }
   background: var(--bp-black); color: var(--bp-off-white);
   border-radius: 12px;
   font-size: 1.06rem; font-weight: 700; letter-spacing: .14em;
-  box-shadow: 0 10px 24px rgba(27,25,22,.22);
+  box-shadow: 0 10px 24px color-mix(in srgb, var(--bp-charcoal) 22%, transparent);
   transition: background-color .25s var(--ease), color .25s var(--ease),
               transform .25s var(--ease), box-shadow .25s var(--ease);
 }
 .btn--send:hover {
   background: var(--bp-amber); color: var(--bp-black);
   transform: translateY(-2px);
-  box-shadow: 0 16px 34px rgba(27,25,22,.3);
+  box-shadow: 0 16px 34px color-mix(in srgb, var(--bp-charcoal) 30%, transparent);
 }
 @media (max-width: 480px) {
   .btn--send { min-height: 58px; padding: 15px 20px; font-size: .95rem; letter-spacing: .1em; }
@@ -295,6 +344,20 @@ ul, ol { list-style: none; }
    оказаться на разном фоне и получить разный цвет. */
 .header .is-on-light {
   --hdr-ink: var(--bp-dark-text);
+}
+/* ГРАБЛИ (правка 04.08). Кнопка «Обсудить проект» стала кремовой, а под
+   шапкой проезжают кремовые поверхности — лента кейсов и карточка формы.
+   Замер: на прокрутке 7680 фон под кнопкой ровно #E6E2DA, контраст 1:1,
+   кнопка пропадала целиком. Прежней янтарной заливке это не грозило, она
+   читалась на чём угодно. Лечится тем же механизмом «чернил», что и
+   остальная шапка: в разметке у кнопки появился data-ink, а здесь —
+   переворот заливки. Правило стоит ВЫШЕ ховера из блока ≥768: у обоих
+   специфичность 0-2-0, и при наведении должен побеждать более поздний.
+   После правки прогон по всей странице с шагом 100px: худший контраст
+   заливки кнопки к тому, что под ней, — 5.33:1 (тёмная кнопка над
+   золотой панелью услуг), надписи к своей заливке — 14.64:1. */
+.header__cta.is-on-light {
+  background: var(--bp-charcoal); color: var(--bp-cream);
 }
 /* Правка 31.07 (пятая): ГАЛО УБРАНО ВЕЗДЕ — переменная --hdr-halo и все
    её потребители (text-shadow у пунктов, drop-shadow у знака и бургера,
@@ -414,14 +477,16 @@ ul, ol { list-style: none; }
   }
   .header__cta::after {
     content: ""; position: absolute; inset: -40% -60%;
-    background: linear-gradient(100deg, transparent 42%, rgba(255,255,255,.5) 50%, transparent 58%);
+    /* блик по кнопке: кнопка стала кремовой, и белая полоса на ней не
+       видна вовсе — блик переведён в золото (правка 04.08) */
+    background: linear-gradient(100deg, transparent 42%, color-mix(in srgb, var(--bp-gold) 55%, transparent) 50%, transparent 58%);
     transform: translateX(-120%);
     transition: transform .7s var(--ease);
     pointer-events: none;
   }
   .header__cta:hover, .header__cta:focus-visible {
     transform: scale(1.05);
-    background: #DDB25E;
+    background: var(--bp-gold);
   }
   .header__cta:hover::after, .header__cta:focus-visible::after { transform: translateX(120%); }
 }
@@ -459,7 +524,7 @@ ul, ol { list-style: none; }
   text-transform: uppercase; letter-spacing: .06em;
   color: var(--bp-off-white);
   text-decoration: none; padding: 10px 0;
-  border-bottom: 1px solid rgba(198,150,60,.25);
+  border-bottom: 1px solid color-mix(in srgb, var(--bp-gold) 25%, transparent);
 }
 .mnav a.btn {
   margin-top: var(--s-4);
@@ -490,9 +555,17 @@ ul, ol { list-style: none; }
    читаются безусловно */
 .hero__media::after {
   content: ""; position: absolute; inset: 0;
+  /* правка 04.08: затемнение набрано фоновым charcoal, а не прежним графитом */
   background:
-    linear-gradient(90deg, rgba(27,25,22,.72) 0%, rgba(27,25,22,.28) 48%, rgba(27,25,22,.05) 72%, transparent 100%),
-    linear-gradient(180deg, rgba(27,25,22,.62) 0%, rgba(27,25,22,.30) 36%, rgba(27,25,22,.92) 100%);
+    linear-gradient(90deg,
+      color-mix(in srgb, var(--bp-charcoal) 72%, transparent) 0%,
+      color-mix(in srgb, var(--bp-charcoal) 28%, transparent) 48%,
+      color-mix(in srgb, var(--bp-charcoal) 5%, transparent) 72%,
+      transparent 100%),
+    linear-gradient(180deg,
+      color-mix(in srgb, var(--bp-charcoal) 62%, transparent) 0%,
+      color-mix(in srgb, var(--bp-charcoal) 30%, transparent) 36%,
+      color-mix(in srgb, var(--bp-charcoal) 92%, transparent) 100%);
 }
 /* ТЗ15 §4.2: трастлайн удалён — кнопки не должны липнуть к нижней кромке,
    отступ снизу ≥ 8vh */
@@ -516,7 +589,7 @@ ul, ol { list-style: none; }
   font-size: clamp(1.25rem, calc(1.95 * var(--vw-step)), 2rem);
   line-height: 1.5; letter-spacing: .12em;
   text-transform: uppercase;
-  text-shadow: 0 2px 24px rgba(27,25,22,.6);
+  text-shadow: 0 2px 24px color-mix(in srgb, var(--bp-charcoal) 60%, transparent);
 }
 /* На узком экране в строку влезает ~21 знак — это длина самих неразрывных
    групп, и они начинают рвать текст на огрызки («ЗАКРЫВАЯ», «ПОЛНЫЙ ЦИКЛ:»
@@ -660,10 +733,10 @@ ul, ol { list-style: none; }
    Появление карточки — общей лентой (playCard в reveal.js).
    ============================================================ */
 .wcards {
-  /* Третий тон панели. Янтарь и айвори уже есть в палитре (4.1), вино —
-     добавочный: --bp-burgundy #2B0E12 почти чёрный и на странице цвета
-     #100b06 панелью не читается вовсе. */
-  --wc-wine: #7A2B2E;
+  /* ПРАВКА 04.08: панели идут ровно тремя акцентами новой палитры —
+     золото → изумруд → вино. Добавочный тон --wc-wine #7A2B2E удалён:
+     он существовал потому, что прежнее бордо #2B0E12 было почти чёрным
+     и панелью не читалось; Deep Burgundy #5D1E21 читается сам. */
   /* Полоска, на которую встаёт очередной ряд стопки, — та же величина,
      что у референса (64px). Используется и в CSS, и в main.js. */
   --wc-top: 64px;
@@ -750,9 +823,9 @@ ul, ol { list-style: none; }
   display: grid;
   gap: 10px;
   padding-block: 10px;
-  border-bottom: 1px dashed rgba(234, 228, 216, .3);
+  border-bottom: 1px dashed color-mix(in srgb, var(--bp-cream) 30%, transparent);
 }
-.wcard:first-child { border-top: 1px dashed rgba(234, 228, 216, .3); }
+.wcard:first-child { border-top: 1px dashed color-mix(in srgb, var(--bp-cream) 30%, transparent); }
 @media (min-width: 1024px) {
   /* ГРАБЛИ: именно minmax(0,1fr), а не 1fr. У 1fr нижняя граница —
      min-content, и одно длинное слово тёмной части крупным кеглем
@@ -863,9 +936,13 @@ ul, ol { list-style: none; }
 @media (min-width: 1024px) {
   .wcard__panel { padding: 40px; gap: 40px; min-height: clamp(480px, calc(100vh - 240px), 760px); }
 }
-.wcard--amber .wcard__panel { background: var(--bp-amber); color: var(--bp-dark-text); }
-.wcard--ivory .wcard__panel { background: var(--bp-ivory); color: var(--bp-dark-text); }
-.wcard--wine  .wcard__panel { background: var(--wc-wine);  color: var(--bp-off-white); }
+/* Классы-модификаторы остались прежними (amber / ivory / wine) — они лишь
+   отмечают позицию в цикле index%3, а разметка на них завязана в семи
+   местах. Значения — три акцента новой палитры. На золоте чернила тёмные
+   (charcoal, 6.5:1), на изумруде и вине — кремовые (9.1:1 и 8.3:1). */
+.wcard--amber .wcard__panel { background: var(--bp-gold);  color: var(--bp-charcoal); }
+.wcard--ivory .wcard__panel { background: var(--bp-green); color: var(--bp-cream); }
+.wcard--wine  .wcard__panel { background: var(--bp-wine);  color: var(--bp-cream); }
 
 /* Несущий якорь панели: у референса это единственная крупная строка
    сверху, и без неё панель выглядит пустой. Стоит в КАЖДОЙ карточке. */
@@ -907,10 +984,10 @@ ul, ol { list-style: none; }
 .wcard__list li > span { min-width: 0; }
 .wcard__list strong { font-weight: 700; }
 /* Цвет пунктира внутри панели — от её собственных чернил, а не общий:
-   на янтаре и айвори он тёмный, на вине светлый. */
-.wcard--amber .wcard__list li,
-.wcard--ivory .wcard__list li { border-color: rgba(23, 20, 15, .3); }
-.wcard--wine  .wcard__list li { border-color: rgba(234, 228, 216, .3); }
+   на золоте он тёмный, на изумруде и вине светлый. */
+.wcard--amber .wcard__list li { border-color: color-mix(in srgb, var(--bp-charcoal) 30%, transparent); }
+.wcard--ivory .wcard__list li,
+.wcard--wine  .wcard__list li { border-color: color-mix(in srgb, var(--bp-cream) 30%, transparent); }
 
 .wcard__list li::before {
   content: ""; flex: 0 0 auto;
@@ -1058,16 +1135,21 @@ ul, ol { list-style: none; }
      поэтому текст от этого не изменился, ужался только запас по высоте. */
   aspect-ratio: 100 / 127;
   width: 100%;
-  box-shadow: 0 24px 60px rgba(0,0,0,.38);
+  box-shadow: 0 24px 60px color-mix(in srgb, var(--bp-charcoal) 38%, transparent);
 }
-/* Три фирменных цвета: амбер → жжёный оранжевый → бордо.
-   Тона взяты ГЛУБОКИМИ намеренно: на светлом амбере (#C6963C, как в
-   референсе) молочный заголовок давал контраст 2.52 при норме 4.5 —
-   на этих значениях 6–8. Приглушённых состояний больше нет: наведение
-   снято, все три карточки всегда в насыщенном тоне. */
-.scn__card:nth-child(1) { background: #6B4A16; }
-.scn__card:nth-child(2) { background: #8A3D14; }
-.scn__card:nth-child(3) { background: #7A1F2A; }
+/* ПРАВКА 04.08: три карточки — ровно три акцента палитры, изумруд →
+   вино → золото. Прежние жжёные тона (#6B4A16 / #8A3D14 / #7A1F2A) были
+   подмешаны вручную ради контраста под кремовым заголовком; проверено
+   заново на новых значениях. Замер — не на глаз: кадр каждой карточки
+   отрисован в canvas, сложен по слоям (фото на .4 поверх цвета карточки,
+   сверху вуаль charcoal по своему градиенту) и посчитан попиксельно.
+   Худшая точка из трёх карточек — золотая: 5.24:1 под заголовком и
+   5.80:1 под описанием при норме 4.5. Изумруд 7.67/7.34, вино 6.43/7.70.
+   Порядок цветов подобран так, чтобы золото не оказалось соседом
+   золотой панели услуг ниже по странице. */
+.scn__card:nth-child(1) { background: var(--bp-green); }
+.scn__card:nth-child(2) { background: var(--bp-wine); }
+.scn__card:nth-child(3) { background: var(--bp-gold); }
 /* Правка 29.07: фото занимает ВСЮ карточку и лежит ПОД текстом,
    цветной блок остаётся подложкой и просвечивает сквозь кадр.
    Порядок слоёв: фото (0) → притеняющая вуаль (1) → пунктирная
@@ -1091,7 +1173,10 @@ ul, ol { list-style: none; }
   content: ""; position: absolute; inset: 0; z-index: 1;
   /* низ плотнее верха: там стоит описание — мелкий текст, ему нужен
      запас по контрасту (на .52 худший случай был 4.6 при норме 4.5) */
-  background: linear-gradient(180deg, rgba(27,25,22,.62) 0%, rgba(27,25,22,.32) 40%, rgba(27,25,22,.68) 100%);
+  background: linear-gradient(180deg,
+    color-mix(in srgb, var(--bp-charcoal) 62%, transparent) 0%,
+    color-mix(in srgb, var(--bp-charcoal) 32%, transparent) 40%,
+    color-mix(in srgb, var(--bp-charcoal) 68%, transparent) 100%);
   pointer-events: none;
 }
 
@@ -1125,7 +1210,7 @@ ul, ol { list-style: none; }
   text-transform: uppercase;
   color: var(--bp-off-white);
   max-width: 12em;
-  text-shadow: 0 2px 18px rgba(27,25,22,.55);
+  text-shadow: 0 2px 18px color-mix(in srgb, var(--bp-charcoal) 55%, transparent);
 }
 
 /* ---------- описание: видно всегда ----------
@@ -1138,7 +1223,7 @@ ul, ol { list-style: none; }
   font-family: var(--font-text); font-size: 5.2cqi;
   line-height: 1.45;
   color: var(--bp-off-white);
-  text-shadow: 0 2px 16px rgba(27,25,22,.6);
+  text-shadow: 0 2px 16px color-mix(in srgb, var(--bp-charcoal) 60%, transparent);
 }
 
 /* ============================================================
@@ -1192,13 +1277,13 @@ ul, ol { list-style: none; }
 @media (min-width: 1024px) { .cases-grid { grid-template-columns: repeat(3, 1fr); } }
 
 .case-card {
-  background: #F1E8D3;
-  border: 1px solid rgba(23,20,15,.08);
+  background: var(--bp-cream);
+  border: 1px solid color-mix(in srgb, var(--bp-charcoal) 8%, transparent);
   border-radius: 4px; overflow: hidden;
   text-align: left; display: flex; flex-direction: column;
   transition: box-shadow .3s var(--ease), transform .3s var(--ease);
 }
-.case-card:hover { box-shadow: 0 18px 44px rgba(23,20,15,.12); transform: translateY(-3px); }
+.case-card:hover { box-shadow: 0 18px 44px color-mix(in srgb, var(--bp-charcoal) 12%, transparent); transform: translateY(-3px); }
 .case-card__logo {
   height: 108px; display: flex; align-items: center; justify-content: center;
   padding: var(--s-3);
@@ -1236,11 +1321,15 @@ ul, ol { list-style: none; }
    Ступени кеглей, интерлиньяж и трекинг — как в ТЗ.
    ============================================================ */
 .cover {
-  /* палитра эталона — решение заказчика «берём оформление один в один».
-     Переключить акцент на фирменный янтарь = одна строка --cv-theme. */
-  --cv-bg: #100b06;
-  --cv-fg: #f5e4c7;
-  --cv-theme: #f15726;
+  /* ПРАВКА 04.08: разворот кейса переведён на общую палитру. Здесь стояли
+     цвета эталона Bucks Sauce (фон #100b06, текст #f5e4c7, акцент —
+     оранжевый #f15726); оранжевого в новом наборе нет, его роль забрало
+     золото. Переменные оставлены: на них завязано два десятка правил
+     разворота, и держать их отдельным слоем удобно — сменить акцент
+     всего разворота по-прежнему можно одной строкой. */
+  --cv-bg: var(--bp-charcoal);
+  --cv-fg: var(--bp-cream);
+  --cv-theme: var(--bp-gold);
 
   --cv-serif: "Roslindale Display Condensed", "Times New Roman", serif;
   --cv-sans: "Apoc", "Golos Text", system-ui, sans-serif;
@@ -1714,8 +1803,8 @@ ul, ol { list-style: none; }
    ============================================================ */
 .faq { max-width: 860px; }
 /* тёмная тема FAQ (ТЗ4 §5.1): фон bp-black, вопросы ivory, акценты амбер */
-.faq details { border-top: 1px solid rgba(234,228,216,.14); }
-.faq details:last-child { border-bottom: 1px solid rgba(234,228,216,.14); }
+.faq details { border-top: 1px solid color-mix(in srgb, var(--bp-cream) 14%, transparent); }
+.faq details:last-child { border-bottom: 1px solid color-mix(in srgb, var(--bp-cream) 14%, transparent); }
 .faq summary {
   list-style: none; cursor: pointer;
   display: flex; justify-content: space-between; align-items: center; gap: var(--s-3);
@@ -1743,16 +1832,19 @@ ul, ol { list-style: none; }
   width: 100%; padding: 13px 14px;
   font: inherit; font-size: .95rem;
   color: var(--bp-dark-text);
-  background: #F5EEDD;
-  border: 1px solid rgba(23,20,15,.25); border-radius: 3px;
+  background: var(--bp-cream);
+  border: 1px solid color-mix(in srgb, var(--bp-charcoal) 25%, transparent); border-radius: 3px;
 }
-.field input::placeholder { color: rgba(23,20,15,.32); }
+.field input::placeholder { color: color-mix(in srgb, var(--bp-charcoal) 32%, transparent); }
 .field input:focus, .field select:focus, .field textarea:focus {
   outline: 2px solid var(--bp-amber); outline-offset: 0; border-color: var(--bp-amber);
 }
 .field textarea { min-height: 96px; resize: vertical; }
-.field .err { display: none; font-size: .78rem; color: #A2321E; margin-top: 4px; }
-.field.is-invalid input, .field.is-invalid select { border-color: #A2321E; }
+/* ПРАВКА 04.08: сигнальный красный #A2321E заменён на Deep Burgundy —
+   единственный красный в новой палитре. На кремовом поле он даёт 9.7:1,
+   так что как «тревожный» цвет читается не хуже прежнего. */
+.field .err { display: none; font-size: .78rem; color: var(--bp-wine); margin-top: 4px; }
+.field.is-invalid input, .field.is-invalid select { border-color: var(--bp-wine); }
 .field.is-invalid .err { display: block; }
 .consent { display: flex; gap: 10px; align-items: flex-start; font-size: .8rem; color: var(--bp-graphite); margin-bottom: var(--s-3); }
 .consent input { margin-top: 3px; width: 16px; height: 16px; accent-color: var(--bp-amber); flex: 0 0 auto; }
@@ -1834,9 +1926,13 @@ form.is-hidden { visibility: hidden; }
 .doc-page .container { max-width: 860px; }
 .doc-page h1 { font-family: var(--font-serif); font-size: 2rem; margin-bottom: var(--s-4); }
 .doc-page h2 { font-family: var(--font-serif); font-size: 1.3rem; margin: var(--s-4) 0 var(--s-2); }
-.doc-page p, .doc-page li { margin-bottom: var(--s-2); color: #33302A; }
+.doc-page p, .doc-page li { margin-bottom: var(--s-2); color: color-mix(in srgb, var(--bp-charcoal) 88%, transparent); }
 .doc-page ul { list-style: disc; padding-left: 22px; }
-.doc-page .todo { background: #FBEFD8; border: 1px solid var(--bp-amber); border-radius: 4px; padding: var(--s-2); font-size: .9rem; }
+/* правка 04.08: заливка врезки была отдельным светлым бежем (#FBEFD8),
+   а страница теперь кремовая — врезка растворилась бы. Берём золото
+   прозрачностью: на кремовой странице оно даёт ту же тёплую подложку,
+   но остаётся золотом, а не шестым цветом. */
+.doc-page .todo { background: color-mix(in srgb, var(--bp-gold) 16%, transparent); border: 1px solid var(--bp-amber); border-radius: 4px; padding: var(--s-2); font-size: .9rem; }
 
 /* ============================================================
    ТЗ2 — анимационная доработка
@@ -1847,17 +1943,21 @@ form.is-hidden { visibility: hidden; }
   position: relative;
   display: inline-flex; align-items: center; justify-content: center;
   background: var(--bp-off-white); color: var(--bp-dark-text);
-  border: 1px solid rgba(23,20,15,.18);
+  border: 1px solid color-mix(in srgb, var(--bp-charcoal) 18%, transparent);
   border-radius: 999px;
   padding: 9px 36px;
   font-family: var(--font-grotesk); font-size: .74rem; font-weight: 600;
   letter-spacing: .12em; text-transform: uppercase;
   white-space: nowrap;
-  box-shadow: 0 4px 14px rgba(0,0,0,.14);
+  box-shadow: 0 4px 14px color-mix(in srgb, var(--bp-charcoal) 14%, transparent);
 }
+/* Точки-заклёпки — те самые «кружки», которые заказчик просил увести в
+   золото (правка 04.08). Были цвета чернил плашки: тёмные на светлой,
+   светлые на тёмной. Теперь золото на обеих, и заклёпка читается как
+   украшение, а не как часть надписи. */
 .plaque::before, .plaque::after {
   content: ""; position: absolute; top: 50%; width: 7px; height: 7px;
-  border-radius: 50%; background: var(--bp-dark-text); opacity: .75;
+  border-radius: 50%; background: var(--bp-gold); opacity: 1;
   transform: translateY(-50%);
 }
 .plaque::before { left: 13px; }
@@ -1872,7 +1972,13 @@ form.is-hidden { visibility: hidden; }
    ============================================================ */
 .hteam {
   position: relative;
-  background: var(--bp-burgundy); color: var(--bp-off-white);
+  /* Правка 04.08: секция окрашена в общий фон страницы. Раньше здесь стояло
+     --bp-burgundy, но прежнее бордо #2B0E12 было почти чёрным и читалось
+     как «чуть тёплый чёрный» — то есть фактически тем же фоном. Новое
+     Deep Burgundy #5D1E21 куда светлее, и та же строка залила бы весь
+     блок команды сплошным цветным полем; вино в новой палитре — акцент,
+     а не подложка на экран. Откат: background: var(--bp-wine). */
+  background: var(--bp-page); color: var(--bp-off-white);
   overflow: clip; /* ТЗ6 §2: ничто не видно за границами секции */
 }
 /* Стык «Кейсы → Команда» — в общем ритме секций (80 + 80). Своей половины
@@ -1905,7 +2011,13 @@ form.is-hidden { visibility: hidden; }
 .hteam__path path {
   fill: none; stroke-width: 1.5; vector-effect: non-scaling-stroke;
 }
-.hteam__path-base { stroke: rgba(198,150,60,.5); stroke-dasharray: .012 .008; }
+/* Своя заливка у корневого <svg> — только ради аудита палитры: по
+   умолчанию она чёрная, а чёрного в наборе нет. Ни одна фигура внутри её
+   не использует (у path fill:none, у маски — свои стопы), но в вычисленных
+   стилях она числится, и проверка «на странице только пять цветов» без
+   этой строки каждый раз спотыкается о ложную находку. */
+.hteam__path, .cgal__clipsvg { fill: none; }
+.hteam__path-base { stroke: color-mix(in srgb, var(--bp-gold) 50%, transparent); stroke-dasharray: .012 .008; }
 .hteam__path-glow { stroke: var(--bp-amber); }
 /* .hteam__float (декоры-напитки) удалены по ТЗ16 §2 */
 .hstation {
@@ -1944,7 +2056,7 @@ form.is-hidden { visibility: hidden; }
    Маякова головы стоят ближе к верхней кромке. */
 .hstation__photo {
   aspect-ratio: 4 / 5; overflow: hidden; border-radius: 8px;
-  box-shadow: 0 18px 44px rgba(0,0,0,.4);
+  box-shadow: 0 18px 44px color-mix(in srgb, var(--bp-charcoal) 40%, transparent);
 }
 .hstation__photo img { width: 100%; height: 100%; object-fit: cover; }
 /* ТЗ16 §4: имя в плашке ~1rem (было .74) — плашка пропорционально выше.
@@ -2095,14 +2207,14 @@ form.is-hidden { visibility: hidden; }
      3 → 2.3: на 1440 в кадре ~2.8 карточки вместо 3.3. Ниже 768 ширину
      задаёт vw-правило в конце блока. */
   width: clamp(320px, calc((100vw - 2 * var(--gutter) - 40px) / 2.3), 500px);
-  background: #F3EDE0; color: var(--bp-dark-text);
-  border: 1px solid rgba(23,20,15,.10);
+  background: var(--bp-cream); color: var(--bp-dark-text);
+  border: 1px solid color-mix(in srgb, var(--bp-charcoal) 10%, transparent);
   border-radius: 12px;
   /* Верхнее поле держит зазор до плашки: она садится наполовину выше
      кромки, и с укрупнённым кеглем прежние 32px упирались в фото. */
   padding: clamp(36px, calc(3.6 * var(--vw-step)), 56px) var(--s-3) var(--s-3);
   text-align: left;
-  box-shadow: 0 12px 32px rgba(27,25,22,.10);
+  box-shadow: 0 12px 32px color-mix(in srgb, var(--bp-charcoal) 10%, transparent);
   transition: border-color .3s var(--ease), box-shadow .3s var(--ease), transform .3s var(--ease);
 }
 /* Правка 04.08: на ховере карточка получает ТУ ЖЕ янтарную обводку, что
@@ -2112,9 +2224,9 @@ form.is-hidden { visibility: hidden; }
    наведении всегда. Значения один в один с :focus-visible, иначе на
    карточке под курсором И в фокусе было бы два разных кольца. */
 .ccard:hover {
-  border-color: rgba(198,150,60,.55);
+  border-color: color-mix(in srgb, var(--bp-gold) 55%, transparent);
   outline: 2px solid var(--bp-amber); outline-offset: 3px;
-  box-shadow: 0 18px 44px rgba(27,25,22,.16);
+  box-shadow: 0 18px 44px color-mix(in srgb, var(--bp-charcoal) 16%, transparent);
   transform: translateY(-3px);
 }
 /* Правка 31.07: плашка с названием кейса заметно крупнее и длиннее —
@@ -2127,7 +2239,7 @@ form.is-hidden { visibility: hidden; }
   position: absolute; top: 0; left: 50%; transform: translate(-50%, -50%);
   max-width: 100%; overflow: hidden; text-overflow: ellipsis;
   background: var(--bp-black); color: var(--bp-off-white);
-  border-color: rgba(234,228,216,.2);
+  border-color: color-mix(in srgb, var(--bp-cream) 20%, transparent);
   /* Боковые поля — ДОЛЯ ширины карточки (проценты у абсолютного элемента
      считаются от padding-box .ccard), поэтому плашка остаётся одинаково
      «длинной» на любом брейкпоинте, а длинные названия («Memo Dine & Bar
@@ -2170,7 +2282,7 @@ form.is-hidden { visibility: hidden; }
   letter-spacing: .01em; text-transform: none;
 }
 .ccard .plaque::before, .ccard .plaque::after {
-  background: var(--bp-off-white); width: 9px; height: 9px;
+  background: var(--bp-gold); width: 9px; height: 9px;
 }
 .ccard .plaque::before { left: max(10px, min(4.9%, 21px)); }
 .ccard .plaque::after { right: max(10px, min(4.9%, 21px)); }
@@ -2285,14 +2397,18 @@ form.is-hidden { visibility: hidden; }
    кнопка возвращаются к базовым «тёмным на светлом» правилам.
    Собственной обводки у карточки нет (убрана по просьбе заказчика) —
    её границу держит контраст со фоном плюс мягкая тень.
-   Откат к тёмной: background #242119, color off-white,
-   border 1px rgba(234,228,216,.18) + прежний блок оверрайдов
-   (см. ревизию 55 в памяти проекта). */
+   Правка 04.08: заказчик подтвердил тот же ход в новой палитре — «форму
+   для заполнения заявки тоже сделай soft cream». Карточка держится на
+   --bp-off-white, а он теперь псевдоним Soft Cream, так что менять здесь
+   нечего; поля внутри — того же крема, их «колодец» рисует толстая
+   charcoal-обводка (см. ниже).
+   Откат к тёмной: background charcoal, color cream, border 1px
+   от крема на 18% + прежний блок оверрайдов (ревизия 55 в памяти). */
 .form-card {
   background: var(--bp-off-white); color: var(--bp-dark-text);
   border: 0;
   border-radius: 16px; padding: var(--s-4);
-  box-shadow: 0 24px 60px rgba(0,0,0,.32);
+  box-shadow: 0 24px 60px color-mix(in srgb, var(--bp-charcoal) 32%, transparent);
 }
 @media (min-width: 768px) { .form-card { padding: var(--s-6); } }
 /* Заголовок: прямой Roslindale (курсив снят), кегль поднят с 1.5rem
@@ -2308,22 +2424,24 @@ form.is-hidden { visibility: hidden; }
 }
 .form-card .btn { width: 100%; }
 /* Поля: толстая рамка и заметный радиус — референс buckssauce.com/shop.
-   Подложка поля светлее карточки, чтобы «колодец» читался без обводки
-   в один пиксель. */
+   Правка 04.08: подложка поля была на тон светлее карточки (#F5EEDD на
+   молочном) — в палитре из пяти цветов такого оттенка нет, и заводить
+   шестой ради подложки незачем: «колодец» здесь и так очерчен рамкой в
+   два пикселя, поле и карточка теперь одного крема. */
 .form-card .field label { font-size: 1rem; color: var(--bp-dark-text); }
 .form-card .field input, .form-card .field select, .form-card .field textarea {
-  background: #F5EEDD;
+  background: var(--bp-cream);
   color: var(--bp-dark-text);
   border: 2px solid var(--bp-dark-text);
   border-radius: 12px;
   padding: 15px 16px;
   font-size: 1rem;
 }
-.form-card .field input::placeholder { color: rgba(23,20,15,.38); }
-.form-card .field.is-invalid input { border-color: #A2321E; }
-/* графит (--bp-graphite) на молочном даёт всего 4.25:1 — ниже нормы
+.form-card .field input::placeholder { color: color-mix(in srgb, var(--bp-charcoal) 38%, transparent); }
+.form-card .field.is-invalid input { border-color: var(--bp-wine); }
+/* графит (--bp-graphite) на креме даёт всего 4.25:1 — ниже нормы
    4.5:1 для мелкого текста (ТЗ 9.3); берём тот же тон, но глубже */
-.form-card .consent { color: rgba(23,20,15,.68); }
+.form-card .consent { color: color-mix(in srgb, var(--bp-charcoal) 68%, transparent); }
 .form-card .consent a { color: var(--bp-dark-text); }
 .form-card .form-success h4 { color: var(--bp-dark-text); }
 

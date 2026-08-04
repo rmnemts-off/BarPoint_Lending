@@ -72,8 +72,13 @@
   var header = document.getElementById("header");
   var inkNodes = [].slice.call(document.querySelectorAll("[data-ink]"));
 
-  var INK_LIGHT = [234, 228, 216]; // --bp-off-white
-  var INK_DARK = [23, 20, 15];     // --bp-dark-text
+  /* Два начертания шапки. Числа обязаны совпадать с палитрой в style.css:
+     здесь они только СРАВНИВАЮТСЯ с фоном под элементом, чтобы выбрать
+     класс, а сам цвет ставит CSS (--hdr-ink). Разъедутся — шапка начнёт
+     выбирать не тот вариант. Правка 04.08: перебиты под новую палитру,
+     было [234,228,216] / [23,20,15]. */
+  var INK_LIGHT = [230, 226, 218]; // --bp-cream
+  var INK_DARK = [16, 17, 17];     // --bp-charcoal
   var relLum = function (c) {
     var f = function (v) {
       v /= 255;
@@ -111,7 +116,7 @@
       r += +m[0] * k; g += +m[1] * k; b += +m[2] * k; a += k;
     }
     if (a < 0.995) { /* добираем цветом body — он лежит под всем */
-      m = getComputedStyle(document.body).backgroundColor.match(/[\d.]+/g) || ["27", "25", "22"];
+      m = getComputedStyle(document.body).backgroundColor.match(/[\d.]+/g) || ["16", "17", "17"];
       k = 1 - a;
       r += +m[0] * k; g += +m[1] * k; b += +m[2] * k;
     }
@@ -268,7 +273,7 @@
   function logoHTML(c) {
     if (c.logoImage) {
       return '<img src="' + c.logoImage + '" alt="Логотип проекта ' + c.title + '"' +
-        (c.logoDark ? ' style="background:#1B1916;padding:8px 14px;border-radius:4px"' : "") + ">";
+        (c.logoDark ? ' style="background:#101111;padding:8px 14px;border-radius:4px"' : "") + ">";
     }
     var cls = c.logoStyle === "grotesk" ? "tlogo tlogo--grotesk" : "tlogo";
     return '<span class="' + cls + '">' + c.title + "</span>";
@@ -1736,7 +1741,7 @@
     /* стартовый цвет — тот, что стоит на body в CSS */
     var bgStart = (function () {
       var m = getComputedStyle(document.body).backgroundColor.match(/\d+/g);
-      return m ? [+m[0], +m[1], +m[2]] : [27, 25, 22];
+      return m ? [+m[0], +m[1], +m[2]] : [16, 17, 17]; /* charcoal, как в CSS */
     })();
 
     var measureBg = function () {
