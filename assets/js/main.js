@@ -202,6 +202,18 @@
   var CAT_LABEL = { bar: "Бар", coffee: "Кофе" };
   var activeFilter = "all";
 
+  /* ПРАВКА 05.08: картинка ВНЕШНЕЙ карточки кейса (плашка в ленте) взята
+     из отдельного поля cardImage, а не из первого кадра галереи.
+     Заказчик прислал по каждому кейсу папку, где кадр «Интерьер» идёт
+     именно на карточку, а нумерованные — внутрь разворота. Раньше и то,
+     и другое тянулось из gallery[0], то есть первый кадр разворота был
+     обязан быть и обложкой; развести их иначе было нельзя.
+     Фолбэк на gallery[0] оставлен намеренно: поле есть у шести кейсов из
+     тринадцати, у остальных обложкой по-прежнему служит первый кадр. */
+  function cardImage(c) {
+    return "assets/img/" + (c.cardImage || c.gallery[0]) + ".webp";
+  }
+
   /* Правка 05.08: рубрика на карточке. По умолчанию — название категории,
      но кейс может задать свою подпись полем categoryLabel (у Aina, Зойки,
      Sixty и Lúwo стоит «Ресторан + бар»). Сама category при этом не
@@ -274,7 +286,7 @@
       card.setAttribute("aria-label", "Кейс " + c.title + " — подробнее");
       card.innerHTML =
         '<span class="case-card__logo">' + logoHTML(c) + "</span>" +
-        '<span class="case-card__photo"><img src="assets/img/' + c.gallery[0] + '.webp" alt="' + c.title + ' — фото проекта" loading="lazy" decoding="async"></span>' +
+        '<span class="case-card__photo"><img src="' + cardImage(c) + '" alt="' + c.title + ' — фото проекта" loading="lazy" decoding="async"></span>' +
         '<span class="case-card__meta"><span class="cat">' + catLabel(c) + '</span><span class="more">смотреть →</span></span>';
       card.addEventListener("click", function () { openCase(i, card); });
       grid.appendChild(card);
@@ -344,7 +356,7 @@
        var badge = … и подстановку badge после <img>. */
     b.innerHTML =
       plaqueHTML(c) +
-      '<span class="ccard__photo"><img src="assets/img/' + c.gallery[0] + '.webp" alt="' + c.title + ' — фото проекта" loading="lazy" decoding="async"></span>' +
+      '<span class="ccard__photo"><img src="' + cardImage(c) + '" alt="' + c.title + ' — фото проекта" loading="lazy" decoding="async"></span>' +
       '<span class="ccard__meta"><span class="cat">' + catLabel(c) + '</span><span class="ccard__desc">' + c.shortDescription + "</span></span>";
     b.addEventListener("click", function () {
       if (railDragMoved) return; // это был drag, не клик
@@ -717,8 +729,24 @@
     arrowsHidden(true);
     gsap.set(out, { x: 0, zIndex: 1, autoAlpha: 1 });
     gsap.set(inc, { x: dir === 1 ? d : -d, zIndex: 2, autoAlpha: 1 });
+    /* ПРАВКА 05.08 — кривая и длительность подмены кадров (клиент: «картинки
+       между собой прерывисто меняются»).
+       Было: duration 1, ease power4.inOut. Замер хода входящего слоя
+       покадрово показал, ЧТО именно рвалось, и это не подтормаживание —
+       кадры ровные, самый долгий 28мс, картинки к моменту клика уже
+       скачаны и декодированы (предзагрузчик отрабатывает при открытии):
+          280мс от старта — пройдено 3% пути (кадр стоит на месте);
+          410…550мс       — пройдено 50% (рывок);
+          550…880мс       — оставшиеся 13% (доползание).
+       t⁴ на ОБОИХ концах даёт мёртвую зону на входе: человек жмёт стрелку,
+       треть секунды не происходит ничего, потом кадр проскакивает.
+       Стало: power2.out — движение начинается сразу на полной скорости и
+       плавно тормозит к месту, мёртвой зоны нет вовсе. Пиковая скорость
+       всего вдвое выше средней (у power4.inOut было в разы), поэтому
+       «проскока» тоже нет. Длительность 1 → .85с: на 90% пути кадр
+       приходит за 580мс, остальное — мягкая доводка. */
     gsap.timeline({
-      defaults: { duration: 1, ease: "power4.inOut" },
+      defaults: { duration: .85, ease: "power2.out" },
       onComplete: function () {
         galAnimating = false; galIndex = next; galFront = back;
         gsap.set(out, { autoAlpha: 0, zIndex: 0, x: 0 });

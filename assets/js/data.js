@@ -60,7 +60,10 @@ window.BARPOINT_CASES = [
       "Обучение бар-команды и стандарты",
       "Операционка и контроль качества"
     ],
-    gallery: ["case-aina-1-900", "case-aina-2-900", "case-aina-3-1200"]
+    /* Кадры 05.08 из архива заказчика «Часть 1»: «Интерьер» — на внешнюю
+       карточку (cardImage), нумерованные — в разворот, порядок по номеру. */
+    cardImage: "case-aina-cover-1200",
+    gallery: ["case-aina-1-667", "case-aina-2-1100", "case-aina-3-1100", "case-aina-4-1100"]
   },
   {
     id: "inta", slug: "inta", category: "bar", title: "Inta",
@@ -79,7 +82,10 @@ window.BARPOINT_CASES = [
       "Подбор аутентичных ингредиентов",
       "Стандарты сервиса и обучение"
     ],
-    gallery: ["case-inta-1-900", "case-inta-2-900", "case-inta-3-900", "case-inta-4-900"]
+    /* Кадры 05.08 из архива заказчика «Часть 1»: «Интерьер» — на внешнюю
+       карточку (cardImage), нумерованные — в разворот, порядок по номеру. */
+    cardImage: "case-inta-cover-1200",
+    gallery: ["case-inta-1-1100", "case-inta-2-1100", "case-inta-3-1100", "case-inta-4-1100"]
   },
   {
     id: "zoyka", slug: "zoyka", category: "bar", categoryLabel: "Ресторан + бар", title: "Зойка",
@@ -97,7 +103,10 @@ window.BARPOINT_CASES = [
       "Театральный сценарий подачи",
       "Обучение команды и аттестации"
     ],
-    gallery: ["case-zoyka-1-1200", "case-zoyka-2-900", "case-zoyka-3-790"]
+    /* Кадры 05.08 из архива заказчика «Часть 1»: «Интерьер» — на внешнюю
+       карточку (cardImage), нумерованные — в разворот, порядок по номеру. */
+    cardImage: "case-zoyka-cover-1200",
+    gallery: ["case-zoyka-1-1100", "case-zoyka-2-1100", "case-zoyka-3-1100", "case-zoyka-4-1100"]
   },
   {
     id: "memo", slug: "memo", category: "bar", title: "Memo Dine & Bar + hide",
@@ -147,7 +156,10 @@ window.BARPOINT_CASES = [
       "Обучение команды и стандарты",
       "Операционка премиум-уровня"
     ],
-    gallery: ["case-sixty-1-958", "case-sixty-2-1400", "case-sixty-3-900"]
+    /* Кадры 05.08 из архива заказчика «Часть 1»: «Интерьер» — на внешнюю
+       карточку (cardImage), нумерованные — в разворот, порядок по номеру. */
+    cardImage: "case-sixty-cover-1200",
+    gallery: ["case-sixty-1-1020", "case-sixty-2-853", "case-sixty-3-1650"]
   },
   {
     id: "duran-bar", slug: "duran-bar", category: "bar", title: "Duran Bar",
@@ -186,7 +198,10 @@ window.BARPOINT_CASES = [
       "Проектирование и запуск бара",
       "Стандарты подачи и обучение"
     ],
-    gallery: ["case-invasion-1-900", "case-invasion-2-900", "case-invasion-3-900", "case-invasion-4-900"]
+    /* Кадры 05.08 из архива заказчика «Часть 1»: «Интерьер» — на внешнюю
+       карточку (cardImage), нумерованные — в разворот, порядок по номеру. */
+    cardImage: "case-invasion-cover-1200",
+    gallery: ["case-invasion-1-853", "case-invasion-2-1100", "case-invasion-3-1100", "case-invasion-4-1100"]
   },
   {
     /* Правка 31.07: в плашке кейса заказчик просил короткое имя —
@@ -222,7 +237,10 @@ window.BARPOINT_CASES = [
       "Проектирование и запуск бара",
       "Обучение команды и аттестации"
     ],
-    gallery: ["case-leps-1-900", "case-leps-2-900", "case-leps-3-900", "case-leps-4-900"]
+    /* Кадры 05.08 из архива заказчика «Часть 1»: «Интерьер» — на внешнюю
+       карточку (cardImage), нумерованные — в разворот, порядок по номеру. */
+    cardImage: "case-leps-asia-cover-1200",
+    gallery: ["case-leps-asia-1-1100", "case-leps-asia-2-1100", "case-leps-asia-3-1100", "case-leps-asia-4-1100"]
   },
   {
     id: "luwo", slug: "luwo", category: "bar", categoryLabel: "Ресторан + бар", title: "Lúwo",
