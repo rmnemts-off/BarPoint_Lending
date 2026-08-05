@@ -202,6 +202,17 @@
   var CAT_LABEL = { bar: "Бар", coffee: "Кофе" };
   var activeFilter = "all";
 
+  /* Правка 05.08: рубрика на карточке. По умолчанию — название категории,
+     но кейс может задать свою подпись полем categoryLabel (у Aina, Зойки,
+     Sixty и Lúwo стоит «Ресторан + бар»). Сама category при этом не
+     меняется: по ней собирается выборка кейсов, см. visibleCaseIndices. */
+  function catLabel(c) {
+    var t = c.categoryLabel || CAT_LABEL[c.category];
+    /* «+» выносим в свой span: у Roslindale это волосяной штрих, и на
+       кегле рубрики знак почти пропадал. Утолщение делает CSS. */
+    return t.replace(/\+/g, '<span class="cat__plus">+</span>');
+  }
+
   function logoHTML(c) {
     if (c.logoImage) {
       return '<img src="' + c.logoImage + '" alt="Логотип проекта ' + c.title + '"' +
@@ -264,7 +275,7 @@
       card.innerHTML =
         '<span class="case-card__logo">' + logoHTML(c) + "</span>" +
         '<span class="case-card__photo"><img src="assets/img/' + c.gallery[0] + '.webp" alt="' + c.title + ' — фото проекта" loading="lazy" decoding="async"></span>' +
-        '<span class="case-card__meta"><span class="cat">' + CAT_LABEL[c.category] + '</span><span class="more">смотреть →</span></span>';
+        '<span class="case-card__meta"><span class="cat">' + catLabel(c) + '</span><span class="more">смотреть →</span></span>';
       card.addEventListener("click", function () { openCase(i, card); });
       grid.appendChild(card);
     });
@@ -334,7 +345,7 @@
     b.innerHTML =
       plaqueHTML(c) +
       '<span class="ccard__photo"><img src="assets/img/' + c.gallery[0] + '.webp" alt="' + c.title + ' — фото проекта" loading="lazy" decoding="async"></span>' +
-      '<span class="ccard__meta"><span class="cat">' + CAT_LABEL[c.category] + '</span><span class="ccard__desc">' + c.shortDescription + "</span></span>";
+      '<span class="ccard__meta"><span class="cat">' + catLabel(c) + '</span><span class="ccard__desc">' + c.shortDescription + "</span></span>";
     b.addEventListener("click", function () {
       if (railDragMoved) return; // это был drag, не клик
       openCase(i, b);

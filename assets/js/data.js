@@ -26,10 +26,18 @@
 
    3) float — плавающий предмет-декор в развороте кейса; берём
       уже отснятые вырезки из assets/img/float-*.webp.
+
+   Правка 05.08: categoryLabel — подпись-рубрика на карточке, если она
+   отличается от общей по категории. Заказчик: у Aina, Зойки, Sixty и
+   Lúwo это не бары, а рестораны с баром, и на карточке должно стоять
+   «Ресторан + бар». Поле МЕНЯЕТ ТОЛЬКО ПОДПИСЬ: category у всех
+   четырёх остаётся "bar", потому что по ней считаются фильтр и набор
+   кейсов в ленте (visibleCaseIndices в main.js). Заведи вместо этого
+   отдельную категорию — и кейсы выпадут из выборки «Бар».
    ============================================================ */
 window.BARPOINT_CASES = [
   {
-    id: "aina", slug: "aina", category: "bar", title: "Aina",
+    id: "aina", slug: "aina", category: "bar", categoryLabel: "Ресторан + бар", title: "Aina",
     logoImage: "assets/img/logo-aina.png",
     logoRatio: "562/382",
     mark: { img: "assets/img/logo-aina-light.png", ar: 1.4712, k: 1.35 },
@@ -70,7 +78,7 @@ window.BARPOINT_CASES = [
     gallery: ["case-inta-1-900", "case-inta-2-900", "case-inta-3-900", "case-inta-4-900"]
   },
   {
-    id: "zoyka", slug: "zoyka", category: "bar", title: "Зойка",
+    id: "zoyka", slug: "zoyka", category: "bar", categoryLabel: "Ресторан + бар", title: "Зойка",
     logoImage: "assets/img/logo-zoyka.png",
     logoRatio: "900/601",
     mark: { img: "assets/img/logo-zoyka-light.png", ar: 1.4975, k: 1.75 },
@@ -122,7 +130,7 @@ window.BARPOINT_CASES = [
     gallery: ["case-buro-1-1200", "case-buro-2-1200", "case-buro-3-1120"]
   },
   {
-    id: "sixty", slug: "sixty", category: "bar", title: "Sixty",
+    id: "sixty", slug: "sixty", category: "bar", categoryLabel: "Ресторан + бар", title: "Sixty",
     logoText: "Sixty", logoStyle: "serif",
     mark: { type: "antiqua" },
     float: "assets/img/float-hero-pour.webp",
@@ -213,7 +221,7 @@ window.BARPOINT_CASES = [
     gallery: ["case-leps-1-900", "case-leps-2-900", "case-leps-3-900", "case-leps-4-900"]
   },
   {
-    id: "luwo", slug: "luwo", category: "bar", title: "Lúwo",
+    id: "luwo", slug: "luwo", category: "bar", categoryLabel: "Ресторан + бар", title: "Lúwo",
     logoImage: "assets/img/logo-luwo.png",
     logoRatio: "568/187",
     mark: { img: "assets/img/logo-luwo-light.png", ar: 3.0374, k: 1.15 },
