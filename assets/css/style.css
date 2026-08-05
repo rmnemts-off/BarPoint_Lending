@@ -234,11 +234,44 @@ ul, ol { list-style: none; }
 
 /* ---------- Типографика ---------- */
 /* Serif — смысл/история; grotesk-слой — служебные надписи (4.2, ТЗ3 §1) */
+
+/* ============================================================
+   ТРЕКИНГ ЗАГОЛОВКОВ И ТЕКСТА — НОЛЬ. Правка 05.08, ориентир сменился.
+   Заказчик написал, что «расстояние между буквами везде очень маленькое»,
+   и показал, каким оно должно быть, — презентацией Barpoint Coffee NEW.
+   Она обмерена целиком, программой, а не на глаз: из PDF вынуты позиции
+   каждого знака на всех 24 полосах и сопоставлены с метриками вложенных
+   шрифтов. Итог одинаков в обоих слоях и на всех кеглях от 20 до 150pt:
+
+     Roslindale Cyrillic Deck Narrow (заголовки)  786 пар знаков   0.0000 em
+     HeadingNow 64 Regular (текст)               1628 пар знаков   0.0000 em
+
+   Квартили тоже нулевые, оператора Tc в потоках почти нет — то есть
+   трекинг не задавали вовсе, обе гарнитуры идут на своих метриках.
+   Отсюда правило: у всех заголовков и running text проекта трекинг
+   normal. Прежние значения (−.02em у карточек услуг и оверлея кейсов,
+   −.01em здесь, +.005…+.012em у капсовых заголовков) сняты.
+
+   ДВА ИСКЛЮЧЕНИЯ, И ОБА ОБЪЯСНИМЫ:
+   1. .wcards-head .h2 и .cases-head .h2 несут -webkit-text-stroke в
+      .0135em — обводка тем же цветом, которой заголовку добавляли веса.
+      Она наращивает штрих в обе стороны и съедает 2 × .0135 просвета,
+      поэтому там стоит +.027em: это не трекинг, а возврат к нулю.
+   2. Капсовые надписи на Copperplate (.eyebrow, кнопки, навигация,
+      таблички) остаются с прежними .06….42em. Это разрядка как приём, в
+      презентации такого слоя просто нет, и обнулять её было бы не
+      «как в презентации», а поломкой.
+
+   Наш текстовый шрифт — Apoc, а не HeadingNow презентации; заголовочный
+   у нас Display Condensed, у неё Deck Narrow. Совпадает величина
+   трекинга, но не собственные боковые поля гарнитур — их подгонкой
+   заниматься не стали, это уже подмена шрифта, а не интервала.
+   ============================================================ */
 .h-serif {
   font-family: var(--font-serif);
   font-weight: 600;
   line-height: 1.12;
-  letter-spacing: -.01em;
+  letter-spacing: normal;
 }
 .h1 { font-size: clamp(2rem, calc(5.6 * var(--vw-step)), 4.4rem); }
 .h2 { font-size: clamp(1.7rem, calc(3.6 * var(--vw-step)), 3rem); }
@@ -758,7 +791,7 @@ ul, ol { list-style: none; }
   font-family: "Roslindale Display Condensed", "Times New Roman", serif;
   font-style: normal; font-weight: 700;
   font-size: clamp(2.5rem, calc(6 * var(--vw-step)), 5.4rem);
-  line-height: 1.04; letter-spacing: .012em;
+  line-height: 1.04; letter-spacing: .027em;
   text-transform: uppercase;
   color: var(--bp-off-white);
   -webkit-text-stroke: max(1px, .0135em) currentColor;
@@ -768,17 +801,21 @@ ul, ol { list-style: none; }
    брейкпоинта, а строка обязана ужиматься на каждом пикселе ширины, иначе
    на 1024–1439 она переламывается. Поэтому здесь — единственное на секцию
    исключение с настоящим 100vw.
-   ЧИСЛО 19.9 — НЕ НА ГЛАЗ: это отношение ширины набранной строки к кеглю,
-   снятое живьём (1718px при кегле 86.4 → 19.881) для ЭТОЙ фразы в
-   Roslindale Display Condensed капсом с трекингом .012em и обводкой.
-   Меняется текст заголовка — пересчитать отношение, иначе строка либо
-   переломится, либо вылезет за край. Вычет 24px — запас на полосу
-   прокрутки (100vw её включает, ширина контента — нет).
+   ЧИСЛО 20.6 — НЕ НА ГЛАЗ: это отношение ширины набранной строки к кеглю,
+   снятое живьём для ЭТОЙ фразы в Roslindale Display Condensed капсом с
+   текущим трекингом и обводкой. Меняется текст заголовка ИЛИ трекинг —
+   пересчитать отношение, иначе строка либо переломится, либо вылезет за
+   край. Именно это и случилось 05.08, когда трекинг подняли с .012 до
+   .027em: при прежних 19.9 строка выходила 1415px против 1385 доступных,
+   и страница получала 10px горизонтальной прокрутки. Замер после правки:
+   1415 / 69.15 = 20.46, взято 20.6 — процент запаса на округления.
+   Вычет 24px — запас на полосу прокрутки (100vw её включает, ширина
+   контента — нет).
    nowrap здесь страховка: если кегль всё-таки окажется великоват, лучше
    лёгкий перелив, чем молчаливый перенос на вторую строку. */
 @media (min-width: 1024px) {
   .wcards-head .h2 {
-    font-size: min(5.4rem, calc((100vw - 2 * var(--gutter) - 24px) / 19.9));
+    font-size: min(5.4rem, calc((100vw - 2 * var(--gutter) - 24px) / 20.6));
     white-space: nowrap;
   }
 }
@@ -862,7 +899,12 @@ ul, ol { list-style: none; }
      Ставим 400 ради буквального совпадения объявления с референсом. */
   font-style: normal; font-weight: 400;
   text-transform: uppercase;
-  line-height: 1; letter-spacing: -.02em;
+  /* ПРАВКА 05.08: трекинг снят. Было −.02em — число с buckssauce, и именно
+     из-за него заказчик написал, что «расстояние между буквами везде очень
+     маленькое». Ориентир теперь свой, презентация Barpoint Coffee NEW:
+     обмер всех 24 полос (786 пар знаков в заголовках, 1628 в тексте) даёт
+     трекинг РОВНО НОЛЬ, квартили тоже нулевые. Подробнее — у .h-serif. */
+  line-height: 1; letter-spacing: normal;
   color: var(--bp-off-white);
   transform: rotate(-3deg);
 }
@@ -1005,7 +1047,8 @@ ul, ol { list-style: none; }
      кегле 80) просит 361px при поле панели 422 на 1024, 451 при 550 на
      1280 и 507 при 630 на 1440 — влезает на всех ширинах. */
   font-size: 5.5556vw;
-  line-height: 1; letter-spacing: -.02em;
+  /* трекинг снят вместе со всеми заголовками проекта, см. .h-serif */
+  line-height: 1; letter-spacing: normal;
   color: inherit;
   /* ПРАВКА 05.08: заголовок снова по ЛЕВОМУ краю — как на референсе,
      скриншот которого прислал заказчик. Центровка (max-width 13em +
@@ -1160,7 +1203,7 @@ ul, ol { list-style: none; }
   font-style: normal; font-weight: 700;
   font-size: clamp(2.2rem, 9.6vw, 15rem);   /* НАСТОЯЩИЙ vw: строка заполняет экран во всю ширину */
   line-height: .94;
-  letter-spacing: .005em;
+  letter-spacing: normal;
   text-transform: uppercase;
   color: var(--bp-off-white);
   white-space: nowrap;
@@ -1335,7 +1378,7 @@ ul, ol { list-style: none; }
   font-family: "Roslindale Display Condensed", "Times New Roman", serif;
   font-style: normal; font-weight: 700;
   font-size: clamp(3.05rem, calc(7.4 * var(--vw-step)), 6.7rem);
-  line-height: 1.02; letter-spacing: .012em;
+  line-height: 1.02; letter-spacing: .027em;
   text-transform: uppercase;
   color: var(--bp-off-white); /* правка 03.08: секция кейсов стала тёмной */
   /* «Жирнее» упирается в шрифт: у Roslindale Display Condensed объявлен
@@ -1625,7 +1668,7 @@ ul, ol { list-style: none; }
 .cinfo__title {
   width: 100%; text-transform: uppercase;
   font-family: var(--cv-serif); font-weight: 700; font-style: normal;
-  font-size: 70px; line-height: .9; letter-spacing: -.02em;
+  font-size: 70px; line-height: .9; letter-spacing: normal;
 }
 @media (min-width: 1024px) {
   /* ширина w-col-4 по формуле оригинала */
@@ -1726,7 +1769,7 @@ ul, ol { list-style: none; }
 .cbox__title {
   text-transform: uppercase; font-family: var(--cv-serif);
   font-weight: 700; font-style: normal;
-  font-size: var(--cv-30); line-height: 1; letter-spacing: -.02em;
+  font-size: var(--cv-30); line-height: 1; letter-spacing: normal;
 }
 .cbox__text { font-size: var(--cv-base); line-height: 1.5; }
 
@@ -1807,7 +1850,7 @@ ul, ol { list-style: none; }
   width: 100%; border-radius: 10px;
   font-family: var(--cv-serif); font-weight: 700; font-style: normal;
   text-transform: uppercase; color: var(--cv-fg);
-  padding: 16px 12px; font-size: var(--cv-40); line-height: 1.1; letter-spacing: -.02em;
+  padding: 16px 12px; font-size: var(--cv-40); line-height: 1.1; letter-spacing: normal;
 }
 @media (min-width: 1024px) {
   .cbtn {
@@ -2138,7 +2181,7 @@ form.is-hidden { visibility: hidden; }
 .hstation--intro .h2 {
   font-family: "Roslindale Display Condensed", "Times New Roman", serif;
   font-style: normal; font-weight: 700;
-  letter-spacing: .012em;
+  letter-spacing: normal;
   font-size: clamp(2.73rem, calc(5.72 * var(--vw-step)), 4.81rem);
 }
 /* Правка 31.07 (четвёртая): правила .hstation--intro .pill и .hteam__sub
@@ -2460,11 +2503,11 @@ form.is-hidden { visibility: hidden; }
 .final__title {
   max-width: 15em;
   font-family: "Roslindale Display Condensed", "Times New Roman", serif;
-  font-style: normal; font-weight: 700; letter-spacing: .012em;
+  font-style: normal; font-weight: 700; letter-spacing: normal;
 }
 .final__title em {
   font-family: var(--font-serif); font-style: italic; font-weight: 600;
-  letter-spacing: -.01em; color: var(--bp-amber);
+  letter-spacing: normal; color: var(--bp-amber);
 }
 /* Шаг между строками ужат с 16 до 8px: сами строки подросли до 44px ради
    пальца (см. .final__contact), и при прежнем шаге просвет между номером и
@@ -2518,7 +2561,7 @@ form.is-hidden { visibility: hidden; }
   font-family: "Roslindale Display Condensed", "Times New Roman", serif;
   font-style: normal; font-weight: 700;
   font-size: clamp(1.85rem, calc(2.6 * var(--vw-step)), 2.35rem);
-  line-height: 1.06; letter-spacing: .005em;
+  line-height: 1.06; letter-spacing: normal;
   margin-bottom: var(--s-4);
   color: var(--bp-dark-text);
 }
