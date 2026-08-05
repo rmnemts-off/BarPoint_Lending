@@ -17,6 +17,8 @@
       { type:"antiqua" } — настоящего знака нет, и в презентации
       имя набрано контрастной антиквой смешанным регистром
       (Sixty стр. 22, Duran Bar стр. 23, Buro Tsum стр. 20).
+      Правка 05.08: у этих трёх знаки нашлись и антиква снята —
+      источники и оговорка по Duran в комментариях у самих кейсов.
 
    2) works — «что сделали» для карточки 2 в развороте кейса.
       ЧЕРНОВИК: составлен из текстов презентаций Materials v3 и
@@ -114,8 +116,9 @@ window.BARPOINT_CASES = [
   },
   {
     id: "buro-tsum", slug: "buro-tsum", category: "bar", title: "Buro Tsum",
-    logoText: "Buro Tsum", logoStyle: "serif",
-    mark: { type: "antiqua" },
+    logoImage: "assets/img/logo-buro.png",
+    logoRatio: "700/312",
+    mark: { img: "assets/img/logo-buro-light.png", ar: 2.2436, k: 1.3 },
     float: "assets/img/float-buro-pink.webp",
     shortDescription: "Коллаборация с BURO 24/7 и ЦУМ: карты по мотивам Cartier, Dior, Bulgari и Недель моды.",
     /* Правка 04.08: 282 → 217 знаков. Трижды повторённое «посвящённые»
@@ -130,9 +133,10 @@ window.BARPOINT_CASES = [
     gallery: ["case-buro-1-1200", "case-buro-2-1200", "case-buro-3-1120"]
   },
   {
-    id: "sixty", slug: "sixty", category: "bar", categoryLabel: "Ресторан + бар", title: "Sixty",
-    logoText: "Sixty", logoStyle: "serif",
-    mark: { type: "antiqua" },
+    id: "sixty", slug: "sixty", category: "bar", title: "Sixty",
+    logoImage: "assets/img/logo-sixty.png",
+    logoRatio: "900/150",
+    mark: { img: "assets/img/logo-sixty-light.png", ar: 6.0, k: 1.35 },
     float: "assets/img/float-hero-pour.webp",
     shortDescription: "62-й этаж башни Москва-Сити — самый высокий ресторан премиум-класса в Восточной Европе.",
     fullDescription: "Самый высокий ресторан премиум-класса в Восточной Европе — на 62-м этаже башни Москва-Сити. Всемирно известные повара, развлекательная коктейльная карта, живая музыка с панорамным видом.",
@@ -149,8 +153,14 @@ window.BARPOINT_CASES = [
   },
   {
     id: "duran-bar", slug: "duran-bar", category: "bar", title: "Duran Bar",
-    logoText: "Duran Bar", logoStyle: "serif",
-    mark: { type: "antiqua" },
+    /* ВНИМАНИЕ (правка 05.08): знак взят с duran64.ru — это Duran Bar&Grill
+       в САРАТОВЕ, а кейс ниже про московский Duran Bar на Рочдельской
+       (закрыт, «лучший бар Москвы» 2015–2017). Заведения разные, знак
+       поставлен по прямой просьбе заказчика. Заменить — положить свой
+       файл вместо logo-duran*.png и поправить ar/logoRatio. */
+    logoImage: "assets/img/logo-duran.png",
+    logoRatio: "800/438",
+    mark: { img: "assets/img/logo-duran-light.png", ar: 1.8265, k: 1.7 },
     float: "assets/img/float-glass-red.webp",
     shortDescription: "Культовый бар с живой электронной музыкой; награды «лучший бар Москвы» 2015–2017.",
     fullDescription: "Культовый московский бар с живой электронной музыкой и концертами всемирно известных диджеев. Один из самых успешных проектов Москвы: признан лучшим баром столицы и отмечен множеством международных наград с 2015 по 2017 год.",
@@ -187,8 +197,8 @@ window.BARPOINT_CASES = [
        было «Marcelo Miracles Shop & Bar». */
     id: "marcelo", slug: "marcelo", category: "bar", title: "Marcelo Miracles",
     logoImage: "assets/img/logo-marcelo.png",
-    logoRatio: "603/101",
-    mark: { img: "assets/img/logo-marcelo-light.png", ar: 5.9703, k: 1.55 },
+    logoRatio: "603/39",
+    mark: { img: "assets/img/logo-marcelo-light.png", ar: 15.4615, k: 0.72 },
     float: "assets/img/float-buro-pink.webp",
     shortDescription: "Проект дизайнера Марка Родовского: коктейльный бар, совмещённый с бутиком.",
     /* Правка 04.08: 254 → 208 знаков (см. Aina) */
@@ -204,8 +214,8 @@ window.BARPOINT_CASES = [
   {
     id: "leps-asia", slug: "leps-asia", category: "bar", title: "LEPS.ASIA",
     logoImage: "assets/img/logo-leps.png",
-    logoRatio: "900/228",
-    mark: { img: "assets/img/logo-leps-light.png", ar: 3.9474, k: 1.45 },
+    logoRatio: "600/88",
+    mark: { img: "assets/img/logo-leps-light.png", ar: 6.8182, k: 1.0 },
     float: "assets/img/float-leps-coupe.webp",
     shortDescription: "Паназиатский премиум-ресторан Григория Лепса и ресторатора Ильи Эстерова.",
     /* Правка 04.08: 333 → 229 знаков. Снято последнее предложение про
@@ -223,8 +233,8 @@ window.BARPOINT_CASES = [
   {
     id: "luwo", slug: "luwo", category: "bar", categoryLabel: "Ресторан + бар", title: "Lúwo",
     logoImage: "assets/img/logo-luwo.png",
-    logoRatio: "568/187",
-    mark: { img: "assets/img/logo-luwo-light.png", ar: 3.0374, k: 1.15 },
+    logoRatio: "568/209",
+    mark: { img: "assets/img/logo-luwo-light.png", ar: 2.7177, k: 1.29 },
     float: "assets/img/float-inta-smoke.webp",
     shortDescription: "Концепция «шёлкового пути»: специи, чай, кофе и эстетика Востока в барной карте.",
     /* Правка 04.08: 269 → 220 знаков, было самое длинное описание (см. Aina) */
@@ -238,7 +248,7 @@ window.BARPOINT_CASES = [
     gallery: ["case-luwo-1-900", "case-luwo-2-900", "case-luwo-3-900", "case-luwo-4-900"]
   },
   {
-    id: "pims", slug: "pims", category: "coffee", title: "PIMS",
+    id: "pims", slug: "pims", category: "coffee", categoryLabel: "Чайная", title: "PIMS",
     logoText: "PIMS", logoStyle: "grotesk",
     logoImage: "assets/img/logo-pims.png",
     logoRatio: "359/108",
@@ -257,7 +267,7 @@ window.BARPOINT_CASES = [
     gallery: ["case-pims-1-1400", "case-pims-2-900", "case-pims-3-900", "case-pims-4-900", "case-pims-5-1400"]
   },
   {
-    id: "landy", slug: "landy", category: "coffee", title: "Landy",
+    id: "landy", slug: "landy", category: "coffee", categoryLabel: "Кофейня", title: "Landy",
     logoText: "Landy", logoStyle: "serif",
     /* знак вынут из презентации Barpoint Coffee NEW.pdf (стр. 23):
        белые буквы на чёрной плашке переведены в тёмный знак на прозрачном */
