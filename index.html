@@ -552,12 +552,14 @@
       <div class="cinfo">
         <div class="cinfo__head">
           <h2 class="cinfo__title" data-cover-title></h2>
-          <!-- на мобильном плавающий предмет стоит между заголовком и подзаголовком -->
-          <div class="cinfo__foodmob" data-cover-foodmob>
-            <div class="cfood" data-parallax-food data-parallax-speed="0.2" data-parallax-float-amplitude="0.1" data-parallax-mouse-force="0">
-              <div class="cfood__inner" data-parallax-food-inner><img src="" alt="" decoding="async"></div>
-            </div>
-          </div>
+          <!-- Правка 05.08: плавающий предмет удалён по просьбе заказчика —
+               «модельки летающие не нужны нигде». Здесь стояла мобильная
+               копия, между заголовком и подзаголовком. Вместе с ней сняты:
+               десктопная в карточке «Что сделали», поле float у всех
+               тринадцати кейсов в data.js, подстановка src и анимация входа
+               в main.js, механика «дыхания» и хода к курсору, и правила
+               .cfood / .cbox__food / .cinfo__foodmob в style.css.
+               Сами файлы assets/img/float-*.webp оставлены на диске. -->
           <div class="cinfo__subwrap"><p class="cinfo__sub" data-cover-sub></p></div>
         </div>
 
@@ -595,15 +597,7 @@
             <div class="cbox cbox--works" data-cover-box data-cover-worksbox>
               <p class="cbox__title">Что сделали</p>
               <ul class="cworks" data-cover-works></ul>
-              <!-- плавающий предмет, выходящий за карточку -->
-              <div class="cbox__food" data-cover-food>
-                <!-- амплитуда задана явно: у эталона предмет качался в открытом
-                     поле со случайным размахом, у нас он живёт внутри карточки
-                     и при размахе под 25% вылезал за её кромку -->
-                <div class="cfood" data-parallax-food data-parallax-speed="0.3" data-parallax-float-amplitude="0.3">
-                  <div class="cfood__inner" data-parallax-food-inner><img src="" alt="" decoding="async"></div>
-                </div>
-              </div>
+              <!-- плавающий предмет удалён 05.08, см. комментарий выше -->
             </div>
 
             <button class="cbtn" type="button" data-cover-cta data-btn data-cover-box>

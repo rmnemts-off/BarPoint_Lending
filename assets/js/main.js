@@ -821,11 +821,10 @@
     /* счётчик кейсов «08 / 13» */
     coverCount.textContent = caseNumber(i) + " / " + visibleCaseIndices().length;
 
-    /* плавающий предмет — своя вырезка на каждый кейс */
-    var foodSrc = c.float || "assets/img/float-hero-pour.webp";
-    Array.prototype.forEach.call(cover.querySelectorAll(".cfood img"), function (im) {
-      im.src = foodSrc;
-    });
+    /* Правка 05.08: подстановка вырезки плавающего предмета удалена вместе
+       с самим предметом (просьба заказчика — «модельки летающие не нужны
+       нигде»). Отсюда же ушло поле float у всех тринадцати кейсов в
+       data.js; файлы assets/img/float-*.webp на диске оставлены. */
 
     /* галерея: кадры кейса + скрытый предзагрузчик */
     GAL = c.gallery.map(function (g) {
@@ -861,14 +860,12 @@
 
   function playCoverIntro() {
     var boxes = cover.querySelectorAll("[data-cover-box]");
-    var foods = cover.querySelectorAll("[data-cover-food], [data-cover-foodmob]");
     revertSplits();
 
     if (!hasGsap) return;
     if (reduceMotion) {
       gsap.set([coverPattern, coverTitle, coverSub, cgal], { opacity: 1, y: 0 });
       gsap.set(boxes, { opacity: 1, y: 0, rotation: 0 });
-      gsap.set(foods, { opacity: 1, scale: 1 });
       return;
     }
 
@@ -922,60 +919,20 @@
       duration: CVD.bigCopy, stagger: CVS.bigCopy, ease: "bigCopy"
     }, "<25%");
 
-    /* плавающий предмет */
-    gsap.set(foods, { opacity: 0, scale: 0 });
-    tl.to(foods, { opacity: 1, scale: 1, duration: CVD.base, ease: CVE.backLow }, "<25%");
+    /* Правка 05.08: вход плавающего предмета удалён вместе с ним самим. */
   }
 
-  /* ============================================================
-     Плавающий предмет: «дыхание» и ход к курсору.
-     Скролл-параллакс оригинала здесь смысла не имеет — разворот
-     это фиксированный слой, страница под ним заморожена, поэтому
-     ScrollTrigger на предмет не вешаем.
-     ============================================================ */
-  var coverMouse = [];
-  if (hasGsap && !reduceMotion) {
-    Array.prototype.forEach.call(cover.querySelectorAll("[data-parallax-food]"), function (el) {
-      var inner = el.querySelector("[data-parallax-food-inner]");
-      if (!inner) return;
-      /* один случайный коэффициент на элемент — им подменяется любой
-         незаданный data-атрибут, поэтому амплитуда качания каждый раз своя */
-      var a = +Math.random().toFixed(2);
-      var ampAttr = el.getAttribute("data-parallax-float-amplitude");
-      var amp = ampAttr === null ? a : parseFloat(ampAttr);
-      if (amp > 0) {
-        gsap.fromTo(el,
-          { yPercent: -25 * amp, rotation: -5 * amp },
-          {
-            yPercent: 25 * amp, rotation: 5 * amp,
-            duration: 3 + 2 * Math.random(), ease: "sine.inOut", repeat: -1, yoyo: true
-          });
-      }
-      var forceAttr = el.getAttribute("data-parallax-mouse-force");
-      var force = forceAttr === null ? a : parseFloat(forceAttr);
-      if (force > 0) {
-        coverMouse.push({
-          el: el, max: 80 * force,
-          qx: gsap.quickTo(inner, "x", { duration: 1.8, ease: "power1.out" }),
-          qy: gsap.quickTo(inner, "y", { duration: 1.8, ease: "power1.out" })
-        });
-      }
-    });
-    if (coverMouse.length) {
-      window.addEventListener("mousemove", function (ev) {
-        if (!cover.classList.contains("is-open")) return;
-        for (var k = 0; k < coverMouse.length; k++) {
-          var t = coverMouse[k], b = t.el.getBoundingClientRect();
-          var dx = ev.clientX - (b.left + b.width / 2);
-          var dy = ev.clientY - (b.top + b.height / 2);
-          var l = Math.max(0, 1 - Math.sqrt(dx * dx + dy * dy) / 1000);
-          var o = l * l * t.max;
-          if (o > 0) { var ang = Math.atan2(dy, dx); t.qx(Math.cos(ang) * o); t.qy(Math.sin(ang) * o); }
-          else { t.qx(0); t.qy(0); }
-        }
-      });
-    }
-  }
+  /* ПЛАВАЮЩИЙ ПРЕДМЕТ УДАЛЁН ЦЕЛИКОМ (05.08, просьба заказчика: «модельки
+     летающие не нужны нигде»). Здесь жили две механики: бесконечное
+     «дыхание» (качание по yPercent ±25·amp с поворотом ±5°, своя случайная
+     амплитуда и длительность на каждый экземпляр) и ход к курсору —
+     обработчик mousemove на window, который тянул вырезку к указателю с
+     силой, спадающей квадратично до нуля на 1000px.
+     Удалены обе, вместе с обработчиком: без него на mousemove больше не
+     висит расчёт по всем предметам на каждое движение мыши.
+     Разметка снята в index.html, поле float — в data.js, стили .cfood /
+     .cbox__food / .cinfo__foodmob — в style.css. Файлы вырезок
+     assets/img/float-*.webp на диске оставлены. */
 
   /* ============================================================
      Ховер главной кнопки: подложка с перелётом + подмена слоёв

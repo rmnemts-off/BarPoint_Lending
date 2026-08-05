@@ -26,8 +26,12 @@
       формулировками заказчика. Если поле убрать, карточка в
       развороте просто не рендерится (ТЗ разворота §5.2).
 
-   3) float — плавающий предмет-декор в развороте кейса; берём
-      уже отснятые вырезки из assets/img/float-*.webp.
+   3) float — УДАЛЁН 05.08 по просьбе заказчика («модельки летающие
+      не нужны нигде»). Поле стояло у всех тринадцати кейсов и задавало
+      вырезку плавающего предмета в развороте. Вместе с ним снята вся
+      механика в main.js (дыхание + ход к курсору), разметка в index.html
+      и стили .cfood в style.css. Файлы assets/img/float-*.webp на диске
+      оставлены — если предмет когда-нибудь вернут, вырезки на месте.
 
    Правка 05.08: categoryLabel — подпись-рубрика на карточке, если она
    отличается от общей по категории. Заказчик: у Aina, Зойки, Sixty и
@@ -43,7 +47,6 @@ window.BARPOINT_CASES = [
     logoImage: "assets/img/logo-aina.png",
     logoRatio: "562/382",
     mark: { img: "assets/img/logo-aina-light.png", ar: 1.4712, k: 1.35 },
-    float: "assets/img/float-glass-red.webp",
     shortDescription: "Кухня народов России — от Камчатки до Дагестана; барная карта отражает эти культуры.",
     /* Правка 04.08: 337 → 226 знаков. Из карточки описания убрали
        прокрутку (см. .cbox--desc в style.css), а в 256px её высоты это
@@ -64,7 +67,6 @@ window.BARPOINT_CASES = [
     logoImage: "assets/img/logo-inta.png",
     logoRatio: "491/367",
     mark: { img: "assets/img/logo-inta-light.png", ar: 1.3379, k: 1.35 },
-    float: "assets/img/float-inta-smoke.webp",
     shortDescription: "Камерный бар в «зале стихии воды» ресторана Aina: каждый коктейль — ритуал.",
     /* Правка 04.08: 332 → 205 знаков, самое длинное описание из тринадцати
        (не влезало на полторы строки). Хвост «Аутентичные ингредиенты
@@ -84,7 +86,6 @@ window.BARPOINT_CASES = [
     logoImage: "assets/img/logo-zoyka.png",
     logoRatio: "900/601",
     mark: { img: "assets/img/logo-zoyka-light.png", ar: 1.4975, k: 1.75 },
-    float: "assets/img/float-hero-pour.webp",
     shortDescription: "Эстетика России 1920-х: карта на поэзии эпохи, официанты читают стихи.",
     /* Правка 04.08: 259 → 229 знаков — см. общий комментарий у Aina.
        Потолок карточки одинаков у всех тринадцати кейсов, поэтому и
@@ -103,7 +104,6 @@ window.BARPOINT_CASES = [
     logoImage: "assets/img/logo-memo.png",
     logoRatio: "643/202",
     mark: { img: "assets/img/logo-memo-light.png", ar: 3.1832, k: 1.35, suffix: "+ hide" },
-    float: "assets/img/float-leps-coupe.webp",
     shortDescription: "Днём — высокая гастрономия, ночью — клуб с перформансами; два бара на этаже.",
     fullDescription: "Днём — ресторан высокой гастрономии, ночью — клуб с перформансами, танцами и концертами. Два бара на каждом этаже предлагают коктейльные карты, созданные, чтобы удивлять, провоцировать и вовлекать.",
     works: [
@@ -119,7 +119,6 @@ window.BARPOINT_CASES = [
     logoImage: "assets/img/logo-buro.png",
     logoRatio: "700/312",
     mark: { img: "assets/img/logo-buro-light.png", ar: 2.2436, k: 1.3 },
-    float: "assets/img/float-buro-pink.webp",
     shortDescription: "Коллаборация с BURO 24/7 и ЦУМ: карты по мотивам Cartier, Dior, Bulgari и Недель моды.",
     /* Правка 04.08: 282 → 217 знаков. Трижды повторённое «посвящённые»
        свёрнуто в «по мотивам» и «с»; ни один факт не потерян. */
@@ -137,7 +136,6 @@ window.BARPOINT_CASES = [
     logoImage: "assets/img/logo-sixty.png",
     logoRatio: "900/150",
     mark: { img: "assets/img/logo-sixty-light.png", ar: 6.0, k: 1.35 },
-    float: "assets/img/float-hero-pour.webp",
     shortDescription: "62-й этаж башни Москва-Сити — самый высокий ресторан премиум-класса в Восточной Европе.",
     fullDescription: "Самый высокий ресторан премиум-класса в Восточной Европе — на 62-м этаже башни Москва-Сити. Всемирно известные повара, развлекательная коктейльная карта, живая музыка с панорамным видом.",
     /* правка 02.08: externalMentions переведены в формат колонки
@@ -161,7 +159,6 @@ window.BARPOINT_CASES = [
     logoImage: "assets/img/logo-duran.png",
     logoRatio: "800/438",
     mark: { img: "assets/img/logo-duran-light.png", ar: 1.8265, k: 1.7 },
-    float: "assets/img/float-glass-red.webp",
     shortDescription: "Культовый бар с живой электронной музыкой; награды «лучший бар Москвы» 2015–2017.",
     fullDescription: "Культовый московский бар с живой электронной музыкой и концертами всемирно известных диджеев. Один из самых успешных проектов Москвы: признан лучшим баром столицы и отмечен множеством международных наград с 2015 по 2017 год.",
     externalMentions: [{ value: "2015–2017", label: "лучший бар Москвы" }],
@@ -180,7 +177,6 @@ window.BARPOINT_CASES = [
     /* знак цветной (белый + фирменный циан) — отдельный файл
        со снятой чёрной подложкой, перекрашивать его не нужно */
     mark: { img: "assets/img/logo-invasion-mark.png", ar: 5.1574, k: 1.5 },
-    float: "assets/img/float-invasion-1.webp",
     shortDescription: "Премиальный гейминг-лаунж; тематические кастомные бокалы под персонажей.",
     /* Правка 04.08: 238 → 197 знаков (см. Aina) */
     fullDescription: "Игровой лаунж премиум-класса: комфорт, сервис, оборудование и аудитория. Коктейли подаются в кастомных бокалах под персонажей игровых вселенных — напиток становится частью игрового мира.",
@@ -199,7 +195,6 @@ window.BARPOINT_CASES = [
     logoImage: "assets/img/logo-marcelo.png",
     logoRatio: "603/39",
     mark: { img: "assets/img/logo-marcelo-light.png", ar: 15.4615, k: 0.72 },
-    float: "assets/img/float-buro-pink.webp",
     shortDescription: "Проект дизайнера Марка Родовского: коктейльный бар, совмещённый с бутиком.",
     /* Правка 04.08: 254 → 208 знаков (см. Aina) */
     fullDescription: "Marcelo Miracles Shop & Bar — модный коктейльный бар и бутик. Проект дизайнера Марка Родовского объединяет гастрономию и фирменный магазин одежды. В основе карты — сезонные авторские коктейли и миксы на кранах.",
@@ -216,7 +211,6 @@ window.BARPOINT_CASES = [
     logoImage: "assets/img/logo-leps.png",
     logoRatio: "600/88",
     mark: { img: "assets/img/logo-leps-light.png", ar: 6.8182, k: 1.0 },
-    float: "assets/img/float-leps-coupe.webp",
     shortDescription: "Паназиатский премиум-ресторан Григория Лепса и ресторатора Ильи Эстерова.",
     /* Правка 04.08: 333 → 229 знаков. Снято последнее предложение про
        «первую половину вечера»: паназиатская кухня и азиатские напитки
@@ -235,7 +229,6 @@ window.BARPOINT_CASES = [
     logoImage: "assets/img/logo-luwo.png",
     logoRatio: "568/209",
     mark: { img: "assets/img/logo-luwo-light.png", ar: 2.7177, k: 1.29 },
-    float: "assets/img/float-inta-smoke.webp",
     shortDescription: "Концепция «шёлкового пути»: специи, чай, кофе и эстетика Востока в барной карте.",
     /* Правка 04.08: 269 → 220 знаков, было самое длинное описание (см. Aina) */
     fullDescription: "Пространство вдохновлено маршрутами, по которым веками двигались караваны — с чаем и кофе, специями, фруктами и цветами. Каждый раздел барной карты — часть этого пути, где встречаются эстетика Запада и шарм Ближнего Востока.",
@@ -253,7 +246,6 @@ window.BARPOINT_CASES = [
     logoImage: "assets/img/logo-pims.png",
     logoRatio: "359/108",
     mark: { img: "assets/img/logo-pims-light.png", ar: 3.3241, k: 0.95 },
-    float: "assets/img/float-hero-pour.webp",
     shortDescription: "Международный бренд напитков: создан и вырос при участии команды BARPOINT.",
     /* Правка 04.08: 248 → 202 знака (см. Aina) */
     fullDescription: "Международный бренд напитков. Мы стояли у истоков PIMS: бренд создан при нашем участии и вырос вместе с нами — команда увеличила оборот от 2 млн до 5 млрд. В основе — тренды, виральность, технологичность.",
@@ -274,7 +266,6 @@ window.BARPOINT_CASES = [
     logoImage: "assets/img/logo-landy.png",
     logoRatio: "610/225",
     mark: { img: "assets/img/logo-landy-light.png", ar: 2.7111, k: 1.2 },
-    float: "assets/img/float-buro-pink.webp",
     shortDescription: "Кафе в жилом комплексе: линейка напитков под аудиторию ЖК и личный бренд владелицы.",
     fullDescription: "Локальное кафе в жилом комплексе. Создали линейку напитков под аудиторию ЖК и личный бренд владелицы — и точка выросла от 1 млн до 5 млн.",
     metrics: [{ label: "рост", value: "1 млн → 5 млн" }],
