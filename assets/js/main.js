@@ -592,8 +592,9 @@
   var arrowSlots = cover.querySelectorAll("[data-arrow-slot]");
   var currentCase = -1;
   var lastFocus = null;
-  if (hasGsap && window.Flip) gsap.registerPlugin(Flip);
-  var canZoom = function () { return hasGsap && !reduceMotion && window.Flip; };
+  var preloadTimer = null;
+  /* Плагин Flip отсюда убран вместе с перелётом фото (правка 06.08) —
+     подробности у openCase. */
 
   /* ---------- токены движения (дословно из системы оригинала) ---------- */
   var CVD = { base: .5, slow: .8, title: .48, paragraph: .7, bigCopy: 1.25 };
@@ -866,9 +867,21 @@
       gsap.set(slotB, { x: 0, zIndex: 0, autoAlpha: 0 });
       gsap.set(arrowSlots, { scale: 1 });
     }
-    cgalPreload.innerHTML = GAL.map(function (g) {
-      return '<img src="' + g.src + '" alt="" decoding="async">';
-    }).join("");
+    /* ПРАВКА 06.08: догрузка остальных кадров отложена до конца вступления.
+       Кадры из архива заказчика (правка 05.08) весят 200–350КБ против
+       прежних 40–130, и четыре таких загрузки с декодированием, запущенные
+       ровно в момент перелёта, отбирали у него кадры. Первые два кадра тут
+       ни при чём — они уже стоят в слотах A и B и грузятся в любом случае;
+       откладывается третий и дальше, до которых человек доберётся никак не
+       раньше, чем долистает до них. */
+    if (preloadTimer) clearTimeout(preloadTimer);
+    cgalPreload.innerHTML = "";
+    preloadTimer = setTimeout(function () {
+      preloadTimer = null;
+      cgalPreload.innerHTML = GAL.map(function (g) {
+        return '<img src="' + g.src + '" alt="" decoding="async">';
+      }).join("");
+    }, 1200);
 
     /* один кадр — листать нечего */
     var single = GAL.length < 2;
@@ -886,9 +899,32 @@
     if (splitSub) { splitSub.revert(); splitSub = null; }
   }
 
+  /* ПРАВКА 06.08: разбивка текста вынута из playCoverIntro в отдельный шаг.
+     SplitText перестраивает разметку заголовка и подзаголовка и заставляет
+     браузер пересчитать раскладку — работа не бесплатная, а делалась она
+     первой строкой вступления, то есть ровно в том кадре, где стартовал
+     перелёт клона. Теперь openCase зовёт prepareCoverIntro сразу после
+     .is-open, а сам перелёт начинается уже со следующего кадра.
+     Вызов оставлен и внутри playCoverIntro — на случай, когда вступление
+     играется само по себе (переключение кейса стрелками внутри разворота). */
+  var introPrepared = false;
+
+  function prepareCoverIntro() {
+    revertSplits();
+    introPrepared = true;
+    if (!hasGsap || reduceMotion || !window.SplitText) return;
+    if (!titleIsMark) {
+      splitTitle = new SplitText(coverTitle, { type: "lines,words,chars" });
+      Array.prototype.forEach.call(coverTitle.children, function (n) { n.setAttribute("aria-hidden", "true"); });
+    }
+    splitSub = new SplitText(coverSub, { type: "lines" });
+    Array.prototype.forEach.call(coverSub.children, function (n) { n.setAttribute("aria-hidden", "true"); });
+  }
+
   function playCoverIntro() {
     var boxes = cover.querySelectorAll("[data-cover-box]");
-    revertSplits();
+    if (!introPrepared) prepareCoverIntro();
+    introPrepared = false;
 
     if (!hasGsap) return;
     if (reduceMotion) {
@@ -909,9 +945,7 @@
       tl.fromTo(coverTitle, { opacity: 0, y: 60, scaleX: .8, scaleY: .5 },
         { opacity: 1, y: 0, scaleX: 1, scaleY: 1,
           duration: CVD.title, ease: CVE.backBase }, 0);
-    } else if (window.SplitText) {
-      splitTitle = new SplitText(coverTitle, { type: "lines,words,chars" });
-      Array.prototype.forEach.call(coverTitle.children, function (n) { n.setAttribute("aria-hidden", "true"); });
+    } else if (splitTitle) {
       if (splitTitle.chars.length) {
         tl.set(splitTitle.chars, { opacity: 0, y: 60, scaleX: .8, scaleY: .5 }, 0)
           .set(coverTitle, { opacity: 1 }, "<")
@@ -927,9 +961,7 @@
       { opacity: 1, y: 0, duration: CVD.slow, ease: CVE.backLow }, 0);
 
     /* подзаголовок — строками снизу */
-    if (window.SplitText) {
-      splitSub = new SplitText(coverSub, { type: "lines" });
-      Array.prototype.forEach.call(coverSub.children, function (n) { n.setAttribute("aria-hidden", "true"); });
+    if (splitSub) {
       if (splitSub.lines.length) {
         tl.set(splitSub.lines, { opacity: 0, yPercent: 50 }, ">")
           .set(coverSub, { opacity: 1 }, "<")
@@ -1033,31 +1065,30 @@
   }
 
   /* ============================================================
-     Открытие / закрытие — механика прежняя (FLIP-зум)
-     ============================================================ */
-  /* карточка кейса i, видимая сейчас в вьюпорте (для обратного зума);
-     лента дублирует карточки — берём первую, чей bbox в кадре */
-  function findLiveCardImg(i) {
-    var imgs = document.querySelectorAll('.ccard[data-index="' + i + '"] .ccard__photo img');
-    for (var k = 0; k < imgs.length; k++) {
-      var r = imgs[k].getBoundingClientRect();
-      if (r.right > 0 && r.left < window.innerWidth && r.bottom > 0 && r.top < window.innerHeight) return imgs[k];
-    }
-    return null;
-  }
+     Открытие / закрытие разворота
+     ============================================================
+     ПРАВКА 06.08 — ПЕРЕЛЁТ ФОТО УБРАН ЦЕЛИКОМ (просьба заказчика:
+     «пусть картинки просто будут на своём месте и всё»).
 
-  function makeGhost(srcImg, fromRect) {
-    var ghost = srcImg.cloneNode();
-    ghost.className = "cover__ghost";
-    ghost.removeAttribute("loading");
-    gsap.set(ghost, {
-      position: "fixed", top: fromRect.top, left: fromRect.left,
-      width: fromRect.width, height: fromRect.height,
-      zIndex: 210, margin: 0, borderRadius: 10, objectFit: "cover"
-    });
-    document.body.appendChild(ghost);
-    return ghost;
-  }
+     Здесь жил FLIP-зум: при открытии клон фото карточки отрывался от
+     ленты и летел в галерею разворота, при закрытии — обратно. Механика
+     держалась на том, что обложка карточки и первый кадр разворота —
+     ОДНА картинка: обе брались из gallery[0], поэтому подмену клона на
+     живую картинку никто не замечал. После правки 05.08 обложка задана
+     отдельным полем cardImage, кадры у шести кейсов разные, и перелёт
+     стал показывать не тот кадр: обложка с интерьером долетала до
+     галереи и на глазах менялась на первый кадр разворота.
+
+     Разделение теперь честное и без переходов: кадр с интерьером живёт
+     только на карточке в ленте, кадры галереи — только внутри разворота.
+     Открытие и закрытие — простое проявление и угасание всего разворота,
+     вступление (заголовок, галерея, карточки) играется как играло.
+
+     Вернуть зум — придётся снова свести обложку и первый кадр к одной
+     картинке, иначе подмена вылезет тем же способом. Вместе с механикой
+     сняты: клоны .cover__ghost со стилем в style.css, поиск видимой
+     карточки в ленте findLiveCardImg и плагин Flip (тег скрипта в
+     index.html; сам файл assets/vendor/Flip.min.js оставлен). */
 
   function openCase(i, sourceEl) {
     var wasOpen = cover.classList.contains("is-open");
@@ -1089,25 +1120,24 @@
     coverInner.scrollTop = 0;
     updateCoverClip();
 
-    /* зум из карточки: клон фото летит из позиции карточки в галерею */
-    var srcImg = sourceEl && sourceEl.querySelector(".ccard__photo img, .case-card__photo img");
-    if (srcImg && canZoom()) {
-      var ghost = makeGhost(srcImg, srcImg.getBoundingClientRect());
-      gsap.set(cover, { opacity: 0 });
-      requestAnimationFrame(function () {
-        var state = Flip.getState(ghost);
-        var f = cgal.getBoundingClientRect();
-        gsap.set(ghost, { top: f.top, left: f.left, width: f.width, height: f.height });
-        gsap.to(cover, { opacity: 1, duration: .35, ease: "power2.out" });
-        Flip.from(state, {
-          duration: .45, ease: "power3.inOut",
-          onComplete: function () { ghost.remove(); gsap.set(cover, { clearProps: "opacity" }); }
-        });
-        playCoverIntro();
+    /* ПРАВКА 06.08: разбивку заголовка и подзаголовка на буквы и строки
+       делаем ЗДЕСЬ, до первого кадра вступления. Раньше она шла первой
+       строкой playCoverIntro — то есть SplitText перестраивал разметку
+       двух блоков и пересчитывал раскладку в том же кадре, где движение
+       уже началось; на замере это стабильно давало один кадр в 33мс на
+       старте, и вступление начиналось с заминки. Резать раньше нельзя:
+       до .is-open разворот display:none, и строки посчитались бы не по
+       той ширине. */
+    prepareCoverIntro();
+
+    /* разворот просто проявляется — фото никуда не летит */
+    if (hasGsap && !reduceMotion) {
+      gsap.fromTo(cover, { opacity: 0 }, {
+        opacity: 1, duration: .3, ease: "power2.out",
+        onComplete: function () { gsap.set(cover, { clearProps: "opacity" }); }
       });
-    } else {
-      playCoverIntro();
     }
+    playCoverIntro();
     cover.querySelector("[data-cover-close]").focus();
   }
 
@@ -1124,19 +1154,7 @@
          со смещением, которое ничем уже не сбрасывалось. */
       if (lastFocus && lastFocus.focus) lastFocus.focus({ preventScroll: true });
     };
-    var target = findLiveCardImg(currentCase);
-    var curImg = galImg(galFront);
-    if (target && curImg && curImg.src && canZoom()) {
-      /* обратный зум: текущий кадр сворачивается в карточку ленты */
-      var ghost = makeGhost(curImg, cgal.getBoundingClientRect());
-      var state = Flip.getState(ghost);
-      var r = target.getBoundingClientRect();
-      gsap.set(ghost, { top: r.top, left: r.left, width: r.width, height: r.height });
-      Flip.from(state, { duration: .4, ease: "power3.inOut", onComplete: function () { ghost.remove(); } });
-      gsap.to(cover, { opacity: 0, duration: .3, ease: "power2.in", onComplete: function () {
-        gsap.set(cover, { clearProps: "opacity" }); finish();
-      } });
-    } else if (hasGsap && !reduceMotion) {
+    if (hasGsap && !reduceMotion) {
       gsap.to(cover, { opacity: 0, duration: .28, ease: "power2.in", onComplete: function () {
         gsap.set(cover, { clearProps: "opacity" }); finish();
       } });

@@ -508,7 +508,8 @@
      Слева — галерея с вырезом под крестик в левом верхнем углу; кадры
      меняются подменой двух слоёв-слотов. Справа — заголовок кейса,
      подзаголовок и сетка 2×2: Описание / Что сделали / Факты / Действие.
-     Открытие и закрытие — прежний FLIP-зум из карточки ленты.
+     Открытие и закрытие — проявление и угасание всего разворота
+     (правка 06.08: перелёт фото из карточки ленты убран, см. main.js).
      Фон разворота задан ТОЛЬКО на .cover, паттерн лежит отдельным
      слоем внутри: у html/body фона этого слоя быть не должно. -->
 <div class="cover" data-cover role="dialog" aria-modal="true" aria-label="Кейс">
@@ -939,7 +940,9 @@
 <script src="assets/vendor/gsap.min.js" defer></script>
 <script src="assets/vendor/ScrollTrigger.min.js" defer></script>
 <script src="assets/vendor/SplitText.min.js" defer></script>
-<script src="assets/vendor/Flip.min.js" defer></script>
+<!-- Flip.min.js больше не подключается: единственным его потребителем был
+     перелёт фото из карточки в разворот, снятый правкой 06.08. Сам файл
+     оставлен в assets/vendor — вернуть плагин можно одной строкой. -->
 <script src="assets/vendor/lenis.min.js" defer></script>
 <script src="assets/js/config.js" defer></script>
 <script src="assets/js/data.js" defer></script>
