@@ -238,7 +238,13 @@ window.BARPOINT_CASES = [
       "Миксы на кранах: технология",
       "Обучение команды и стандарты"
     ],
-    gallery: ["case-marcelo-1-900", "case-marcelo-2-900", "case-marcelo-3-900", "case-marcelo-4-900"]
+    /* Кадры 06.08 из архива заказчика «Часть 2»: «Интерьер» — на внешнюю
+       карточку (cardImage), нумерованные — в разворот, порядок по номеру.
+       Кадры 1 и 3 отданы уже кадрированными в пропорцию галереи: внизу
+       исходников вшита подпись «MARCELO MIRACLES / SHOP & BAR», и на
+       невысоком окне она выползала в кадр обрезанной по половине букв. */
+    cardImage: "case-marcelo-cover-1200",
+    gallery: ["case-marcelo-1-1100", "case-marcelo-2-1100", "case-marcelo-3-1004", "case-marcelo-4-1100"]
   },
   {
     id: "leps-asia", slug: "leps-asia", category: "bar", title: "LEPS.ASIA",
@@ -275,7 +281,38 @@ window.BARPOINT_CASES = [
       "Проектирование и запуск бара",
       "Стандарты подачи и обучение"
     ],
-    gallery: ["case-luwo-1-900", "case-luwo-2-900", "case-luwo-3-900", "case-luwo-4-900"]
+    /* Кадры 06.08 из архива заказчика «Часть 2»: «Интерьер» — на внешнюю
+       карточку (cardImage), нумерованные — в разворот, порядок по номеру.
+       Кадр 3 отдан уже кадрированным в пропорцию галереи со сдвигом вниз:
+       центр-кроп резал нижнюю миску с зеленью. */
+    cardImage: "case-luwo-cover-1200",
+    gallery: ["case-luwo-1-1100", "case-luwo-2-1100", "case-luwo-3-1100", "case-luwo-4-1100"]
+  },
+  {
+    /* ЧЕРНОВИК 06.08. Кейс заведён под кадры из архива «Часть 2»; текстов
+       и знака заказчик ещё не прислал, поэтому:
+         — тексты стоят рыбой (lorem ipsum) той же длины, что у соседних
+           кейсов: и карточка, и разворот верстаются по реальному объёму;
+         — знака нет, стоит mark.type "antiqua" — имя набирается прямой
+           антиквой, тем же приёмом, что раньше у Sixty и Duran Bar.
+       Место в массиве выбрано по рубрике: сначала идут все бары, потом
+       кофейные кейсы, поэтому Poison Drop встал последним из баров.
+       Заменить: shortDescription, fullDescription, works, mark (файл
+       logo-poison-drop-light.png) и logoImage для fallback-сетки. */
+    id: "poison-drop", slug: "poison-drop", category: "bar", title: "Poison Drop",
+    mark: { type: "antiqua" },
+    shortDescription: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor.",
+    fullDescription: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo.",
+    works: [
+      "Lorem ipsum dolor sit amet",
+      "Consectetur adipiscing elit sed",
+      "Eiusmod tempor incididunt labore",
+      "Magna aliqua ut enim ad minim"
+    ],
+    /* Кадры 06.08 из архива заказчика «Часть 2»: «Интерьер» — на внешнюю
+       карточку (cardImage), нумерованные — в разворот, порядок по номеру. */
+    cardImage: "case-poison-drop-cover-883",
+    gallery: ["case-poison-drop-1-853", "case-poison-drop-2-853", "case-poison-drop-3-853", "case-poison-drop-4-853"]
   },
   {
     id: "pims", slug: "pims", category: "coffee", categoryLabel: "Чайная", title: "PIMS",
@@ -293,7 +330,11 @@ window.BARPOINT_CASES = [
       "Технологичность и виральность",
       "Масштабирование: 2 млн → 5 млрд"
     ],
-    gallery: ["case-pims-1-1400", "case-pims-2-900", "case-pims-3-900", "case-pims-4-900", "case-pims-5-1400"]
+    /* Кадры 06.08 из архива заказчика «Часть 2»: «Интерьер» — на внешнюю
+       карточку (cardImage), нумерованные — в разворот, порядок по номеру.
+       Кадров стало четыре вместо пяти — в папке их прислали четыре. */
+    cardImage: "case-pims-cover-1200",
+    gallery: ["case-pims-1-1100", "case-pims-2-674", "case-pims-3-2257", "case-pims-4-857"]
   },
   {
     id: "landy", slug: "landy", category: "coffee", categoryLabel: "Кофейня", title: "Landy",
@@ -312,6 +353,34 @@ window.BARPOINT_CASES = [
       "Технологические карты и обучение",
       "Экономика точки: 1 млн → 5 млн"
     ],
-    gallery: ["case-landy-1-1280", "case-landy-2-900", "case-landy-3-1400"]
+    /* Кадры 06.08 из архива заказчика «Часть 2»: «Интерьер» — на внешнюю
+       карточку (cardImage), нумерованные — в разворот, порядок по номеру.
+       Кадров стало четыре вместо трёх. Кадр 4 отдан уже кадрированным в
+       пропорцию галереи со сдвигом вниз: центр-кроп резал дно тарелки. */
+    cardImage: "case-landy-cover-1200",
+    gallery: ["case-landy-1-1100", "case-landy-2-1190", "case-landy-3-1280", "case-landy-4-576"]
+  },
+  {
+    /* ЧЕРНОВИК 06.08 — см. оговорку у Poison Drop.
+       Правка 06.08: подпись-рубрика «Десерт-бар» — со слов заказчика.
+       Поле categoryLabel меняет ТОЛЬКО подпись на карточке; сама category
+       осталась "coffee", то есть в фильтре кейс лежит в «Кофе» рядом с
+       «Чайной» (PIMS) и «Кофейней» (Landy) — это ведро безалкогольных
+       точек. Если по смыслу кейс должен попадать под фильтр «Бар» —
+       менять надо category, одной подписи для этого мало.
+       Кадры 1 и 3 отданы уже кадрированными: в исходниках по краям вшиты
+       стрелки карусели, кроп в пропорцию галереи их срезает. */
+    id: "yumms", slug: "yumms", category: "coffee", categoryLabel: "Десерт-бар", title: "YUMMS",
+    mark: { type: "antiqua" },
+    shortDescription: "Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi aliquip.",
+    fullDescription: "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum sed.",
+    works: [
+      "Duis aute irure dolor in",
+      "Voluptate velit esse cillum",
+      "Excepteur sint occaecat cupidatat",
+      "Officia deserunt mollit anim id"
+    ],
+    cardImage: "case-yumms-cover-1137",
+    gallery: ["case-yumms-1-1100", "case-yumms-2-765", "case-yumms-3-1100", "case-yumms-4-754"]
   }
 ];
