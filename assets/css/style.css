@@ -699,8 +699,13 @@ ul, ol { list-style: none; }
 }
 
 /* ---------- фирменные начертания проектов ---------- */
-/* Duran Bar — контрастная антиква смешанным регистром, как в презентации */
-.mq--duran {
+/* Duran Bar — контрастная антиква смешанным регистром, как в презентации.
+   Правка 06.08: то же начертание получил класс .mq--type — под ним идут
+   YUMMS и Poison Drop, у которых знака ещё нет. Приём общий с плашками
+   кейсов (mark.type "antiqua", см. .pmark-type), поэтому и в ленте, и в
+   строке имя выглядит одинаково. Когда заказчик пришлёт знаки, элемент
+   меняется на mq--logo с картинкой — правило можно будет снять. */
+.mq--duran, .mq--type {
   font-family: "Roslindale Display Condensed", "Times New Roman", serif;
   font-weight: 500; font-style: normal;
   font-size: calc(var(--mq) * 1.06);
@@ -736,6 +741,11 @@ ul, ol { list-style: none; }
 /* PIMS — чистая капитель без выносных, поэтому высота знака = высота
    капители соседей (у «S» лишь типографский овершут в пару пикселей) */
 .mq__img--pims  { height: calc(var(--mq) * .76); }
+/* LEPS.ASIA — та же история, что у PIMS: файл (600×88) обрезан ровно по
+   капители, выносных нет, поэтому и множитель тот же. Знак вчетверо
+   длиннее прочих — это длина самого слова, ужимать его по высоте ради
+   ширины нельзя, иначе капитель уедет ниже соседей. */
+.mq__img--leps  { height: calc(var(--mq) * .76); }
 
 /* 6.3 PAS и 6.4 Философия — секции и стили УДАЛЕНЫ по ТЗ14 §2–3;
    «Три сценария» (id=about) занял место PAS сразу после трастстрипа */
@@ -1531,14 +1541,29 @@ ul, ol { list-style: none; }
     display: block;
     position: absolute; inset: 0; top: -40px; height: calc(100% + 2.5rem);
     z-index: 0; opacity: .1;
+    overflow: hidden;
+  }
+  /* ПРАВКА 06.08 (вторая): тайл переехал на ::before, а лента — с
+     background-position на transform. Сдвиг фона — paint-свойство:
+     браузер перерисовывал полноэкранную плитку КАЖДЫЙ КАДР на главном
+     потоке всё время, пока открыт кейс, и этим отъедал бюджет у всех
+     анимаций разворота (вступление, подмена кадров, влёт блоков).
+     transform едет на композиторе — главный поток свободен, рисунок
+     движения тот же. Слой на 95px (один тайл) шире и сдвинут влево на
+     столько же: за цикл он уезжает вправо ровно на тайл, левый свес
+     закрывает открывающуюся кромку, а фаза узора в нулевой и конечной
+     точках совпадает — шва нет. opacity интро-твина живёт на родителе
+     и на ::before действует как раньше. */
+  .cover__pattern::before {
+    content: ""; position: absolute; inset: 0; left: -95px;
     background-image: url(../img/case-pattern.png);
     background-repeat: repeat;
     background-size: 95px 158px;
     animation: 12s linear infinite cover-pattern;
   }
 }
-@keyframes cover-pattern { 0% { background-position: 0 0; } to { background-position: 95px 0; } }
-@media (prefers-reduced-motion: reduce) { .cover__pattern { animation: none; } }
+@keyframes cover-pattern { 0% { transform: translate3d(0, 0, 0); } to { transform: translate3d(95px, 0, 0); } }
+@media (prefers-reduced-motion: reduce) { .cover__pattern::before { animation: none; } }
 
 /* ---------- контейнер ---------- */
 .cover__inner {

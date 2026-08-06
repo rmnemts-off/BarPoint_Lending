@@ -451,13 +451,35 @@
       if (Math.abs(railExtra) < RAIL_SNAP) { railExtra = 0; railVel = railAim; railFling = false; }
     } else {
       railVel += (railAim - railVel) * RAIL_TAKEUP;
+      /* при выключенном автопрокате (открыт разворот, railGain 0) подтяжка
+         гонит скорость к нулю лишь асимптотически — лента вечно ползла бы
+         на сотые пикселя и писала transform каждый кадр под анимациями
+         разворота. Ниже порога — честный ноль */
+      if (!railAim && Math.abs(railVel) < RAIL_SNAP) railVel = 0;
     }
+    if (!railVel) return; // стоим — кадру нечего писать
     railPos += railVel * s;
     railWrap();
     railRender();
   }
 
   function setRailSpeed(scale) { railGain = scale; }
+
+  /* Прогрев обложек (правка 06.08, вторая). Карточки лежат с loading="lazy",
+     и при автопрокате браузер брался за каждую обложку ровно в момент,
+     когда та подъезжала к кадру: загрузка и декод 200–350-КБ вебпов
+     падали прямо на движение — лента вздрагивала. Как только лента впервые
+     оказалась у экрана, снимаем lazy у всех её картинок разом: они успевают
+     доехать, пока лента ещё только въезжает в кадр. Смена loading на eager
+     у отложенной картинки запускает загрузку сразу — это по спецификации.
+     После пересборки фильтром карточки снова с lazy, но URL уже в кэше. */
+  var railWarmed = false;
+  function warmRailImages() {
+    if (railWarmed) return;
+    railWarmed = true;
+    Array.prototype.forEach.call(railTrack.querySelectorAll("img[loading=lazy]"),
+      function (img) { img.loading = "eager"; });
+  }
 
   function initRail() {
     rail.hidden = false;
@@ -466,8 +488,12 @@
 
     if (window.IntersectionObserver) {
       railLive = false;
-      new IntersectionObserver(function (es) { railLive = es[0].isIntersecting; },
-        { rootMargin: "160px 0px" }).observe(rail);
+      new IntersectionObserver(function (es) {
+        railLive = es[0].isIntersecting;
+        if (railLive) warmRailImages();
+      }, { rootMargin: "160px 0px" }).observe(rail);
+    } else {
+      warmRailImages();
     }
 
     var rz;
@@ -546,17 +572,26 @@
       b.setAttribute("aria-pressed", "true");
       activeFilter = b.dataset.filter;
       if (railMode) {
-        /* плавный fade-out → пересборка → fade-in (ТЗ2 §6) */
+        /* плавный fade-out → пересборка → fade-in (ТЗ2 §6).
+           ПРАВКА 06.08 (вторая): ScrollTrigger.refresh() переехал сюда из
+           хвоста обработчика. Раньше пересчёт (десятки миллисекунд на всю
+           страницу) дёргался в один кадр со СТАРТОМ фейда — анимация
+           начиналась с затыка, — и мерил ещё СТАРУЮ ленту: статичный режим
+           («Кофе» — две карточки по центру) меняет высоту блока уже после.
+           Теперь пересчёт идёт между фейдами, пока лента невидима, и по
+           уже пересобранной раскладке. overwrite: быстрые клики по
+           фильтрам иначе копили встречные твины прозрачности. */
         gsap.to(rail, {
-          opacity: 0, duration: 0.25, onComplete: function () {
+          opacity: 0, duration: 0.25, overwrite: true, onComplete: function () {
             buildRail();
-            gsap.to(rail, { opacity: 1, duration: 0.25 });
+            ScrollTrigger.refresh();
+            gsap.to(rail, { opacity: 1, duration: 0.25, overwrite: true });
           }
         });
       } else {
         filterGrid();
+        if (hasGsap) ScrollTrigger.refresh();
       }
-      if (hasGsap) ScrollTrigger.refresh();
     });
   });
 
@@ -594,6 +629,7 @@
   var currentCase = -1;
   var lastFocus = null;
   var preloadTimer = null;
+  var coverClosing = false; /* идёт fade закрытия — см. openCase/closeCover */
   /* Плагин Flip отсюда убран вместе с перелётом фото (правка 06.08) —
      подробности у openCase. */
 
@@ -701,6 +737,7 @@
      ============================================================ */
   var GAL = [];
   var galIndex = 0, galFront = "a", galAnimating = false;
+  var galTl = null;   /* живой таймлайн подмены: гасится при смене кейса */
   var SWIPE_PX = 40;
 
   function galWrap(i) { return (i + GAL.length) % GAL.length; }
@@ -756,16 +793,17 @@
        всего вдвое выше средней (у power4.inOut было в разы), поэтому
        «проскока» тоже нет. Длительность 1 → .85с: на 90% пути кадр
        приходит за 580мс, остальное — мягкая доводка. */
-    gsap.timeline({
+    galTl = gsap.timeline({
       defaults: { duration: .85, ease: "power2.out" },
       onComplete: function () {
+        galTl = null;
         galAnimating = false; galIndex = next; galFront = back;
         gsap.set(out, { autoAlpha: 0, zIndex: 0, x: 0 });
         gsap.set(inc, { zIndex: 1 });
         arrowsHidden(false);
       }
-    })
-      .to(out, { x: dir === 1 ? -(.1 * d) : .1 * d }, 0)
+    });
+    galTl.to(out, { x: dir === 1 ? -(.1 * d) : .1 * d }, 0)
       .to(inc, { x: 0 }, 0);
   }
 
@@ -874,6 +912,16 @@
       return { src: "assets/img/" + g + ".webp", alt: c.title + " — фото проекта" };
     });
     galIndex = 0; galFront = "a"; galAnimating = false;
+    if (hasGsap) {
+      /* ПРАВКА 06.08 (вторая): смена кейса могла прийтись на середину
+         подмены кадров — недобитый таймлайн galGo доигрывал за кроссфейдом,
+         и его onComplete перетирал только что расставленные слоты (наверх
+         всплывал слот B с кадром прошлого кейса, стрелки застревали в
+         scale 0 до конца его arrowsHidden). Гасим таймлайн и твины стрелок
+         ДО расстановки, потом ставим чистые состояния. */
+      if (galTl) { galTl.kill(); galTl = null; }
+      gsap.killTweensOf(arrowSlots);
+    }
     applyGalImage(imgA, 0);
     applyGalImage(imgB, galWrap(1));
     if (hasGsap) {
@@ -887,15 +935,15 @@
        ровно в момент перелёта, отбирали у него кадры. Первые два кадра тут
        ни при чём — они уже стоят в слотах A и B и грузятся в любом случае;
        откладывается третий и дальше, до которых человек доберётся никак не
-       раньше, чем долистает до них. */
+       раньше, чем долистает до них.
+       ПРАВКА 06.08 (вторая): штатно предзагрузчик будит onComplete
+       вступления (раньше жёсткий таймер 1200мс стрелял ровно под влёт
+       нижних блоков). Таймер остался страховкой для веток, где вступление
+       не играется или гасится на середине: reduced-motion, закрытие и
+       переоткрытие до конца интро. */
     if (preloadTimer) clearTimeout(preloadTimer);
     cgalPreload.innerHTML = "";
-    preloadTimer = setTimeout(function () {
-      preloadTimer = null;
-      cgalPreload.innerHTML = GAL.map(function (g) {
-        return '<img src="' + g.src + '" alt="" decoding="async">';
-      }).join("");
-    }, 1200);
+    preloadTimer = setTimeout(preloadGallery, 2600);
 
     /* один кадр — листать нечего */
     var single = GAL.length < 2;
@@ -903,6 +951,17 @@
       if (single) b.setAttribute("data-disabled", ""); else b.removeAttribute("data-disabled");
       b.disabled = single;
     });
+  }
+
+  /* Догрузка кадров 3+ текущего кейса (см. комментарий в fillCover).
+     Зовут двое — onComplete вступления и страховочный таймер; guard по
+     firstChild не даёт второму вызову перезалить уже стоящие картинки. */
+  function preloadGallery() {
+    if (preloadTimer) { clearTimeout(preloadTimer); preloadTimer = null; }
+    if (cgalPreload.firstChild) return;
+    cgalPreload.innerHTML = GAL.map(function (g) {
+      return '<img src="' + g.src + '" alt="" decoding="async">';
+    }).join("");
   }
 
   /* ============================================================
@@ -920,19 +979,48 @@
      перелёт клона. Теперь openCase зовёт prepareCoverIntro сразу после
      .is-open, а сам перелёт начинается уже со следующего кадра.
      Вызов оставлен и внутри playCoverIntro — на случай, когда вступление
-     играется само по себе (переключение кейса стрелками внутри разворота). */
+     играется само по себе (переключение кейса стрелками внутри разворота).
+
+     ПРАВКА 06.08 (вторая): здесь же — СТАРТОВЫЕ состояния вступления.
+     Раньше текст прятали set-ы внутри самого таймлайна, а у того delay
+     100мс, и скрывающий set подзаголовка вообще стоял ПОСЛЕ твина галереи
+     (">", 0.8с). Итог на замере (perf_cases.py): подзаголовок виден с
+     первого кадра, на 0.87с исчезает и выезжает заново — «текст под
+     логотипом появляется дважды»; у текстовых заголовков (Poison Drop,
+     YUMMS) те же 100мс мигала целая строка до нарезки на буквы.
+     Теперь всё прячется синхронно, в том же кадре, где разворот стал
+     display:block, — до первого пейнта, глазу нечему мигать. */
   var introPrepared = false;
+  var introTl = null;   /* живое вступление: гасится при закрытии/смене кейса */
 
   function prepareCoverIntro() {
     revertSplits();
     introPrepared = true;
-    if (!hasGsap || reduceMotion || !window.SplitText) return;
-    if (!titleIsMark) {
-      splitTitle = new SplitText(coverTitle, { type: "lines,words,chars" });
-      Array.prototype.forEach.call(coverTitle.children, function (n) { n.setAttribute("aria-hidden", "true"); });
+    if (!hasGsap || reduceMotion) return;
+    if (window.SplitText) {
+      if (!titleIsMark) {
+        splitTitle = new SplitText(coverTitle, { type: "lines,words,chars" });
+        Array.prototype.forEach.call(coverTitle.children, function (n) { n.setAttribute("aria-hidden", "true"); });
+      }
+      splitSub = new SplitText(coverSub, { type: "lines" });
+      Array.prototype.forEach.call(coverSub.children, function (n) { n.setAttribute("aria-hidden", "true"); });
     }
-    splitSub = new SplitText(coverSub, { type: "lines" });
-    Array.prototype.forEach.call(coverSub.children, function (n) { n.setAttribute("aria-hidden", "true"); });
+    /* стартовые состояния — до первого кадра (см. комментарий выше) */
+    gsap.set(coverPattern, { opacity: 0 });
+    if (titleIsMark) {
+      gsap.set(coverTitle, { opacity: 0, y: 60, scaleX: .8, scaleY: .5 });
+    } else if (splitTitle && splitTitle.chars.length) {
+      gsap.set(splitTitle.chars, { opacity: 0, y: 60, scaleX: .8, scaleY: .5 });
+      /* прошлый кейс мог быть знаком: его твин оставил на заголовке свои
+         инлайновые y/scale — возвращаем узлу нейтраль, буквы едут сами */
+      gsap.set(coverTitle, { opacity: 1, y: 0, scaleX: 1, scaleY: 1 });
+    }
+    if (splitSub && splitSub.lines.length) {
+      gsap.set(splitSub.lines, { opacity: 0, yPercent: 50 });
+      gsap.set(coverSub, { opacity: 1 });
+    }
+    gsap.set(cgal, { opacity: 0, y: 40 });
+    gsap.set(cover.querySelectorAll("[data-cover-box]"), { opacity: 0, y: 100, rotation: "random(-30, 30)" });
   }
 
   function playCoverIntro() {
@@ -941,57 +1029,61 @@
     introPrepared = false;
 
     if (!hasGsap) return;
+    if (introTl) { introTl.kill(); introTl = null; }
     if (reduceMotion) {
       gsap.set([coverPattern, coverTitle, coverSub, cgal], { opacity: 1, y: 0 });
       gsap.set(boxes, { opacity: 1, y: 0, rotation: 0 });
       return;
     }
 
-    var tl = gsap.timeline({ delay: COVER_DELAY / 1000 });
+    /* ПРАВКА 06.08 (вторая) — хореография уплотнена (клиент: «текст внизу
+       появляется не сразу»). Раньше подзаголовок ждал конца твина галереи
+       (метка ">", 0.8с), блоки шли за ним на "<25%" — низ разворота
+       пустовал больше секунды (замер: строка-перелистывание видима только
+       к 1.13с, список — позже). Теперь всё внахлёст, абсолютными метками:
+       заголовок и галерея с нуля, подзаголовок догоняет на .3, блоки на
+       .5 — рисунок тот же (сверху вниз), но без мёртвых пауз. Сами
+       длительности, кривые и порядок — из системы движения, не тронуты.
+       Стартовые состояния уже стоят (prepareCoverIntro), поэтому в ленте
+       одни .to — set-ов, способных мигнуть текстом, внутри больше нет.
+       onComplete будит предзагрузчик кадров: раньше тот стрелял по таймеру
+       на 1.2с — ровно под влёт блоков. */
+    var tl = introTl = gsap.timeline({
+      delay: COVER_DELAY / 1000,
+      onComplete: function () { introTl = null; preloadGallery(); }
+    });
 
-    gsap.set(coverPattern, { opacity: 0 });
     tl.to(coverPattern, { opacity: .1, duration: CVD.base, ease: CVE.base }, 0);
 
-    /* Заголовок. Текстовый режём SplitText и выводим по буквам; знак
+    /* Заголовок. Текстовый порезан SplitText и выводится по буквам; знак
        заведения — картинка, резать нечего, поэтому он входит целиком
        тем же движением, что и буквы (правка 03.08). */
     if (titleIsMark) {
-      tl.fromTo(coverTitle, { opacity: 0, y: 60, scaleX: .8, scaleY: .5 },
-        { opacity: 1, y: 0, scaleX: 1, scaleY: 1,
-          duration: CVD.title, ease: CVE.backBase }, 0);
-    } else if (splitTitle) {
-      if (splitTitle.chars.length) {
-        tl.set(splitTitle.chars, { opacity: 0, y: 60, scaleX: .8, scaleY: .5 }, 0)
-          .set(coverTitle, { opacity: 1 }, "<")
-          .to(splitTitle.chars, {
-            opacity: 1, scaleX: 1, scaleY: 1, y: 0,
-            duration: CVD.title, stagger: CVS.title, ease: CVE.backBase
-          }, "<");
-      }
+      tl.to(coverTitle, { opacity: 1, y: 0, scaleX: 1, scaleY: 1,
+        duration: CVD.title, ease: CVE.backBase }, 0);
+    } else if (splitTitle && splitTitle.chars.length) {
+      tl.to(splitTitle.chars, {
+        opacity: 1, scaleX: 1, scaleY: 1, y: 0,
+        duration: CVD.title, stagger: CVS.title, ease: CVE.backBase
+      }, 0);
     }
 
     /* галерея */
-    tl.fromTo(cgal, { opacity: 0, y: 40 },
-      { opacity: 1, y: 0, duration: CVD.slow, ease: CVE.backLow }, 0);
+    tl.to(cgal, { opacity: 1, y: 0, duration: CVD.slow, ease: CVE.backLow }, 0);
 
     /* подзаголовок — строками снизу */
-    if (splitSub) {
-      if (splitSub.lines.length) {
-        tl.set(splitSub.lines, { opacity: 0, yPercent: 50 }, ">")
-          .set(coverSub, { opacity: 1 }, "<")
-          .to(splitSub.lines, {
-            opacity: 1, yPercent: 0,
-            duration: CVD.paragraph, stagger: CVS.paragraph, ease: CVE.copy
-          }, "<");
-      }
+    if (splitSub && splitSub.lines.length) {
+      tl.to(splitSub.lines, {
+        opacity: 1, yPercent: 0,
+        duration: CVD.paragraph, stagger: CVS.paragraph, ease: CVE.copy
+      }, .3);
     }
 
     /* четыре карточки влетают снизу со случайным поворотом −30…30° */
-    gsap.set(boxes, { opacity: 0, y: 100, rotation: "random(-30, 30)" });
     tl.to(boxes, {
       opacity: 1, y: 0, rotation: 0,
       duration: CVD.bigCopy, stagger: CVS.bigCopy, ease: "bigCopy"
-    }, "<25%");
+    }, .5);
 
     /* Правка 05.08: вход плавающего предмета удалён вместе с ним самим. */
   }
@@ -1105,12 +1197,25 @@
      index.html; сам файл assets/vendor/Flip.min.js оставлен). */
 
   function openCase(i, sourceEl) {
-    var wasOpen = cover.classList.contains("is-open");
+    /* ПРАВКА 06.08 (вторая): клик по карточке, пока разворот ещё ДОЗАКРЫВАЕТСЯ
+       (fade 0.28с), раньше попадал в ветку «открыт» — кроссфейд играл под
+       уходящим слоем, finish() закрытия добегал и прятал разворот: клик
+       просто съедался. Пока идёт закрытие, разворот считается закрытым и
+       открывается заново; его fromTo с overwrite глушит встречный твин
+       закрытия вместе с finish(). */
+    var wasOpen = cover.classList.contains("is-open") && !coverClosing;
+    /* повторный клик по тому же кейсу (даблклик, единственный кейс в
+       фильтре) — кроссфейд в самого себя только моргал бы сеткой */
+    if (wasOpen && i === currentCase) return;
+    coverClosing = false;
     currentCase = i;
     if (wasOpen) {
       /* переключение кейса внутри разворота: перекрёстный fade ~0.3s,
          затем разворот проигрывает вступление заново */
       if (hasGsap && !reduceMotion) {
+        /* вступление прошлого кейса могло ещё идти — двум таймлайнам на
+           одних узлах (блоки, галерея) нельзя жить одновременно */
+        if (introTl) { introTl.kill(); introTl = null; }
         gsap.to(coverGrid, {
           opacity: 0, duration: .28, ease: "power1.out", overwrite: true,
           onComplete: function () {
@@ -1144,10 +1249,12 @@
        той ширине. */
     prepareCoverIntro();
 
-    /* разворот просто проявляется — фото никуда не летит */
+    /* разворот просто проявляется — фото никуда не летит. overwrite: на
+       мгновенном закрыть-открыть здесь мог остаться встречный твин
+       закрытия, и два твина спорили бы за opacity всего слоя */
     if (hasGsap && !reduceMotion) {
       gsap.fromTo(cover, { opacity: 0 }, {
-        opacity: 1, duration: .3, ease: "power2.out",
+        opacity: 1, duration: .3, ease: "power2.out", overwrite: true,
         onComplete: function () { gsap.set(cover, { clearProps: "opacity" }); }
       });
     }
@@ -1156,7 +1263,18 @@
   }
 
   function closeCover() {
+    /* ПРАВКА 06.08 (вторая): гасим всё, что могло ещё идти. Вступление —
+       иначе его твины доигрывали за кадром и дрались с вступлением
+       следующего открытия (замер ловил влёт блоков от ЧУЖОГО таймлайна).
+       Кроссфейд смены кейса — иначе его onComplete после закрытия
+       перезаполнял разворот, а сетка оставалась полупрозрачной. */
+    if (hasGsap) {
+      if (introTl) { introTl.kill(); introTl = null; }
+      gsap.killTweensOf(coverGrid);
+      gsap.set(coverGrid, { clearProps: "opacity" });
+    }
     var finish = function () {
+      coverClosing = false;
       cover.classList.remove("is-open");
       document.body.style.overflow = "";
       lenisStart();
@@ -1169,9 +1287,11 @@
       if (lastFocus && lastFocus.focus) lastFocus.focus({ preventScroll: true });
     };
     if (hasGsap && !reduceMotion) {
-      gsap.to(cover, { opacity: 0, duration: .28, ease: "power2.in", onComplete: function () {
-        gsap.set(cover, { clearProps: "opacity" }); finish();
-      } });
+      coverClosing = true;
+      gsap.to(cover, { opacity: 0, duration: .28, ease: "power2.in", overwrite: true,
+        onComplete: function () {
+          gsap.set(cover, { clearProps: "opacity" }); finish();
+        } });
     } else {
       finish();
     }
