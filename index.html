@@ -251,13 +251,22 @@
          короткие (2–3 слова) — на них разлёт читается, а не сыплется.
          Описания под ними намеренно оставлены построчными: два разлёта
          подряд в одной карточке спорят друг с другом. -->
+    <!-- Правка 07.08: три кадра заменены по просьбе заказчика — коктейль,
+         кофе, гости уступили место мороженому, коктейлю с лаймом и
+         мартини с телефоном (порядок задал он). Кроп сделан заранее под
+         форму карточки 100/127, а не отдан object-fit: исходники пришли
+         небольшими, и лишнего запаса на обрезку у них нет. Апскейла нет,
+         поэтому на 2x первые два кадра мягче третьего — ширина в имени
+         файла настоящая. Вуаль не трогали: худшая точка 4.75 — заголовок
+         первой карточки, в него заходят взбитые сливки — при норме 4.5,
+         остальные 4.83–6.63. -->
     <div class="scn" data-scn>
       <article class="scn__card" data-scn-card data-scn-i="0">
         <span class="scn__frame" aria-hidden="true"></span>
         <h3 class="scn__title" data-gsap-big-copy-on-scroll>Открываете<br>с нуля</h3>
         <p class="scn__desc" data-gsap-text-on-scroll data-gsap-delay="0.1">Помогаем спроектировать концепцию, карту напитков и запустить точку без типичных ошибок старта.</p>
         <figure class="scn__photo">
-          <img src="assets/img/scenario-1-900.webp" width="900" height="1125" alt="Напиток наливают в бокал — старт нового проекта" loading="lazy" decoding="async">
+          <img src="assets/img/scenario-1-518.webp" width="518" height="658" alt="Молочный коктейль со взбитыми сливками и мороженое" loading="lazy" decoding="async">
         </figure>
       </article>
 
@@ -266,7 +275,7 @@
         <h3 class="scn__title" data-gsap-big-copy-on-scroll>Упёрлись<br>в потолок</h3>
         <p class="scn__desc" data-gsap-text-on-scroll data-gsap-delay="0.1">Разбираем, где теряются деньги и гости, и выстраиваем систему вместо ручного управления.</p>
         <figure class="scn__photo">
-          <img src="assets/img/scenario-2-900.webp" width="900" height="1125" alt="Кофе с молоком — текстура вихря" loading="lazy" decoding="async">
+          <img src="assets/img/scenario-2-527.webp" width="527" height="669" alt="Коктейль с лаймом на золотом бархате" loading="lazy" decoding="async">
         </figure>
       </article>
 
@@ -275,7 +284,7 @@
         <h3 class="scn__title" data-gsap-big-copy-on-scroll>Хотите<br>масштабироваться</h3>
         <p class="scn__desc" data-gsap-text-on-scroll data-gsap-delay="0.1">Готовим бренд, стандарты и экономику так, чтобы формат можно было тиражировать.</p>
         <figure class="scn__photo">
-          <img src="assets/img/scenario-3-900.webp" width="900" height="1125" alt="Гости с фирменными напитками PIMS" loading="lazy" decoding="async">
+          <img src="assets/img/scenario-3-900.webp" width="900" height="1143" alt="Мартини с оливками и ретро-телефон на столе" loading="lazy" decoding="async">
         </figure>
       </article>
     </div>
@@ -399,13 +408,19 @@
            медиа-половина в 637px пуста — это и есть «чёрный экран».
            С правкой 07.08 таких картинок в стопке четыре, а не две (кадр
            теперь в каждой карточке), и eager остаётся дешёвым: вместе они
-           весят 338 КБ, идут с fetchpriority="low", на первый экран не
+           весят 483 КБ, идут с fetchpriority="low", на первый экран не
            влияют, а к стопке приезжают готовыми.
            Остальным картинкам сайта lazy НЕ трогаем — там обычный поток,
            и отложенная загрузка работает как задумано. -->
+      <!-- Правка 07.08: кадр заменён по просьбе заказчика. Форма исходника
+           (1.09) выбрана не случайно: у .wcard__media жёсткой формы нет —
+           на десктопе это половина ряда (замер 1440×900: 698×734, то есть
+           0.95), а до 1024px включается aspect-ratio 4/3. Один файл режется
+           двумя разными окнами, поэтому кадр держим между ними. Здесь с
+           боков уходит по 88px, все четыре стакана остаются в кадре. -->
       <div class="wcard__aside wcard__aside--media">
         <figure class="wcard__media">
-          <img src="assets/img/svc-coffee-2-1400.webp" width="1400" height="933" alt="Модульная кофейная точка PIMS" loading="eager" fetchpriority="low" decoding="async">
+          <img src="assets/img/svc-pims-1350.webp" width="1350" height="1235" alt="Стаканы PIMS в снегу" loading="eager" fetchpriority="low" decoding="async">
         </figure>
       </div>
       <div class="wcard__panel">
@@ -441,9 +456,15 @@
 
     <!-- 3-й блок файла заказчика. Текст СЛЕВА — снова --flip. -->
     <article class="wcard wcard--amber wcard--flip">
+      <!-- Правка 07.08: кадр заменён по просьбе заказчика. Исходник снят
+           широко (2117×1192, 1.78), и в десктопное окно из него попадало бы
+           1132px — больше половины ширины за краем, вместе с главным
+           бокалом: он стоит слева. Поэтому кадр подрезан справа до 1300px,
+           бокал вышел в середину окна с запасом ~57px, дальняя пара бокалов
+           ушла. Форма получилась 1.09 — та же, что у соседнего PIMS. -->
       <div class="wcard__aside wcard__aside--media">
         <figure class="wcard__media">
-          <img src="assets/img/pas-mood-1200.webp" width="1200" height="882" alt="Переговоры по телефону" loading="eager" fetchpriority="low" decoding="async">
+          <img src="assets/img/svc-coupes-1300.webp" width="1300" height="1192" alt="Коктейли в бокалах купе на сервированном столе" loading="eager" fetchpriority="low" decoding="async">
         </figure>
       </div>
       <div class="wcard__panel">
