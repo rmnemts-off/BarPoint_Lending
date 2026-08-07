@@ -31,9 +31,20 @@
   <link rel="preload" href="assets/fonts/roslindale-i-cyrillic.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="assets/fonts/apoc-400-cyrillic.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="assets/fonts/copperplate-400-cyrillic.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="preload" href="assets/img/hero-lounge-mob-800.webp" as="image" media="(max-width: 767px)">
-  <link rel="preload" href="assets/img/hero-lounge-1200.webp" as="image" media="(min-width: 768px) and (max-width: 1024px)">
-  <link rel="preload" href="assets/img/hero-lounge-1386.webp" as="image" media="(min-width: 1025px)">
+  <!-- ПРАВКА 08.08: предзагрузка героя переписана на imagesrcset. Раньше
+       каждая ветка тянула ОДИН файл, и это работало, только пока потолок
+       srcset совпадал с предзагруженным (1386). Теперь ступеней пять, и
+       фиксированный href разошёлся бы с тем, что выберет srcset, — кадр
+       героя скачался бы дважды. imagesrcset повторяет srcset один в один,
+       href оставлен фолбэком для браузеров, которые его не знают. -->
+  <link rel="preload" as="image" media="(max-width: 767px)"
+        href="assets/img/hero-lounge-mob-800.webp"
+        imagesrcset="assets/img/hero-lounge-mob-600.webp 600w, assets/img/hero-lounge-mob-800.webp 800w, assets/img/hero-lounge-mob-1200.webp 1200w"
+        imagesizes="100vw">
+  <link rel="preload" as="image" media="(min-width: 768px)"
+        href="assets/img/hero-lounge-1600.webp"
+        imagesrcset="assets/img/hero-lounge-800.webp 800w, assets/img/hero-lounge-1200.webp 1200w, assets/img/hero-lounge-1600.webp 1600w, assets/img/hero-lounge-2000.webp 2000w, assets/img/hero-lounge-2560.webp 2560w"
+        imagesizes="100vw">
   <link rel="stylesheet" href="assets/css/fonts.css">
   <link rel="stylesheet" href="assets/css/style.css">
 
@@ -133,24 +144,28 @@
          негрони на зелёном бархате (файлы hero-retro-*) удалён: он и так
          был вырезкой из PDF брендбука в 2188×1213, полного разрешения
          заказчик так и не прислал.
-         РАЗРЕШЕНИЕ — УЗКОЕ МЕСТО. Исходник всего 1386×780, а герой тянется
-         во всю ширину окна: на 1512 при dpr 2 нужно 3024px, то есть кадр
-         даёт 46% и на большом экране будет мягким. Апскейлить не стали —
-         детали это не добавляет. Ступень 1386 — родной размер, выше в
-         srcset не поднимаемся, чтобы браузер не растягивал файл сверх него.
+         ПРАВКА 08.08: разрешение перестало быть узким местом. Заказчик
+         прислал тот же кадр после апскейлера, 5120×2880 вместо 1386×780;
+         сверка со старым файлом даёт среднее отличие 2.4 из 255 — кадр
+         тот же, композиция не поехала, точка кадрирования в CSS прежняя.
+         Потолок лестницы поднят с 1386 до 2560: окно 1512 при dpr 2
+         просит 3024px, прежний файл закрывал 46% из них, новый — 85%.
+         Платим за это 115 КБ на первом экране (315 против 200).
          Кадр горизонтальный (1.777) — почти ровно окно; на мобильных
-         портретный кроп 4:5 (art-direction через <picture>). -->
+         портретный кроп 4:5 (art-direction через <picture>). Мобильное
+         окно не подбиралось заново: оно найдено корреляцией со старым
+         файлом — 0.275..0.725 по ширине, высота полная. -->
     <picture>
       <source media="(max-width: 767px)"
-              srcset="assets/img/hero-lounge-mob-600.webp 600w, assets/img/hero-lounge-mob-800.webp 800w"
-              sizes="100vw" width="800" height="1000">
-      <img src="assets/img/hero-lounge-1386.webp"
-           srcset="assets/img/hero-lounge-800.webp 800w, assets/img/hero-lounge-1200.webp 1200w, assets/img/hero-lounge-1386.webp 1386w"
-           sizes="100vw" width="1386" height="780"
+              srcset="assets/img/hero-lounge-mob-600.webp 600w, assets/img/hero-lounge-mob-800.webp 800w, assets/img/hero-lounge-mob-1200.webp 1200w"
+              sizes="100vw" width="1200" height="1500">
+      <img src="assets/img/hero-lounge-1600.webp"
+           srcset="assets/img/hero-lounge-800.webp 800w, assets/img/hero-lounge-1200.webp 1200w, assets/img/hero-lounge-1600.webp 1600w, assets/img/hero-lounge-2000.webp 2000w, assets/img/hero-lounge-2560.webp 2560w"
+           sizes="100vw" width="2560" height="1440"
            alt="Двое гостей в креслах и золотой столик с коктейлями между ними"
            fetchpriority="high" decoding="async">
     </picture>
-    <!-- <video autoplay muted loop playsinline poster="assets/img/hero-lounge-1386.webp">
+    <!-- <video autoplay muted loop playsinline poster="assets/img/hero-lounge-1600.webp">
            <source src="assets/video/hero-loop.mp4" type="video/mp4"></video> -->
   </div>
   <!-- Правка 30.07: янтарная строка-eyebrow «Консалтинг барных и кофейных
