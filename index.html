@@ -180,7 +180,7 @@
      в СВОЁМ фирменном начертании. Где есть настоящий знак — стоит он:
      Зойка, АЙНА, Lúwo извлечены из презентации, а PIMS снят с вывески на
      фото кейса (кадр был фронтальный, буквы вырезаны по маске яркости,
-     отчищены от бликов и перекрашены в #17140F). Сам исходный кадр
+     отчищены от бликов и перекрашены под палитру). Сам исходный кадр
      case-pims-1-1400 заменён снимками из архива «Часть 2» 06.08 —
      знак с тех пор лежит готовым файлом logo-pims-light.png.
      Где знака нет — воспроизведён его стиль:
@@ -236,7 +236,7 @@
      Правка 29.07: наведение убрано целиком — карточки статичны, все три
      всегда в насыщенном состоянии, описание видно без ховера. Поэтому
      они больше не интерактивны: ни tabindex, ни aria-expanded. -->
-<section class="section section--black" id="about" data-bg="#101111">
+<section class="section section--black" id="about" data-bg="#150C0C">
   <div class="container">
     <div class="scn-head">
       <h2 class="scn-head__title" data-gsap-big-copy-on-scroll>Три сценария работы</h2>
@@ -332,7 +332,13 @@
      Сейчас используется только --media; правила .wcard__q в style.css
      оставлены, вернуть крупное слово можно сменой одного класса. Если
      возвращать будете — там же расписано ограничение на длину слова.
-     Цвет панели идёт по кругу янтарь → изумруд → вино, как index%3.
+     ПРАВКА 07.08 (вторая, просьба заказчика): панели идут ДВУМЯ цветами
+     через один — Honey Garlic → Burnt Coffee → Honey Garlic → Burnt
+     Coffee. Раньше цикл был на три (янтарь → изумруд → вино, index%3),
+     поэтому четвёртая карточка повторяла первую. Имена классов оставлены
+     прежними — --amber теперь honey, --ivory теперь coffee, а --wine из
+     разметки ушёл совсем (третья карточка стала --amber, четвёртая
+     --ivory). Классы — метка позиции в цикле, а не название оттенка.
      Внутри панели два вида набора, оба продиктованы файлом заказчика:
        .wcard__title  большой заголовок — там, где в файле «Название»;
        .wcard__sub    маленький заголовок своей группы пунктов — там,
@@ -341,7 +347,7 @@
      большого заголовка: они собраны из трёх групп каждая.
      Появление — общей лентой на карточку, см. playCard в reveal.js;
      data-gsap-* внутри карточек НЕ ставим, иначе отыграет дважды. -->
-<section class="section wcards" id="services" data-bg="#101111">
+<section class="section wcards" id="services" data-bg="#150C0C">
   <div class="container">
     <div class="sec-head wcards-head">
       <!-- Правка 04.08: подзаголовок («От дизайна к вкусу…») снят по просьбе
@@ -434,7 +440,7 @@
     </article>
 
     <!-- 3-й блок файла заказчика. Текст СЛЕВА — снова --flip. -->
-    <article class="wcard wcard--wine wcard--flip">
+    <article class="wcard wcard--amber wcard--flip">
       <div class="wcard__aside wcard__aside--media">
         <figure class="wcard__media">
           <img src="assets/img/pas-mood-1200.webp" width="1200" height="882" alt="Переговоры по телефону" loading="eager" fetchpriority="low" decoding="async">
@@ -473,7 +479,7 @@
     <!-- 4-й блок файла заказчика. Текст СПРАВА — --flip не ставим.
          Капс здесь стоит не отдельной строкой, а зачином пункта, поэтому
          это не .wcard__sub, а .wcard__lead внутри самого пункта. -->
-    <article class="wcard wcard--amber">
+    <article class="wcard wcard--ivory">
       <div class="wcard__aside wcard__aside--media">
         <figure class="wcard__media">
           <img src="assets/img/svc-bar-2-1000.webp" width="1000" height="1136" alt="Коктейль из авторской карты" loading="eager" fetchpriority="low" decoding="async">
@@ -496,7 +502,7 @@
 
 
 <!-- ============ 6.8 Портфолио / кейсы ============ -->
-<section class="section section--ivory" id="cases" data-bg="#101111">
+<section class="section section--ivory" id="cases" data-bg="#150C0C">
   <div class="container">
     <!-- Правка 31.07: пилюля «Портфолио» и фильтр «Все / Бар / Кофе» убраны;
          заголовок — капсом, прямым Roslindale, по центру. -->
@@ -665,7 +671,7 @@
      разбор GT.GROUP по заведениям (ALICE и Vani, Michelin 2021).
      Понадобится вернуть — придётся уменьшать фотографию, а не добавлять
      строку. -->
-<section class="hteam" id="team" data-hteam data-bg="#101111">
+<section class="hteam" id="team" data-hteam data-bg="#150C0C">
   <div class="hteam__viewport" data-hteam-viewport>
     <div class="hteam__track" data-hteam-track>
       <!-- ТЗ3 §3: волна пути перерисована под короткий трек из двух станций -->
@@ -772,7 +778,7 @@
 <!-- ============ 6.14 FAQ ============
      [ЧЕРНОВИК вопросов по ТЗ 6.14 — согласовать с заказчиком] -->
 <!-- FAQ временно скрыт по просьбе заказчика (17.07.2026). Вернуть: раскомментировать до пометки КОНЕЦ FAQ.
-<section class="section section--black" id="faq" data-bg="#101111">
+<section class="section section--black" id="faq" data-bg="#150C0C">
   <div class="container">
     <div class="sec-head">
       <p class="pill">FAQ</p>
@@ -810,7 +816,7 @@
 
 <!-- ============ 6.15 Финальный CTA + форма (возврат по ТЗ5 §7,
      состав полей — ТЗ v1 §6.15; входит в body-механику ТЗ5 §5) ============ -->
-<section class="section final" id="contact" data-bg="#101111">
+<section class="section final" id="contact" data-bg="#150C0C">
   <div class="container final__grid">
     <!-- Правка 31.07 (четвёртая): пилюля «Контакты» убрана — блок
          начинается сразу с фразы-приглашения. -->
@@ -892,7 +898,7 @@
           <input type="checkbox" name="consent" required>
           <span>Согласен(на) на обработку персональных данных в соответствии с <a href="privacy.html">политикой обработки персональных данных</a> (152-ФЗ)</span>
         </label>
-        <p class="err" data-consent-err style="display:none; color:#5D1E21; font-size:.78rem; margin:-8px 0 16px">Для отправки нужно согласие на обработку данных</p>
+        <p class="err" data-consent-err style="display:none; color:var(--bp-amber-text); font-size:.78rem; margin:-8px 0 16px">Для отправки нужно согласие на обработку данных</p>
         <!-- Правка 31.07 (четвёртая): главная кнопка формы вынесена в
              собственный класс .btn--send — крупнее кегль, выше габарит,
              стрелка-указатель (референс buckssauce.com/shop). Подпись
@@ -926,7 +932,7 @@
 </main>
 
 <!-- ============ 6.16 Футер (компактный, возврат по ТЗ5 §7) ============ -->
-<footer class="footer" data-bg="#101111">
+<footer class="footer" data-bg="#150C0C">
   <div class="container">
     <!-- Правка 31.07 (четвёртая): верхняя полоса футера (лого + подпись
          «Ателье барных концепций…» + дублирующая навигация) убрана

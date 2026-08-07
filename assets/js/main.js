@@ -229,7 +229,7 @@
   function logoHTML(c) {
     if (c.logoImage) {
       return '<img src="' + c.logoImage + '" alt="Логотип проекта ' + c.title + '"' +
-        (c.logoDark ? ' style="background:#101111;padding:8px 14px;border-radius:4px"' : "") + ">";
+        (c.logoDark ? ' style="background:var(--bp-page);padding:8px 14px;border-radius:4px"' : "") + ">";
     }
     var cls = c.logoStyle === "grotesk" ? "tlogo tlogo--grotesk" : "tlogo";
     return '<span class="' + cls + '">' + c.title + "</span>";
@@ -1823,7 +1823,7 @@
     /* стартовый цвет — тот, что стоит на body в CSS */
     var bgStart = (function () {
       var m = getComputedStyle(document.body).backgroundColor.match(/\d+/g);
-      return m ? [+m[0], +m[1], +m[2]] : [16, 17, 17]; /* charcoal, как в CSS */
+      return m ? [+m[0], +m[1], +m[2]] : [21, 12, 12]; /* balsamico, как в CSS */
     })();
 
     var measureBg = function () {

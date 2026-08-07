@@ -4,70 +4,105 @@
    ============================================================ */
 
 /* ---------- 4.1 Цветовая палитра ----------
-   ПРАВКА 04.08 — ПОЛНАЯ СМЕНА ПАЛИТРЫ. Заказчик прислал набор из пяти
-   цветов, и других на странице быть не должно:
+   ПРАВКА 07.08 — ВТОРАЯ ПОЛНАЯ СМЕНА ПАЛИТРЫ. Заказчик прислал новую
+   карту из пяти цветов, и других на странице быть не должно:
 
-     Charcoal Black #101111 — фон всего сайта;
-     Soft Cream    #E6E2DA — весь текст на тёмном, светлые поверхности,
-                             карточка формы и главные CTA;
-     Emerald Green #154230 ┐
-     Deep Burgundy #5D1E21 ├ акценты: панели услуг, карточки сценариев,
-     Antique Gold  #A6824A ┘ иконки, обводки, мелкие знаки.
+     Balsamico    #150C0C — фон всего сайта;
+     Champagne    #EACEAA — ВЕСЬ текст, светлые поверхности, карточка
+                            формы и главные CTA;
+     Honey Garlic #85431E — ОСНОВНОЙ акцент (прямая формулировка
+                            заказчика: «для комбиков, кружков и т.д.,
+                            вместо жёлтого»). Занял место прежнего
+                            золота: заливки, заклёпки, панели услуг,
+                            карточки сценариев, кнопки на наведении;
+     Whiskey Sour #D39858 ┐
+     Burnt Coffee #34150F ┘ два вспомогательных акцента.
 
-   ПРАВИЛО ФАЙЛА: любой цвет в CSS — это одна из пяти переменных ниже.
-   Полутона (тени, пунктиры, приглушённый текст) набираются ТОЛЬКО
-   прозрачностью этих же пяти через color-mix (…, transparent); новых
-   значений не заводить, в том числе подмешкой одного цвета к другому —
-   она даёт шестой сплошной тон.
+   ПОЧЕМУ АКЦЕНТ РАЗДЕЛЁН НА ДВА ТОКЕНА. Honey Garlic тёмный: на
+   Balsamico он даёт 2.59:1. Заливкой он виден отлично, а буквами и
+   волосяными линиями на фоне — нет (норма 4.5, для крупного 3). Поэтому
+   роль поделена ровно по границе «пятно / знак»:
+     --bp-amber (=honey)     — всё, что заказчик перечислил: заливки,
+                               кружки-заклёпки, плашки, панели, ромбы;
+     --bp-accent-ink (=whiskey) — акцент, который лежит НА тёмном фоне
+                               буквами или линией в пиксель: курсив в
+                               заголовках, ссылка на наведении, иконки
+                               контактов, подписи ролей, трасса команды,
+                               подчёркивание в навигации. 7.71:1.
+   Burnt Coffee от фона почти неотличим (1.16:1) и потому работает
+   только поверхностью под светлым текстом — панель услуг, карточка
+   сценария; знаком на фоне он не годится вовсе.
 
-   ПРОВЕРЕНО 04.08 двумя проходами:
-   1) по исходнику — во всём CSSOM (fonts.css + style.css, 524 правила)
-      ровно пять цветовых литералов, ни одного rgb()/hsl();
+   ПРАВИЛО ФАЙЛА (прежнее): любой цвет в CSS — это одна из пяти
+   переменных ниже. Полутона (тени, пунктиры, приглушённый текст)
+   набираются ТОЛЬКО прозрачностью этих же пяти через
+   color-mix (…, transparent); новых значений не заводить, в том числе
+   подмешкой одного цвета к другому — она даёт шестой сплошной тон.
+
+   КОНТРАСТЫ, ЗАМЕРЕНЫ НА НОВЫХ ЗНАЧЕНИЯХ:
+     champagne / balsamico  12.76:1  — основной текст;
+     champagne / honey       4.93:1  — текст на панелях и кнопках
+                                       (было 2.75 на золоте, стало лучше);
+     champagne / coffee     11.04:1  — текст на тёмной панели;
+     balsamico / whiskey     7.71:1  — тёмный текст на светлой панели;
+     whiskey  / balsamico    7.71:1  — акцентный знак на фоне;
+     honey    / champagne    4.93:1  — акцентный текст на светлом.
+
+   ПРОВЕРЕНО 07.08 двумя проходами (методика та же, что 04.08):
+   1) по исходнику — во всём CSSOM ровно пять цветовых литералов,
+      ни одного rgb()/hsl();
    2) по ВЫЧИСЛЕННЫМ стилям — обход каждого элемента и псевдоэлемента с
       разбором color / background / border / outline / box-shadow /
       text-shadow / fill / stroke, на 1440×900, 1280×720 и 375×812, во
       всех состояниях: прокрутка от начала до конца с шагом 300px,
-      открытый разворот кейса, мобильное меню, светлые «чернила» шапки,
-      ошибки формы, экран благодарности, раскрытый FAQ. Найдено пять
-      значений, посторонних — ноль.
+      открытый разворот кейса, мобильное меню, ошибки формы, экран
+      благодарности, раскрытый FAQ.
    Одноцветная графика (знаки заведений -light.png, подписи, фавиконка,
-   apple-touch-icon) перекрашена под палитру отдельно, скриптом: она
-   несла старые #EAE4D8 / #F2EFE7 / #0B0A08 запечёнными в пиксели.
+   apple-touch-icon, монограмма) перекрашена под палитру отдельно,
+   скриптом: она несёт цвет запечённым в пиксели.
    Фотографии, разумеется, не трогали.
 
-   Прежняя палитра (графит #1B1916, беж #E8DCC2, янтарь #C6963C,
-   тёмный янтарь #7A561B, бордо #2B0E12, страница #100b06, графитовый
-   текст #6E6A63/#17140F, молочный #EAE4D8) удалена целиком. */
+   Прежняя палитра (charcoal #101111, cream #E6E2DA, emerald #154230,
+   burgundy #5D1E21, gold #A6824A) удалена целиком; до неё была ещё
+   одна — графит/беж/янтарь, см. историю. */
 :root {
-  --bp-charcoal: #101111;
-  --bp-cream:    #E6E2DA;
-  --bp-green:    #154230;
-  --bp-wine:     #5D1E21;
-  --bp-gold:     #A6824A;
+  --bp-balsamico: #150C0C;
+  --bp-champagne: #EACEAA;
+  --bp-honey:     #85431E;
+  --bp-whiskey:   #D39858;
+  --bp-coffee:    #34150F;
 
   /* Прежние имена оставлены ПСЕВДОНИМАМИ новых: на них завязано под сотню
      правил по всему файлу, и переименование ради переименования дало бы
      диф, в котором не видно смысловых изменений. Каждое имя ниже — это
      роль, а не оттенок, и роли сохранились.
      --bp-black / --bp-page — обе роли («тёмная плашка» и «фон страницы»)
-     схлопнулись в charcoal: фон один на всю страницу.
+     схлопнулись в balsamico: фон один на всю страницу.
      --bp-ivory — светлая поверхность; отдельного бежевого больше нет.
-     --bp-amber-text — акцент для МЕЛКОГО текста на светлом. Золото для
-     этой роли не годится: #A6824A на креме даёт 2.75:1 при норме 4.5
-     (замер), бордо — 9.7:1. Поэтому здесь вино, а не золото. */
-  --bp-page: var(--bp-charcoal);
-  --bp-black: var(--bp-charcoal);
-  --bp-dark-text: var(--bp-charcoal);
-  --bp-off-white: var(--bp-cream);
-  --bp-ivory: var(--bp-cream);
-  --bp-amber: var(--bp-gold);
-  --bp-burgundy: var(--bp-wine);
-  --bp-amber-text: var(--bp-wine);
-  /* приглушённый тёмный текст на светлом (бывший графит #6E6A63) — тот же
-     charcoal, просто тише. Именно ПРОЗРАЧНОСТЬЮ, а не подмешкой крема:
-     подмешка дала бы шестой сплошной цвет, а полупрозрачный charcoal на
-     кремовой подложке выглядит так же и палитру не расширяет. */
-  --bp-graphite: color-mix(in srgb, var(--bp-charcoal) 62%, transparent);
+     --bp-amber-text — акцент для МЕЛКОГО текста на СВЕТЛОМ. Здесь honey:
+     на шампани он даёт 4.93:1 при норме 4.5. Красного в новом наборе
+     нет вовсе, поэтому эта же роль обслуживает и ошибки формы —
+     #85431E из всех пяти ближе всего к тревожному тону.
+     --bp-green / --bp-wine (изумруд и бордо прошлой палитры) удалены:
+     их места заняли coffee и whiskey, и роли при этом РАЗОШЛИСЬ —
+     whiskey светлый, чернила на нём тёмные. Оставить их псевдонимами
+     значило бы спрятать смену роли за прежним именем. */
+  --bp-charcoal: var(--bp-balsamico);
+  --bp-page: var(--bp-balsamico);
+  --bp-black: var(--bp-balsamico);
+  --bp-dark-text: var(--bp-balsamico);
+  --bp-cream: var(--bp-champagne);
+  --bp-off-white: var(--bp-champagne);
+  --bp-ivory: var(--bp-champagne);
+  --bp-gold: var(--bp-honey);
+  --bp-amber: var(--bp-honey);
+  --bp-amber-text: var(--bp-honey);
+  --bp-accent-ink: var(--bp-whiskey);
+  /* приглушённый тёмный текст на светлом — тот же balsamico, просто
+     тише. Именно ПРОЗРАЧНОСТЬЮ, а не подмешкой шампани: подмешка дала бы
+     шестой сплошной цвет, а полупрозрачный balsamico на шампани выглядит
+     так же и палитру не расширяет. На шампани даёт 4.67:1. */
+  --bp-graphite: color-mix(in srgb, var(--bp-balsamico) 62%, transparent);
 
   /* 4.2 Типографика — правка заказчика 26.07: три роли —
      - заголовки/крупные тексты: Roslindale Cyrillic Display Condensed
@@ -166,11 +201,16 @@ img { max-width: 100%; height: auto; display: block; }
 a { color: inherit; }
 button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; }
 ul, ol { list-style: none; }
-:focus-visible { outline: 2px solid var(--bp-amber); outline-offset: 3px; }
+/* кольцо фокуса лежит на фоне страницы, а он тёмный на всю высоту, —
+   значит это «знак», а не «пятно»: honey дал бы 2.59:1 и кольцо просто
+   не читалось бы. На светлых поверхностях (поля формы, документы) свои
+   правила ниже, там honey. */
+:focus-visible { outline: 2px solid var(--bp-accent-ink); outline-offset: 3px; }
 
 .skip-link {
   position: absolute; left: -9999px; top: 0; z-index: 200;
-  background: var(--bp-amber); color: var(--bp-black);
+  /* чернила на honey — светлые: тёмные дали бы 2.59:1 (было 6.5 на золоте) */
+  background: var(--bp-amber); color: var(--bp-cream);
   padding: 10px 18px; font-weight: 600;
 }
 .skip-link:focus { left: 0; }
@@ -216,7 +256,7 @@ ul, ol { list-style: none; }
 .section--burgundy { background: var(--bp-page); color: var(--bp-off-white); }
 
 /* Тонкая линия-разделитель (4.6) */
-.rule { border: 0; border-top: 1px solid var(--bp-amber); opacity: .6; }
+.rule { border: 0; border-top: 1px solid var(--bp-accent-ink); opacity: .6; }
 
 /* ---------- Тихие зоны стыков .seam — УДАЛЕНЫ (правка 03.08) ----------
    Проставка `.seam { height: clamp(140px, 26vh, 340px) }` стояла на трёх
@@ -225,7 +265,7 @@ ul, ol { list-style: none; }
    воздух ПЕРЕТЕКАНИЮ ФОНА (см. одноимённый блок в main.js) — цвет body
    менялся от секции к секции, и менять его поверх плотного содержимого
    было нельзя. С правки 03.08 фон на всей странице один (--bp-page, все
-   data-bg = #101111), перетекать нечему, а 234 лишних пикселя на экране
+   data-bg = #150C0C), перетекать нечему, а 234 лишних пикселя на экране
    900px остались. Отсюда и жалоба заказчика на «большие промежутки».
    Ритм стыков теперь целиком на паддингах .section — см. выше.
    Откат: вернуть правило и три <div class="seam"> в index.html.
@@ -320,10 +360,15 @@ ul, ol { list-style: none; }
    .btn--send. Прежние подсветки #D9AC55 / #DDB25E были осветлённым
    янтарём и в новой палитре лишние. */
 .btn--primary { background: var(--bp-cream); color: var(--bp-charcoal); }
-.btn--primary:hover { background: var(--bp-gold); transform: translateY(-1px); }
+/* на наведении кнопка заливается honey, и чернила ОБЯЗАНЫ смениться на
+   светлые: тёмные на honey — 2.59:1 (на прежнем золоте было 6.5, и
+   переключать цвет не требовалось). Светлые дают 4.93:1. */
+.btn--primary:hover { background: var(--bp-gold); color: var(--bp-cream); transform: translateY(-1px); }
 .btn--ghost { border: 1px solid var(--bp-off-white); color: var(--bp-off-white); }
-.btn--ghost:hover { border-color: var(--bp-amber); color: var(--bp-amber); }
+/* призрачная кнопка стоит на тёмном фоне — акцент «знаковый», whiskey */
+.btn--ghost:hover { border-color: var(--bp-accent-ink); color: var(--bp-accent-ink); }
 .btn--ghost-dark { border: 1px solid var(--bp-dark-text); color: var(--bp-dark-text); }
+/* а эта — на светлой поверхности, здесь honey читается (4.93:1) */
 .btn--ghost-dark:hover { border-color: var(--bp-amber); color: var(--bp-amber); }
 
 /* Правка 31.07 (четвёртая): главная кнопка формы заявки.
@@ -345,7 +390,7 @@ ul, ol { list-style: none; }
               transform .25s var(--ease), box-shadow .25s var(--ease);
 }
 .btn--send:hover {
-  background: var(--bp-amber); color: var(--bp-black);
+  background: var(--bp-amber); color: var(--bp-cream);
   transform: translateY(-2px);
   box-shadow: 0 16px 34px color-mix(in srgb, var(--bp-charcoal) 30%, transparent);
 }
@@ -481,11 +526,11 @@ ul, ol { list-style: none; }
      в кейсах; на клавиатуре срабатывает по :focus-visible */
   .header__nav a::after {
     content: ""; position: absolute; left: 0; right: 0; bottom: 0;
-    height: 2px; background: var(--bp-amber);
+    height: 2px; background: var(--bp-accent-ink);
     transform: scaleX(0); transform-origin: left center;
     transition: transform .35s var(--ease);
   }
-  .header__nav a:hover, .header__nav a:focus-visible { color: var(--bp-amber); }
+  .header__nav a:hover, .header__nav a:focus-visible { color: var(--bp-accent-ink); }
   .header__nav a:hover::after, .header__nav a:focus-visible::after { transform: scaleX(1); }
 }
 .header__cta { display: none; }
@@ -514,8 +559,8 @@ ul, ol { list-style: none; }
   }
   .header__cta::after {
     content: ""; position: absolute; inset: -40% -60%;
-    /* блик по кнопке: кнопка стала кремовой, и белая полоса на ней не
-       видна вовсе — блик переведён в золото (правка 04.08) */
+    /* блик по кнопке: кнопка светлая, и белая полоса на ней не видна
+       вовсе — блик идёт основным акцентом (04.08 золото, 07.08 honey) */
     background: linear-gradient(100deg, transparent 42%, color-mix(in srgb, var(--bp-gold) 55%, transparent) 50%, transparent 58%);
     transform: translateX(-120%);
     transition: transform .7s var(--ease);
@@ -523,6 +568,7 @@ ul, ol { list-style: none; }
   }
   .header__cta:hover, .header__cta:focus-visible {
     transform: scale(1.05);
+    /* цвет чернил на наведении переключает .btn--primary:hover выше */
     background: var(--bp-gold);
   }
   .header__cta:hover::after, .header__cta:focus-visible::after { transform: translateX(120%); }
@@ -561,7 +607,9 @@ ul, ol { list-style: none; }
   text-transform: uppercase; letter-spacing: .06em;
   color: var(--bp-off-white);
   text-decoration: none; padding: 10px 0;
-  border-bottom: 1px solid color-mix(in srgb, var(--bp-gold) 25%, transparent);
+  /* волосяная линия по тёмному фону меню: honey на 25% с фоном почти
+     сливается, поэтому здесь whiskey */
+  border-bottom: 1px solid color-mix(in srgb, var(--bp-accent-ink) 25%, transparent);
 }
 .mnav a.btn {
   margin-top: var(--s-4);
@@ -638,7 +686,7 @@ ul, ol { list-style: none; }
    текстовая группа с 42vh, кнопки; всё в одном экране.
    .hero__sub и .hero__trust удалены по ТЗ15 §2.3/§4. */
 .hero__content { margin-top: 42vh; }
-.hero__title em { font-style: italic; color: var(--bp-amber); }
+.hero__title em { font-style: italic; color: var(--bp-accent-ink); }
 /* ТЗ15 §3.3: неразрывные группы (союз/предлог + слово) — nbsp не работает
    под SplitText, переносы держит nowrap-обёртка */
 .nw { white-space: nowrap; }
@@ -694,7 +742,8 @@ ul, ol { list-style: none; }
 .marquee__item::after {
   content: ""; flex: 0 0 auto;
   width: 7px; height: 7px;
-  background: var(--bp-amber);
+  /* ромб в 7px лежит прямо на фоне строки — знак, а не пятно */
+  background: var(--bp-accent-ink);
   transform: rotate(45deg);
 }
 
@@ -780,10 +829,12 @@ ul, ol { list-style: none; }
    Появление карточки — общей лентой (playCard в reveal.js).
    ============================================================ */
 .wcards {
-  /* ПРАВКА 04.08: панели идут ровно тремя акцентами новой палитры —
-     золото → изумруд → вино. Добавочный тон --wc-wine #7A2B2E удалён:
-     он существовал потому, что прежнее бордо #2B0E12 было почти чёрным
-     и панелью не читалось; Deep Burgundy #5D1E21 читается сам. */
+  /* ПРАВКА 04.08: панели идут ровно тремя акцентами палитры. Добавочный
+     тон --wc-wine #7A2B2E удалён: он существовал потому, что бордо
+     #2B0E12 было почти чёрным и панелью не читалось.
+     ПРАВКА 07.08: акценты сменились на honey → coffee → whiskey, и
+     третья панель стала СВЕТЛОЙ — чернила на ней тёмные, см. блок
+     .wcard--amber/--ivory/--wine ниже. */
   /* Полоска, на которую встаёт очередной ряд стопки, — та же величина,
      что у референса (64px). Используется и в CSS, и в main.js. */
   --wc-top: 64px;
@@ -1036,16 +1087,18 @@ ul, ol { list-style: none; }
      ширине текстовой колонки, то есть ещё и меньше переносов. */
   .wcard__panel { padding: 36px; gap: 72px; min-height: clamp(480px, calc(100vh - 240px), 760px); }
 }
-/* Классы-модификаторы остались прежними (amber / ivory / wine) — они лишь
-   отмечают позицию в цикле index%3, а разметка на них завязана в семи
-   местах. Значения — три акцента новой палитры. На золоте чернила тёмные
-   (charcoal, 6.5:1), на изумруде и вине — кремовые (9.1:1 и 8.3:1). */
-/* Правка 05.08: чернила во ВСЕХ панелях светлые — просьба заказчика.
-   На золоте они дают 2.75:1 (на изумруде 8.77, на вине 9.72); у референса
-   ровно так же — кремовый текст на золотой панели. */
-.wcard--amber .wcard__panel { background: var(--bp-gold);  color: var(--bp-cream); }
-.wcard--ivory .wcard__panel { background: var(--bp-green); color: var(--bp-cream); }
-.wcard--wine  .wcard__panel { background: var(--bp-wine);  color: var(--bp-cream); }
+/* Классы-модификаторы остались прежними по именам — они отмечают позицию
+   в цикле, а не оттенок, и разметка на них завязана.
+   ПРАВКА 07.08 (вторая, просьба заказчика): цветов в стопке ДВА, через
+   один — honey → coffee → honey → coffee. Цикл был на три (index%3), из-за
+   чего четвёртая карточка повторяла первую; теперь чередование ровное, а
+   --wine из разметки убран совсем (см. index.html). Правило ниже оставлено
+   на случай, если третий цвет вернут: whiskey светлее шампани, поэтому
+   чернила на нём ОБЯЗАНЫ быть тёмными — светлые дали бы 1.66:1.
+   Чернила: на honey 4.93:1, на coffee 11.04:1 (было на золоте 2.75). */
+.wcard--amber .wcard__panel { background: var(--bp-honey);   color: var(--bp-champagne); }
+.wcard--ivory .wcard__panel { background: var(--bp-coffee);  color: var(--bp-champagne); }
+.wcard--wine  .wcard__panel { background: var(--bp-whiskey); color: var(--bp-balsamico); }
 
 /* Несущий якорь панели: у референса это единственная крупная строка
    сверху, и без неё панель выглядит пустой. Стоит в КАЖДОЙ карточке. */
@@ -1183,10 +1236,13 @@ ul, ol { list-style: none; }
   text-transform: uppercase;
   -webkit-text-stroke: .022em currentColor;
 }
-/* Пунктир — от чернил панели; с правкой 05.08 они светлые во всех трёх */
+/* Пунктир — от чернил панели. Правка 07.08: раньше здесь стоял крем,
+   потому что чернила во всех трёх панелях были светлые. Теперь на
+   whiskey они тёмные, и светлый пунктир на светлой панели пропал бы, —
+   берём currentColor, он и есть цвет чернил конкретной панели. */
 .wcard--amber .wcard__list li,
 .wcard--ivory .wcard__list li,
-.wcard--wine  .wcard__list li { border-color: color-mix(in srgb, var(--bp-cream) 30%, transparent); }
+.wcard--wine  .wcard__list li { border-color: color-mix(in srgb, currentColor 30%, transparent); }
 
 .wcard__list li::before {
   content: ""; flex: 0 0 auto;
@@ -1425,21 +1481,20 @@ ul, ol { list-style: none; }
   width: 100%;
   box-shadow: 0 24px 60px color-mix(in srgb, var(--bp-charcoal) 38%, transparent);
 }
-/* ПРАВКА 04.08: три карточки — ровно три акцента палитры, изумруд →
-   вино → золото. Прежние жжёные тона (#6B4A16 / #8A3D14 / #7A1F2A) были
-   подмешаны вручную ради контраста под кремовым заголовком; проверено
-   заново на новых значениях. Замер — не на глаз: кадр каждой карточки
-   отрисован в canvas, сложен по слоям (фото на .4 поверх цвета карточки,
-   сверху вуаль charcoal по своему градиенту) и посчитан попиксельно.
-   Худшая точка из трёх карточек — золотая: 5.24:1 под заголовком и
-   5.80:1 под описанием при норме 4.5. Изумруд 7.67/7.34, вино 6.43/7.70.
-   Порядок цветов подобран так, чтобы золото не оказалось соседом
-   золотой панели услуг ниже по странице. */
-.scn__card:nth-child(1) { background: var(--bp-green); }
-.scn__card:nth-child(2) { background: var(--bp-wine); }
-.scn__card:nth-child(3) { background: var(--bp-gold); }
-/* Правка 29.07: фото занимает ВСЮ карточку и лежит ПОД текстом,
-   цветной блок остаётся подложкой и просвечивает сквозь кадр.
+/* ПРАВКА 07.08 (вторая, просьба заказчика): ЦВЕТНОЙ ПОДЛОЖКИ У КАДРОВ
+   БОЛЬШЕ НЕТ. С 29.07 карточка была цветным пятном, а фотография лежала
+   на нём с прозрачностью .4 — цвет просвечивал сквозь кадр и тонировал
+   его. Теперь кадр идёт в полную силу, и цвет карточки из-под него убран
+   целиком: три правила .scn__card:nth-child(n) { background } удалены,
+   вместе с ними — уплотнённая вуаль третьей карточки (она была нужна
+   ровно потому, что подложка была светлой, whiskey).
+   Под кадром остаётся фон страницы: он виден только пока картинка не
+   загрузилась и в скруглениях, поэтому отдельного цвета ему не нужно.
+   Откат: вернуть три nth-child с honey / coffee / whiskey, opacity .4
+   у .scn__photo img и вуаль 62/32/68 (для whiskey — 70/46/72).
+   Прежние жжёные тона (#6B4A16 / #8A3D14 / #7A1F2A) из ревизии 04.08
+   подмешивались вручную и удалены ещё тогда. */
+/* Правка 29.07: фото занимает ВСЮ карточку и лежит ПОД текстом.
    Порядок слоёв: фото (0) → притеняющая вуаль (1) → пунктирная
    рамка (2) → заголовок (3). Надписи «Сценарий 0X» убраны. */
 .scn__photo {
@@ -1449,25 +1504,37 @@ ul, ol { list-style: none; }
 }
 .scn__photo img {
   width: 100%; height: 100%; object-fit: cover;
-  /* прозрачность: сквозь кадр читается цвет карточки, а поверх — текст */
-  opacity: .4;
 }
 
 /* Вуаль поверх фото: без неё светлые участки кадров (лёд, белая одежда)
    роняют контраст заголовка ниже нормы 4.5 — замерено по пикселям самих
-   фотографий. Цвет вуали — тот же графит, что и фон секции, поэтому
-   тонировка читается как затемнение самой карточки. */
+   фотографий. Цвет вуали — тот же графит, что и фон секции.
+
+   ПРАВКА 07.08 (вторая): вуаль пересобрана под кадр БЕЗ подложки. Раньше
+   цвет карточки уже съедал 60% яркости фотографии, и вуали хватало
+   мягкой — 62/32/68. Теперь кадр идёт в полную силу, и на прежних
+   значениях худшая точка падает до 2.30:1. Простое равномерное
+   уплотнение (78/62/80) норму вытягивает, но гасит кадр целиком — то
+   есть возвращает ровно то, от чего уходили.
+   Поэтому вуаль сделана ПО МЕСТУ ТЕКСТА, а не по всей карточке: плотно
+   там, где стоят заголовок (8–24% высоты) и описание (76–92%), и почти
+   прозрачно в промежутке между ними. В этом окне кадр виден как есть.
+   Замер попиксельно в canvas на 1440×900, худшее из трёх карточек:
+     62/32/68 (прежняя)        — 2.30 / 2.81  ✗
+     78/62/80 (равномерная)    — 5.58 / 4.73, но окно гаснет до 36–57
+     74/68/08/72/76 (эта)      — 4.85 / 5.42, окно 79/51/93
+   Ещё светлее (нулевая вуаль в окне) даёт 4.56 — запас к норме 0.06,
+   слишком тонко для разных кадров и кропов. */
 .scn__card::after {
   content: ""; position: absolute; inset: 0; z-index: 1;
-  /* низ плотнее верха: там стоит описание — мелкий текст, ему нужен
-     запас по контрасту (на .52 худший случай был 4.6 при норме 4.5) */
   background: linear-gradient(180deg,
-    color-mix(in srgb, var(--bp-charcoal) 62%, transparent) 0%,
-    color-mix(in srgb, var(--bp-charcoal) 32%, transparent) 40%,
-    color-mix(in srgb, var(--bp-charcoal) 68%, transparent) 100%);
+    color-mix(in srgb, var(--bp-charcoal) 74%, transparent) 0%,
+    color-mix(in srgb, var(--bp-charcoal) 68%, transparent) 26%,
+    color-mix(in srgb, var(--bp-charcoal) 8%,  transparent) 47%,
+    color-mix(in srgb, var(--bp-charcoal) 72%, transparent) 75%,
+    color-mix(in srgb, var(--bp-charcoal) 76%, transparent) 100%);
   pointer-events: none;
 }
-
 /* пунктирная рамка внутри — приём референса, рифмуется с плашками бренда */
 /* отступ рамки тоже в долях ширины: у margin все четыре процента
    считаются от inline-размера, поэтому сверху и сбоку он одинаковый
@@ -1612,9 +1679,10 @@ ul, ol { list-style: none; }
   /* ПРАВКА 04.08: разворот кейса переведён на общую палитру. Здесь стояли
      цвета эталона Bucks Sauce (фон #100b06, текст #f5e4c7, акцент —
      оранжевый #f15726); оранжевого в новом наборе нет, его роль забрало
-     золото. Переменные оставлены: на них завязано два десятка правил
-     разворота, и держать их отдельным слоем удобно — сменить акцент
-     всего разворота по-прежнему можно одной строкой. */
+     золото, а с правкой 07.08 — Honey Garlic, который к тому оранжевому
+     заметно ближе. Переменные оставлены: на них завязано два десятка
+     правил разворота, и держать их отдельным слоем удобно — сменить
+     акцент всего разворота по-прежнему можно одной строкой. */
   --cv-bg: var(--bp-charcoal);
   --cv-fg: var(--bp-cream);
   --cv-theme: var(--bp-gold);
@@ -1986,7 +2054,10 @@ ul, ol { list-style: none; }
 /* «Что сделали» */
 .cworks li { display: flex; align-items: flex-start; gap: 4px; width: 100%; }
 .cworks__bullet { flex: 0 0 auto; width: 12px; height: 12px; margin-top: 4px; }
-.cworks__bullet svg { width: 100%; height: 100%; display: block; fill: var(--cv-theme); }
+/* Маркер списка в 12px лежит на фоне разворота, а фон тёмный: --cv-theme
+   (honey) дал бы 2.59:1 и маркер потерялся бы. Заливка кнопки ниже —
+   другое дело, там honey работает пятном под светлыми чернилами. */
+.cworks__bullet svg { width: 100%; height: 100%; display: block; fill: var(--bp-accent-ink); }
 .cworks li + li { margin-top: 6px; }
 .cworks__text { font-size: var(--cv-cardtext); line-height: 1.3; }
 
@@ -2109,7 +2180,8 @@ ul, ol { list-style: none; }
 }
 .faq summary .ic::before, .faq summary .ic::after {
   content: ""; position: absolute; inset: 0; margin: auto;
-  background: var(--bp-amber);
+  /* «плюс» в полтора пикселя лежит на фоне секции — знак, не пятно */
+  background: var(--bp-accent-ink);
 }
 .faq summary .ic::before { width: 16px; height: 1.5px; }
 .faq summary .ic::after { width: 1.5px; height: 16px; transition: transform .3s var(--ease); }
@@ -2131,11 +2203,14 @@ ul, ol { list-style: none; }
   outline: 2px solid var(--bp-amber); outline-offset: 0; border-color: var(--bp-amber);
 }
 .field textarea { min-height: 96px; resize: vertical; }
-/* ПРАВКА 04.08: сигнальный красный #A2321E заменён на Deep Burgundy —
-   единственный красный в новой палитре. На кремовом поле он даёт 9.7:1,
-   так что как «тревожный» цвет читается не хуже прежнего. */
-.field .err { display: none; font-size: .78rem; color: var(--bp-wine); margin-top: 4px; }
-.field.is-invalid input, .field.is-invalid select { border-color: var(--bp-wine); }
+/* ПРАВКА 07.08: бордо из палитры ушло, красного в новом наборе нет
+   вовсе. Ближе всего к тревожному тону Honey Garlic — жжёный
+   красно-коричневый; на шампани он даёт 4.93:1 (было 9.7 у бордо).
+   Это тот же --bp-amber-text, что у рубрик на светлых карточках:
+   отдельного сигнального цвета в пятёрке просто нет, и заводить
+   шестой ради ошибок формы правилу файла противоречит. */
+.field .err { display: none; font-size: .78rem; color: var(--bp-amber-text); margin-top: 4px; }
+.field.is-invalid input, .field.is-invalid select { border-color: var(--bp-amber-text); }
 .field.is-invalid .err { display: block; }
 .consent { display: flex; gap: 10px; align-items: flex-start; font-size: .8rem; color: var(--bp-graphite); margin-bottom: var(--s-3); }
 .consent input { margin-top: 3px; width: 16px; height: 16px; accent-color: var(--bp-amber); flex: 0 0 auto; }
@@ -2219,7 +2294,7 @@ form.is-hidden { visibility: hidden; }
   background: var(--bp-black); color: var(--bp-off-white);
   padding: var(--gutter);
 }
-.page-plain .code { font-family: var(--font-grotesk); font-weight: 700; font-size: clamp(4rem, calc(16 * var(--vw-step)), 9rem); color: var(--bp-amber); line-height: 1; }
+.page-plain .code { font-family: var(--font-grotesk); font-weight: 700; font-size: clamp(4rem, calc(16 * var(--vw-step)), 9rem); color: var(--bp-accent-ink); line-height: 1; }
 .page-plain h1 { font-family: var(--font-serif); font-weight: 600; font-size: 1.6rem; margin-top: var(--s-3); }
 .page-plain p { margin-top: var(--s-2); color: color-mix(in srgb, var(--bp-off-white) 65%, transparent); }
 .page-plain .btn { margin-top: var(--s-4); }
@@ -2254,9 +2329,12 @@ form.is-hidden { visibility: hidden; }
   box-shadow: 0 4px 14px color-mix(in srgb, var(--bp-charcoal) 14%, transparent);
 }
 /* Точки-заклёпки — те самые «кружки», которые заказчик просил увести в
-   золото (правка 04.08). Были цвета чернил плашки: тёмные на светлой,
-   светлые на тёмной. Теперь золото на обеих, и заклёпка читается как
-   украшение, а не как часть надписи. */
+   акцент (правка 04.08 — в золото, правка 07.08 — в Honey Garlic:
+   формулировка «для комбиков, кружков и т.д.» относится ровно к ним).
+   Были цвета чернил плашки: тёмные на светлой, светлые на тёмной.
+   Теперь акцент на обеих, и заклёпка читается как украшение, а не как
+   часть надписи. На тёмной плашке кейса honey звучит тише прежнего
+   золота (2.59:1 против 3.9) — но это украшение, и таково пожелание. */
 .plaque::before, .plaque::after {
   content: ""; position: absolute; top: 50%; width: 7px; height: 7px;
   border-radius: 50%; background: var(--bp-gold); opacity: 1;
@@ -2276,10 +2354,12 @@ form.is-hidden { visibility: hidden; }
   position: relative;
   /* Правка 04.08: секция окрашена в общий фон страницы. Раньше здесь стояло
      --bp-burgundy, но прежнее бордо #2B0E12 было почти чёрным и читалось
-     как «чуть тёплый чёрный» — то есть фактически тем же фоном. Новое
-     Deep Burgundy #5D1E21 куда светлее, и та же строка залила бы весь
-     блок команды сплошным цветным полем; вино в новой палитре — акцент,
-     а не подложка на экран. Откат: background: var(--bp-wine). */
+     как «чуть тёплый чёрный» — то есть фактически тем же фоном. Бордо
+     #5D1E21 было куда светлее, и та же строка залила бы весь блок команды
+     сплошным цветным полем. С палитрой 07.08 вывод не изменился: залить
+     секцию можно только balsamico (это и есть фон) либо coffee, который
+     от фона отличается на 1.15:1 — то есть неотличим.
+     Откат: background: var(--bp-coffee). */
   background: var(--bp-page); color: var(--bp-off-white);
   overflow: clip; /* ТЗ6 §2: ничто не видно за границами секции */
 }
@@ -2319,8 +2399,9 @@ form.is-hidden { visibility: hidden; }
    стилях она числится, и проверка «на странице только пять цветов» без
    этой строки каждый раз спотыкается о ложную находку. */
 .hteam__path, .cgal__clipsvg { fill: none; }
-.hteam__path-base { stroke: color-mix(in srgb, var(--bp-gold) 50%, transparent); stroke-dasharray: .012 .008; }
-.hteam__path-glow { stroke: var(--bp-amber); }
+/* трасса — волосяная линия по фону секции, оба слоя «знаковые» */
+.hteam__path-base { stroke: color-mix(in srgb, var(--bp-accent-ink) 50%, transparent); stroke-dasharray: .012 .008; }
+.hteam__path-glow { stroke: var(--bp-accent-ink); }
 /* .hteam__float (декоры-напитки) удалены по ТЗ16 §2 */
 .hstation {
   position: relative;
@@ -2384,7 +2465,7 @@ form.is-hidden { visibility: hidden; }
   /* .13 → .11em: самая длинная роль («Creative Head Bartender & R&D Lead»)
      при .13em переставала вставать в строку даже на карточке 461px */
   letter-spacing: .11em; text-transform: uppercase;
-  color: var(--bp-amber);
+  color: var(--bp-accent-ink);
 }
 /* Правка 03.08 (вторая): не абзац, а строки-должности, как в презентации
    «Barpoint Bars» (сл. 4–8) — тот же капс и трекинг, что у янтарной роли
@@ -2528,8 +2609,10 @@ form.is-hidden { visibility: hidden; }
    наведении всегда. Значения один в один с :focus-visible, иначе на
    карточке под курсором И в фокусе было бы два разных кольца. */
 .ccard:hover {
+  /* обводка идёт по кромке светлой карточки — honey; кольцо отступает
+     на 3px и попадает уже на тёмный фон секции — whiskey */
   border-color: color-mix(in srgb, var(--bp-gold) 55%, transparent);
-  outline: 2px solid var(--bp-amber); outline-offset: 3px;
+  outline: 2px solid var(--bp-accent-ink); outline-offset: 3px;
   box-shadow: 0 18px 44px color-mix(in srgb, var(--bp-charcoal) 16%, transparent);
   transform: translateY(-3px);
 }
@@ -2683,7 +2766,7 @@ form.is-hidden { visibility: hidden; }
 }
 .final__title em {
   font-family: var(--font-serif); font-style: italic; font-weight: 600;
-  letter-spacing: normal; color: var(--bp-amber);
+  letter-spacing: normal; color: var(--bp-accent-ink);
 }
 /* Шаг между строками ужат с 16 до 8px: сами строки подросли до 44px ради
    пальца (см. .final__contact), и при прежнем шаге просвет между номером и
@@ -2702,10 +2785,10 @@ form.is-hidden { visibility: hidden; }
 }
 .final__ico {
   width: 22px; height: 22px; flex: none;
-  fill: var(--bp-amber); transition: fill .25s var(--ease);
+  fill: var(--bp-accent-ink); transition: fill .25s var(--ease);
 }
 .final__contacts .value { font-size: 1.15rem; transition: color .25s var(--ease); }
-.final__contact:hover .value, .final__contact:focus-visible .value { color: var(--bp-amber); }
+.final__contact:hover .value, .final__contact:focus-visible .value { color: var(--bp-accent-ink); }
 .final__sig { width: 120px; margin-top: var(--s-2); opacity: .8; }
 
 /* Правка 31.07 (четвёртая): карточка формы МОЛОЧНАЯ.
@@ -2757,7 +2840,7 @@ form.is-hidden { visibility: hidden; }
   font-size: 1rem;
 }
 .form-card .field input::placeholder { color: color-mix(in srgb, var(--bp-charcoal) 38%, transparent); }
-.form-card .field.is-invalid input { border-color: var(--bp-wine); }
+.form-card .field.is-invalid input { border-color: var(--bp-amber-text); }
 /* графит (--bp-graphite) на креме даёт всего 4.25:1 — ниже нормы
    4.5:1 для мелкого текста (ТЗ 9.3); берём тот же тон, но глубже */
 .form-card .consent { color: color-mix(in srgb, var(--bp-charcoal) 68%, transparent); }
@@ -2782,7 +2865,11 @@ form.is-hidden { visibility: hidden; }
 .footer { color: var(--bp-off-white); padding-block: var(--s-3); }
 .footer__bottom {
   display: flex; flex-wrap: wrap; gap: var(--s-2) var(--s-4);
-  font-size: .78rem; color: color-mix(in srgb, var(--bp-off-white) 50%, transparent);
+  /* 50% → 58% (правка 07.08): шампань темнее прежнего крема, и на
+     половине прозрачности служебная строка давала 3.90:1 при норме 4.5
+     (на креме было 4.37 — тоже мимо, просто ближе). На 58% выходит
+     4.87. Замер попиксельный, как и всё в этом файле. */
+  font-size: .78rem; color: color-mix(in srgb, var(--bp-off-white) 58%, transparent);
 }
 .footer__bottom a { color: inherit; }
 
