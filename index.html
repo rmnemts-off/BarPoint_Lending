@@ -31,9 +31,9 @@
   <link rel="preload" href="assets/fonts/roslindale-i-cyrillic.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="assets/fonts/apoc-400-cyrillic.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="assets/fonts/copperplate-400-cyrillic.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="preload" href="assets/img/hero-retro-mob-800.webp" as="image" media="(max-width: 767px)">
-  <link rel="preload" href="assets/img/hero-retro-1200.webp" as="image" media="(min-width: 768px) and (max-width: 1024px)">
-  <link rel="preload" href="assets/img/hero-retro-2000.webp" as="image" media="(min-width: 1025px)">
+  <link rel="preload" href="assets/img/hero-lounge-mob-800.webp" as="image" media="(max-width: 767px)">
+  <link rel="preload" href="assets/img/hero-lounge-1200.webp" as="image" media="(min-width: 768px) and (max-width: 1024px)">
+  <link rel="preload" href="assets/img/hero-lounge-1386.webp" as="image" media="(min-width: 1025px)">
   <link rel="stylesheet" href="assets/css/fonts.css">
   <link rel="stylesheet" href="assets/css/style.css">
 
@@ -128,22 +128,29 @@
      стоит фолбэк-фото. Чтобы включить видео: раскомментировать <video>. -->
 <section class="hero" id="top">
   <div class="hero__media" data-hero-media>
-    <!-- ТЗ8 §2 (возврат по просьбе заказчика 17.07): ретро-натюрморт —
-         негрони на зелёном бархате (слайд 81 брендбука, извлечён из PDF
-         2188×1213; заменить исходником полного разрешения, когда передаст
-         заказчик). Кадр горизонтальный; на мобильных — портретный кроп
-         вокруг стакана (art-direction через <picture>). -->
+    <!-- ПРАВКА 07.08 (просьба заказчика): главный кадр — двое в креслах,
+         золотой столик с коктейлями между ними. Прежний ретро-натюрморт с
+         негрони на зелёном бархате (файлы hero-retro-*) удалён: он и так
+         был вырезкой из PDF брендбука в 2188×1213, полного разрешения
+         заказчик так и не прислал.
+         РАЗРЕШЕНИЕ — УЗКОЕ МЕСТО. Исходник всего 1386×780, а герой тянется
+         во всю ширину окна: на 1512 при dpr 2 нужно 3024px, то есть кадр
+         даёт 46% и на большом экране будет мягким. Апскейлить не стали —
+         детали это не добавляет. Ступень 1386 — родной размер, выше в
+         srcset не поднимаемся, чтобы браузер не растягивал файл сверх него.
+         Кадр горизонтальный (1.777) — почти ровно окно; на мобильных
+         портретный кроп 4:5 (art-direction через <picture>). -->
     <picture>
       <source media="(max-width: 767px)"
-              srcset="assets/img/hero-retro-mob-600.webp 600w, assets/img/hero-retro-mob-800.webp 800w"
+              srcset="assets/img/hero-lounge-mob-600.webp 600w, assets/img/hero-lounge-mob-800.webp 800w"
               sizes="100vw" width="800" height="1000">
-      <img src="assets/img/hero-retro-2000.webp"
-           srcset="assets/img/hero-retro-800.webp 800w, assets/img/hero-retro-1200.webp 1200w, assets/img/hero-retro-2000.webp 2000w"
-           sizes="100vw" width="2000" height="1109"
-           alt="Негрони в гранёном стакане на зелёном бархате — ретро-натюрморт с игральными костями, зажигалкой и долларом"
+      <img src="assets/img/hero-lounge-1386.webp"
+           srcset="assets/img/hero-lounge-800.webp 800w, assets/img/hero-lounge-1200.webp 1200w, assets/img/hero-lounge-1386.webp 1386w"
+           sizes="100vw" width="1386" height="780"
+           alt="Двое гостей в креслах и золотой столик с коктейлями между ними"
            fetchpriority="high" decoding="async">
     </picture>
-    <!-- <video autoplay muted loop playsinline poster="assets/img/hero-retro-2000.webp">
+    <!-- <video autoplay muted loop playsinline poster="assets/img/hero-lounge-1386.webp">
            <source src="assets/video/hero-loop.mp4" type="video/mp4"></video> -->
   </div>
   <!-- Правка 30.07: янтарная строка-eyebrow «Консалтинг барных и кофейных
@@ -374,7 +381,7 @@
            второй карточки, и она общая для ряда, выводимого трансформом. -->
       <div class="wcard__aside wcard__aside--media">
         <figure class="wcard__media">
-          <img src="assets/img/svc-coffee-1-1000.webp" width="1000" height="1250" alt="Бариста готовит пролив за стойкой" loading="eager" fetchpriority="low" decoding="async">
+          <img src="assets/img/svc-news-1267.webp" width="1267" height="1152" alt="Гость за столиком с газетой «BARPOINT IS A SYSTEM»" loading="eager" fetchpriority="low" decoding="async">
         </figure>
       </div>
       <div class="wcard__panel">
@@ -412,15 +419,15 @@
            влияют, а к стопке приезжают готовыми.
            Остальным картинкам сайта lazy НЕ трогаем — там обычный поток,
            и отложенная загрузка работает как задумано. -->
-      <!-- Правка 07.08: кадр заменён по просьбе заказчика. Форма исходника
-           (1.09) выбрана не случайно: у .wcard__media жёсткой формы нет —
-           на десктопе это половина ряда (замер 1440×900: 698×734, то есть
-           0.95), а до 1024px включается aspect-ratio 4/3. Один файл режется
-           двумя разными окнами, поэтому кадр держим между ними. Здесь с
-           боков уходит по 88px, все четыре стакана остаются в кадре. -->
+      <!-- Правка 07.08 (вторая): сюда переехал кадр с мартини — заказчик
+           попросил его именно в «Проектирование и запуск». Файл тот же, что
+           стоял в третьей карточке, поэтому имя осталось прежним
+           (svc-coupes): пересохранять один и тот же кадр под новым именем
+           смысла нет. Прежние стаканы PIMS в снегу (svc-pims-1350) сняты.
+           Про форму 1.09 — см. общий комментарий у первой карточки. -->
       <div class="wcard__aside wcard__aside--media">
         <figure class="wcard__media">
-          <img src="assets/img/svc-pims-1350.webp" width="1350" height="1235" alt="Стаканы PIMS в снегу" loading="eager" fetchpriority="low" decoding="async">
+          <img src="assets/img/svc-coupes-1300.webp" width="1300" height="1192" alt="Мартини с оливками на шпажке, дыня и сыр на сервированном столе" loading="eager" fetchpriority="low" decoding="async">
         </figure>
       </div>
       <div class="wcard__panel">
@@ -456,15 +463,16 @@
 
     <!-- 3-й блок файла заказчика. Текст СЛЕВА — снова --flip. -->
     <article class="wcard wcard--amber wcard--flip">
-      <!-- Правка 07.08: кадр заменён по просьбе заказчика. Исходник снят
-           широко (2117×1192, 1.78), и в десктопное окно из него попадало бы
-           1132px — больше половины ширины за краем, вместе с главным
-           бокалом: он стоит слева. Поэтому кадр подрезан справа до 1300px,
-           бокал вышел в середину окна с запасом ~57px, дальняя пара бокалов
-           ушла. Форма получилась 1.09 — та же, что у соседнего PIMS. -->
+      <!-- Правка 07.08 (вторая): кадр с документами. Исходник 1362×735 снят
+           очень широко (1.85), кадрирован в 1.10 со сдвигом влево (fx .42) —
+           бумаги и кофе встали в середину окна.
+           ОГОВОРКА: после кадрирования остаётся 809px, а коробка на 1920
+           просит 1890 device px — это 43%, на большом экране кадр будет
+           мягким. Кадрирование тут ни при чём: cover срезал бы ровно
+           столько же, просто по центру. Нужен исходник крупнее. -->
       <div class="wcard__aside wcard__aside--media">
         <figure class="wcard__media">
-          <img src="assets/img/svc-coupes-1300.webp" width="1300" height="1192" alt="Коктейли в бокалах купе на сервированном столе" loading="eager" fetchpriority="low" decoding="async">
+          <img src="assets/img/svc-docs-809.webp" width="809" height="735" alt="Документы, договоры и кофе на тёмном столе — вид сверху" loading="eager" fetchpriority="low" decoding="async">
         </figure>
       </div>
       <div class="wcard__panel">
@@ -503,7 +511,7 @@
     <article class="wcard wcard--ivory">
       <div class="wcard__aside wcard__aside--media">
         <figure class="wcard__media">
-          <img src="assets/img/svc-bar-2-1000.webp" width="1000" height="1136" alt="Коктейль из авторской карты" loading="eager" fetchpriority="low" decoding="async">
+          <img src="assets/img/svc-scales-725.webp" width="725" height="659" alt="Стакан PIMS на барных весах при отработке рецептуры" loading="eager" fetchpriority="low" decoding="async">
         </figure>
       </div>
       <div class="wcard__panel">
