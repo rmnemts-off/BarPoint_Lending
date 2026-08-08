@@ -94,6 +94,13 @@
          ПРАВИЛО ТЗ5 §3 в силе: логотип не касается заголовка/кнопок
          ни в одной фазе полёта — при нарушении уменьшать логотип, не текст. */
       var frac = window.innerWidth < 768 ? 0.78 : (window.innerHeight < 760 ? 0.50 : 0.66);
+      /* ПРАВКА 08.08 (слова заказчика: «логотип большой немного опустить
+         вниз»): центр знака опущен с 32% до 35.5% высоты экрана. Ниже
+         нельзя без пересбора первого экрана: подзаголовок одновременно
+         вырос кеглем вверх (см. .hero__title), и запретная зона до текста
+         начала бы ужимать сам знак — п. maxW ниже. Константа одна на оба
+         места расчёта. */
+      var CY = 0.355;
       /* Кап в 1000px снят 31.07: он существовал только потому, что знак был
          растром 800px и выше 1.25× начинал мылить. Теперь знак векторный
          (инлайновый SVG в шапке), предела по разрешению нет — ширину
@@ -114,16 +121,16 @@
            трансформы игнорирует — берём положение по цепочке offsetParent. */
         var eyeDocTop = 0, node = heroTop;
         while (node) { eyeDocTop += node.offsetTop; node = node.offsetParent; }
-        var maxHalfH = (eyeDocTop - GAP) - window.innerHeight * 0.32;
+        var maxHalfH = (eyeDocTop - GAP) - window.innerHeight * CY;
         var maxW = (maxHalfH * 2) / Math.max(ratio, 0.01);
         if (maxW > 160) startW = Math.min(startW, maxW);
       }
       return {
         /* масштаб — от фактической ширины логотипа (offsetWidth без transform) */
         startScale: startW / Math.max(heroLogo.offsetWidth, 1),
-        /* ТЗ5 §3: центр логотипа на 32% высоты экрана — верхняя зона,
-           текстовая группа живёт ниже 52vh, зоны не пересекаются */
-        startY: window.innerHeight * 0.32 - s.top - s.height / 2
+        /* центр логотипа на CY высоты экрана (правка 08.08, было 32%) —
+           верхняя зона, текстовая группа живёт ниже, зоны не пересекаются */
+        startY: window.innerHeight * CY - s.top - s.height / 2
       };
     };
     var fm = measureFlight();
@@ -222,8 +229,12 @@
   function catLabel(c) {
     var t = c.categoryLabel || CAT_LABEL[c.category];
     /* «+» выносим в свой span: у Roslindale это волосяной штрих, и на
-       кегле рубрики знак почти пропадал. Утолщение делает CSS. */
-    return t.replace(/\+/g, '<span class="cat__plus">+</span>');
+       кегле рубрики знак почти пропадал. Утолщение делает CSS.
+       Правка 08.08: тот же приём для дефиса — заказчик попросил дефис
+       в «Десерт-бар» у YUMMS «чуть жирнее»; правило то же, обводка
+       тоньше плюсовой (см. .cat__dash в style.css). */
+    return t.replace(/\+/g, '<span class="cat__plus">+</span>')
+      .replace(/-/g, '<span class="cat__dash">-</span>');
   }
 
   function logoHTML(c) {
@@ -851,8 +862,14 @@
     if (m && m.img) {
       coverTitle.classList.remove("cinfo__title--type");
       coverTitle.classList.add("cinfo__title--mark");
-      coverTitle.innerHTML = '<img class="cinfo__mark" src="' + m.img +
-        '" alt="" style="--ar:' + m.ar + ";--k:" + m.k + '" decoding="async">';
+      /* ПРАВКА 08.08 (слова заказчика): в развороте знак стоит ПОЛНОЙ
+         версией — с мелкой подписью под именем (MOSCOW, SHOP & BAR,
+         DINE & BAR…), поле mark.cover; на плашках в ленте — чистой (img).
+         Суффикс «+ hide» у Memo раньше жил только на плашке (plaqueHTML)
+         и в разворот не попадал вовсе — теперь ставится и здесь. */
+      coverTitle.innerHTML = '<img class="cinfo__mark" src="' + (m.cover || m.img) +
+        '" alt="" style="--ar:' + m.ar + ";--k:" + m.k + '" decoding="async">' +
+        (m.suffix ? '<span class="cinfo__marksuffix">' + m.suffix + "</span>" : "");
       return true;
     }
     /* знака нет — имя набирается антиквой смешанным регистром, ровно
@@ -1920,7 +1937,9 @@
     var teamTextBottom = function () {
       if (!teamSec) return -1e9;
       var secTop = teamSec.getBoundingClientRect().top, low = 0;
-      var nodes = teamSec.querySelectorAll(".hstation__creds, .hstation--intro .h2");
+      /* Правка 08.08: строки-регалии (.hstation__creds) сняты из разметки —
+         нижний текст станции теперь роль */
+      var nodes = teamSec.querySelectorAll(".hstation__role, .hstation--intro .h2");
       for (var i = 0; i < nodes.length; i++) {
         var b = nodes[i].getBoundingClientRect();
         if (b.width && b.bottom - secTop > low) low = b.bottom - secTop;

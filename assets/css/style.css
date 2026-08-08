@@ -337,11 +337,15 @@ ul, ol { list-style: none; }
 .lead { font-size: 1.1rem; color: color-mix(in srgb, var(--bp-off-white) 72%, transparent); max-width: 46em; }
 .section--black .lead, .section--burgundy .lead { color: color-mix(in srgb, var(--bp-off-white) 72%, transparent); }
 
-.sec-head { margin-bottom: var(--s-6); }
+/* ПРАВКА 08.08 (заказчик: «расстояние между названиями блоков и самими
+   блоками большевато»): подвал шапки секции ужат на ступень —
+   48 -> 40 на мобильном, 64 -> 48 на десктопе. Тот же шаг у .scn-head
+   («Три сценария работы»), чтобы ритм заголовков был единый. */
+.sec-head { margin-bottom: 40px; }
 .sec-head .pill { margin-bottom: var(--s-3); }
 .sec-head .h2 { max-width: 18em; }
 .sec-head .lead { margin-top: var(--s-2); }
-@media (min-width: 1024px) { .sec-head { margin-bottom: var(--s-8); } }
+@media (min-width: 1024px) { .sec-head { margin-bottom: var(--s-6); } }
 
 /* ---------- Кнопки (4.6) ---------- */
 .btn {
@@ -359,6 +363,12 @@ ul, ol { list-style: none; }
    акцент никуда не делся, он стал реакцией; тот же приём, что у
    .btn--send. Прежние подсветки #D9AC55 / #DDB25E были осветлённым
    янтарём и в новой палитре лишние. */
+/* will-change (правка 08.08): обе CTA двигаются на ховере (translateY), и
+   без подсказки браузер выносил кнопку на собственный слой ПРЯМО в момент
+   наведения — растеризация на первом кадре давала видимый затык (жалоба
+   заказчика: «кнопка „обсудить проект“ при наведении подлагивает»).
+   С will-change слой существует заранее, ховер начинается без рывка. */
+.btn--primary, .btn--send { will-change: transform; }
 .btn--primary { background: var(--bp-cream); color: var(--bp-charcoal); }
 /* на наведении кнопка заливается honey, и чернила ОБЯЗАНЫ смениться на
    светлые: тёмные на honey — 2.59:1 (на прежнем золоте было 6.5, и
@@ -677,7 +687,10 @@ ul, ol { list-style: none; }
   font-family: var(--font-grotesk);
   font-style: normal; font-weight: 700;
   /* правка 30.07: +30% к кеглю (было .95/1.5/1.55) */
-  font-size: clamp(1.25rem, calc(1.95 * var(--vw-step)), 2rem);
+  /* правка 08.08: ещё +15% (заказчик: «сделать чуть большим шрифтом,
+     нижний край на месте»). Низ держится сам: .hero — flex-колонка с
+     justify-content: flex-end, контент прижат к низу и растёт вверх. */
+  font-size: clamp(1.4rem, calc(2.25 * var(--vw-step)), 2.3rem);
   line-height: 1.5; letter-spacing: .12em;
   text-transform: uppercase;
   text-shadow: 0 2px 24px color-mix(in srgb, var(--bp-charcoal) 60%, transparent);
@@ -796,6 +809,9 @@ ul, ol { list-style: none; }
 /* PIMS — чистая капитель без выносных, поэтому высота знака = высота
    капители соседей (у «S» лишь типографский овершут в пару пикселей) */
 .mq__img--pims  { height: calc(var(--mq) * .76); }
+/* YUMMS (правка 08.08): слово толстое и округлое, как у PIMS — та же
+   ступень высоты даёт им одинаковый оптический вес в строке */
+.mq__img--yumms { height: calc(var(--mq) * .76); }
 /* LEPS.ASIA — та же история, что у PIMS: файл (600×88) обрезан ровно по
    капители, выносных нет, поэтому и множитель тот же. Знак вчетверо
    длиннее прочих — это длина самого слова, ужимать его по высоте ради
@@ -857,7 +873,11 @@ ul, ol { list-style: none; }
   max-width: none;
   font-family: "Roslindale Display Condensed", "Times New Roman", serif;
   font-style: normal; font-weight: 700;
-  font-size: clamp(2.5rem, calc(6 * var(--vw-step)), 5.4rem);
+  /* правка 08.08 (заказчик: «шрифт соответственно побольше» — вместе со
+     сменой текста на «Кофейни, бары, рестораны»): вилка поднята на ~17%.
+     Требование одной строки в силе: новый текст короче прежнего, на 1024
+     влезает с запасом. */
+  font-size: clamp(2.9rem, calc(7 * var(--vw-step)), 6.3rem);
   line-height: 1.04; letter-spacing: .027em;
   text-transform: uppercase;
   color: var(--bp-off-white);
@@ -1199,7 +1219,6 @@ ul, ol { list-style: none; }
 .wcard__list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; width: 100%; }
 .wcard__list li {
   display: flex; align-items: flex-start; gap: 20px;
-  padding-block: 7px;
   /* 19.8px — просьба заказчика 05.08: пункт на 10% крупнее. Это
      единственное сознательное расхождение с типографикой референса, у
      него text-[18px] на любой ширине. Интерлиньяж считать не нужно, он
@@ -1213,8 +1232,19 @@ ul, ol { list-style: none; }
      766px при 772 доступных — шесть пикселей до кромки, то есть не
      раскладка, а везение. При семи она 755, запас 17. Каждый пиксель
      здесь идёт восьмикратно: пунктов в карточке восемь, поля с двух
-     сторон. */
-  font-size: 1.35rem; line-height: 1.5;
+     сторон.
+     ПРАВКА 08.08 (заказчик: «на Windows текст занимает только часть
+     блока, на macOS блок заполнен»). Причина не в системе, а в высоте
+     окна: панель растёт от окна (100vh − 240), а кегль был жёсткий —
+     21.6px. На маковских ~900px всё сходилось, на виндовых 1080 панель
+     выше на 180px, и тот же текст заполнял её на две трети. Кегль и
+     вертикальные поля пункта теперь считаются от ВЫСОТЫ окна с той же
+     точкой отсчёта: 2.4vh на 900 — ровно прежние 21.6px (на маке не
+     меняется ничего), на 1080 — 25.9px, и панель заполнена так же.
+     Замер выше (766/772 на 1440×900) остаётся в силе: на этой высоте
+     формула даёт прежние числа один в один. */
+  font-size: clamp(1.2rem, 2.4vh, 1.72rem); line-height: 1.5;
+  padding-block: clamp(6px, 0.78vh, 9px);
   border-bottom: 1px dashed;
 }
 .wcard__list li:first-child { border-top: 1px dashed; }
@@ -1415,7 +1445,8 @@ ul, ol { list-style: none; }
    Condensed (не курсивный алиас --font-serif): курсив снят по правке.
    Размер задан в vw, а строка не переносится, поэтому её ширина
    остаётся постоянной долей экрана на любой ширине окна. */
-.scn-head { text-align: center; margin-bottom: var(--s-8); }
+/* margin: s-8 -> s-6 (правка 08.08, общий шаг с .sec-head — см. там) */
+.scn-head { text-align: center; margin-bottom: var(--s-6); }
 .scn-head__title {
   font-family: "Roslindale Display Condensed", "Times New Roman", serif;
   font-style: normal; font-weight: 700;
@@ -1606,7 +1637,9 @@ ul, ol { list-style: none; }
   max-width: none;
   font-family: "Roslindale Display Condensed", "Times New Roman", serif;
   font-style: normal; font-weight: 700;
-  font-size: clamp(3.05rem, calc(7.4 * var(--vw-step)), 6.7rem);
+  /* правка 08.08 (заказчик: «„наши проекты“ сделай большим шрифтом»):
+     вилка поднята на ~13% — дальше некуда, на 1024 упрётся в края */
+  font-size: clamp(3.4rem, calc(8.4 * var(--vw-step)), 7.6rem);
   line-height: 1.02; letter-spacing: .027em;
   text-transform: uppercase;
   color: var(--bp-off-white); /* правка 03.08: секция кейсов стала тёмной */
@@ -1615,11 +1648,19 @@ ul, ol { list-style: none; }
      же цветом — она наращивает штрих, а не рисует контур. */
   -webkit-text-stroke: max(1px, .0135em) currentColor;
 }
+/* ПРАВКА 08.08 (заказчик: «лучше убрать курсив и сделать более
+   гармонично»): лид набирался --font-serif, а его первый шрифт —
+   Roslindale ITALIC, отсюда курсив. Теперь это спокойная капс-строка
+   Copperplate — тот же голос, что у навигации и подзаголовка героя;
+   под гигантским серифным заголовком она читается подписью, а не
+   вторым заголовком. Кегль снижен соразмерно смене роли. */
 .cases-head .lead {
-  max-width: 34em; margin-inline: auto; margin-top: var(--s-3);
-  font-family: var(--font-serif); font-style: italic;
-  font-size: clamp(1.18rem, calc(1.7 * var(--vw-step)), 1.7rem);
-  line-height: 1.35;
+  max-width: 46em; margin-inline: auto; margin-top: var(--s-3);
+  font-family: var(--font-grotesk);
+  font-style: normal; font-weight: 600;
+  font-size: clamp(.92rem, calc(1.1 * var(--vw-step)), 1.08rem);
+  letter-spacing: .16em; text-transform: uppercase;
+  line-height: 1.6;
 }
 /* «Тише» — только там, где подпись уже крупная (≥24px): на этом кегле
    AA требует 3:1, и приглушённый графит его держит (3.26:1). Ниже 1280
@@ -1942,6 +1983,16 @@ ul, ol { list-style: none; }
   display: flex; align-items: center; justify-content: center;
 }
 .cinfo__mark { display: block; width: 100%; height: 100%; object-fit: contain; }
+/* «+ hide» у Memo в развороте (правка 08.08): раньше суффикс жил только
+   на плашке в ленте, в заголовке разворота знак стоял без него. Кегль —
+   от полосы знака, той же логикой, что .cinfo__title--type. */
+.cinfo__marksuffix {
+  flex: 0 0 auto; margin-left: .4em;
+  font-family: "Roslindale Display Condensed", "Times New Roman", serif;
+  font-weight: 500; font-style: normal; text-transform: none;
+  font-size: calc(var(--cv-mark-h) * .42); line-height: 1;
+  opacity: .85;
+}
 .cinfo__subwrap { width: 50%; }
 @media (min-width: 1024px) {
   /* Правка 03.08 (вторая): w-col-3 → w-col-4, вровень с заголовком.
@@ -2063,7 +2114,9 @@ ul, ol { list-style: none; }
 /* Маркер списка в 12px лежит на фоне разворота, а фон тёмный: --cv-theme
    (honey) дал бы 2.59:1 и маркер потерялся бы. Заливка кнопки ниже —
    другое дело, там honey работает пятном под светлыми чернилами. */
-.cworks__bullet svg { width: 100%; height: 100%; display: block; fill: var(--bp-accent-ink); }
+/* fill: accent-ink -> --cv-theme (правка 08.08, заказчик: «точки такого же
+   цвета, как и кнопка») — тот же honey, которым залита .cbtn__bg */
+.cworks__bullet svg { width: 100%; height: 100%; display: block; fill: var(--cv-theme); }
 .cworks li + li { margin-top: 6px; }
 .cworks__text { font-size: var(--cv-cardtext); line-height: 1.3; }
 
@@ -2219,7 +2272,26 @@ ul, ol { list-style: none; }
 .field.is-invalid input, .field.is-invalid select { border-color: var(--bp-amber-text); }
 .field.is-invalid .err { display: block; }
 .consent { display: flex; gap: 10px; align-items: flex-start; font-size: .8rem; color: var(--bp-graphite); margin-bottom: var(--s-3); }
-.consent input { margin-top: 3px; width: 16px; height: 16px; accent-color: var(--bp-amber); flex: 0 0 auto; }
+/* ПРАВКА 08.08 (заказчик: «белый квадратик для галочки сделай под цвет
+   формы»): нативный чекбокс всегда рисуется белым — appearance: none и
+   рисуем сами. Пустой — квадрат цвета карточки с тёмной рамкой, отмеченный
+   заливается янтарём, галочка — вписанный SVG-штрих кремом. */
+.consent input {
+  appearance: none; -webkit-appearance: none;
+  margin-top: 3px; width: 17px; height: 17px; flex: 0 0 auto;
+  background: var(--bp-off-white);
+  border: 2px solid var(--bp-dark-text); border-radius: 4px;
+  display: inline-grid; place-content: center;
+  cursor: pointer;
+}
+.consent input::before {
+  content: ""; width: 11px; height: 11px; transform: scale(0);
+  background: var(--bp-cream);
+  clip-path: polygon(14% 44%, 0 62%, 40% 100%, 100% 16%, 84% 2%, 38% 66%);
+}
+.consent input:checked { background: var(--bp-amber); border-color: var(--bp-amber); }
+.consent input:checked::before { transform: scale(1); }
+.consent input:focus-visible { outline: 2px solid var(--bp-amber); outline-offset: 2px; }
 .consent a { color: var(--bp-dark-text); }
 .form-card .btn { width: 100%; }
 /* .form-note («Ответим в течение рабочего дня. Звонок-знакомство —
@@ -2456,8 +2528,16 @@ form.is-hidden { visibility: hidden; }
 .hstation__card .plaque {
   position: absolute; top: auto; left: 50%; transform: translate(-50%, -50%);
   max-width: 96%;
-  font-size: 1.18rem;
-  padding: 13px 48px;
+  /* ПРАВКА 08.08 (заказчик): обводка плашки с именем снята (кромку держат
+     контраст и тень), кегль имени поднят 1.18 -> 1.34rem, а точки-заклёпки
+     уравнены с плашками кейсов — 9px против базовых 7 (см. .ccard .plaque
+     в блоке ленты, там тот же размер). */
+  border: 0;
+  font-size: 1.34rem;
+  padding: 14px 50px;
+}
+.hstation__card .plaque::before, .hstation__card .plaque::after {
+  width: 9px; height: 9px;
 }
 /* ГРАБЛИ: это поле НЕ равно просвету под плашкой. Плашка вынута из потока
    (position: absolute) и приподнята на половину своей высоты, поэтому
@@ -2467,27 +2547,16 @@ form.is-hidden { visibility: hidden; }
    плашки — пересчитать и это число. */
 .hstation__role {
   margin-top: 46px;
-  font-family: var(--font-grotesk); font-size: 1.12rem; font-weight: 600;
+  /* 1.12 -> 1.26rem (правка 08.08: «шрифт у роли соответственно больше» —
+     в паре с ростом имени на плашке) */
+  font-family: var(--font-grotesk); font-size: 1.26rem; font-weight: 600;
   /* .13 → .11em: самая длинная роль («Creative Head Bartender & R&D Lead»)
      при .13em переставала вставать в строку даже на карточке 461px */
   letter-spacing: .11em; text-transform: uppercase;
   color: var(--bp-accent-ink);
 }
-/* Правка 03.08 (вторая): не абзац, а строки-должности, как в презентации
-   «Barpoint Bars» (сл. 4–8) — тот же капс и трекинг, что у янтарной роли
-   выше, только мельче и светлым. Абзац в 1.08rem/1.45 занимал под фото
-   до четырёх строк на человека и поднимал весь трек под шапку. */
-.hstation__creds {
-  margin-top: 10px;
-  font-family: var(--font-grotesk); font-size: .95rem; font-weight: 600;
-  /* трекинг ужат с .12 до .08em вместе с ростом кегля: капс с широким
-     трекингом на карточке в 358px (1280×720) переставал вставать в строку,
-     а каждая лишняя строка поднимает весь трек — см. комментарий в
-     index.html у секции команды */
-  letter-spacing: .08em; text-transform: uppercase;
-  line-height: 1.5;
-  color: color-mix(in srgb, var(--bp-off-white) 74%, transparent);
-}
+/* Строки-регалии (.hstation__creds) сняты 08.08 по просьбе заказчика
+   вместе с разметкой — под фото осталась только янтарная роль. */
 /* десктоп: пин на 100vh (движение ведёт GSAP) */
 @media (min-width: 1024px) and (prefers-reduced-motion: no-preference) {
   /* ГРАБЛИ: шапка фиксированная и лежит ПОВЕРХ секции, а трек центрируется
@@ -2519,9 +2588,8 @@ form.is-hidden { visibility: hidden; }
   .hstation__card { width: min(78vw, 360px); margin-inline: auto; }
   /* карточка тут ~293px — капс с трекингом ломается почти на каждой
      строке; кегль и трекинг ужимаем, как на низких десктопах */
-  .hstation__card .plaque { font-size: 1.02rem; padding: 11px 36px; }
-  .hstation__role { font-size: 1rem; letter-spacing: .1em; }
-  .hstation__creds { font-size: .86rem; letter-spacing: .06em; line-height: 1.45; }
+  .hstation__card .plaque { font-size: 1.14rem; padding: 12px 38px; }
+  .hstation__role { font-size: 1.12rem; letter-spacing: .1em; }
 }
 @media (min-width: 1024px) and (prefers-reduced-motion: reduce) {
   .hteam__viewport { overflow-x: auto; scroll-snap-type: x mandatory; }
@@ -2543,11 +2611,10 @@ form.is-hidden { visibility: hidden; }
      Маяков с его тремя строками регалий.
      Правка 03.08 (третья): вся ступень поднята вслед за базовой — порядок
      «имя > роль > подпись» тот же, просто на шаг мельче. */
-  .hstation__card .plaque { font-size: 1.05rem; padding: 11px 40px; }
+  .hstation__card .plaque { font-size: 1.18rem; padding: 12px 42px; }
   /* тот же расчёт, что и в базовом правиле: плашка здесь ниже, её половина
      съедает ~25px, оставляем просвет ~13px */
-  .hstation__role { margin-top: 38px; font-size: 1.02rem; letter-spacing: .1em; }
-  .hstation__creds { margin-top: 8px; font-size: .86rem; letter-spacing: .06em; line-height: 1.45; }
+  .hstation__role { margin-top: 38px; font-size: 1.14rem; letter-spacing: .1em; }
 }
 
 /* ============================================================
@@ -2599,14 +2666,29 @@ form.is-hidden { visibility: hidden; }
      задаёт vw-правило в конце блока. */
   width: clamp(320px, calc((100vw - 2 * var(--gutter) - 40px) / 2.3), 500px);
   background: var(--bp-cream); color: var(--bp-dark-text);
-  border: 1px solid color-mix(in srgb, var(--bp-charcoal) 10%, transparent);
+  /* ПРАВКА 08.08 (заказчик: «оставь только жёлтую обводку при наведении,
+     тонкую вокруг карточек убери»). Рамка не удалена, а обесцвечена:
+     border: 0 сдвинул бы раскладку ленты на 2px и замер её периода. */
+  border: 1px solid transparent;
   border-radius: 12px;
   /* Верхнее поле держит зазор до плашки: она садится наполовину выше
      кромки, и с укрупнённым кеглем прежние 32px упирались в фото. */
   padding: clamp(36px, calc(3.6 * var(--vw-step)), 56px) var(--s-3) var(--s-3);
   text-align: left;
   box-shadow: 0 12px 32px color-mix(in srgb, var(--bp-charcoal) 10%, transparent);
-  transition: border-color .3s var(--ease), box-shadow .3s var(--ease), transform .3s var(--ease);
+  transition: transform .3s var(--ease);
+}
+/* Тень наведения — заранее отрисованный ::after, ховер меняет только его
+   прозрачность (правка 08.08). Раньше transition стоял на самом
+   box-shadow: каждый кадр ховера браузер перерисовывал размытие 44px на
+   карточке 450×540, а лента при этом ещё и едет — карточки проезжают под
+   неподвижным курсором, и ховер вспыхивает на каждой. Opacity едет на
+   композиторе и главному потоку не стоит ничего. */
+.ccard::after {
+  content: ""; position: absolute; inset: -1px; border-radius: 12px;
+  box-shadow: 0 18px 44px color-mix(in srgb, var(--bp-charcoal) 16%, transparent);
+  opacity: 0; transition: opacity .3s var(--ease);
+  pointer-events: none; z-index: -1;
 }
 /* Правка 04.08: на ховере карточка получает ТУ ЖЕ янтарную обводку, что
    и после возврата из кейса. Клиент увидел её на просмотренной карточке
@@ -2615,13 +2697,12 @@ form.is-hidden { visibility: hidden; }
    наведении всегда. Значения один в один с :focus-visible, иначе на
    карточке под курсором И в фокусе было бы два разных кольца. */
 .ccard:hover {
-  /* обводка идёт по кромке светлой карточки — honey; кольцо отступает
-     на 3px и попадает уже на тёмный фон секции — whiskey */
-  border-color: color-mix(in srgb, var(--bp-gold) 55%, transparent);
+  /* правка 08.08: подсветка тонкой рамки снята вместе с самой рамкой —
+     осталось только жёлтое кольцо на тёмном фоне секции */
   outline: 2px solid var(--bp-accent-ink); outline-offset: 3px;
-  box-shadow: 0 18px 44px color-mix(in srgb, var(--bp-charcoal) 16%, transparent);
   transform: translateY(-3px);
 }
+.ccard:hover::after { opacity: 1; }
 /* Правка 31.07: плашка с названием кейса заметно крупнее и длиннее —
    кегль 11.8 → 24.8px на 1440 (два захода: +40%, затем ещё ×1.5).
    Посадка через translate(-50%,-50%) при top:0 — плашка сама садится
@@ -2718,6 +2799,10 @@ form.is-hidden { visibility: hidden; }
   -webkit-text-stroke: .055em currentColor;
   padding-inline: .05em;
 }
+/* Дефис рубрики («Десерт-бар» у YUMMS) — заказчик 08.08: «чуть жирнее».
+   Тот же приём обводкой, что у плюса выше, но вдвое легче: дефис — не
+   волосяной штрих, ему хватает лёгкого утолщения. */
+.ccard__meta .cat__dash { -webkit-text-stroke: .03em currentColor; }
 .ccard__desc {
   display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
   overflow: hidden;
@@ -2837,15 +2922,20 @@ form.is-hidden { visibility: hidden; }
    шестой ради подложки незачем: «колодец» здесь и так очерчен рамкой в
    два пикселя, поле и карточка теперь одного крема. */
 .form-card .field label { font-size: 1rem; color: var(--bp-dark-text); }
+/* ПРАВКА 08.08 (заказчик: «заливку полей сделай как у фона»): поля-колодцы
+   теперь ФОНОВОГО цвета страницы — тёмный balsamico на кремовой карточке,
+   в паре с такой же тёмной кнопкой «Отправить заявку» под ними. Прежняя
+   тёмная рамка на тёмной заливке не видна и снята; текст внутри — крем.
+   Фокус остаётся янтарным кольцом (общее правило .field input:focus). */
 .form-card .field input, .form-card .field select, .form-card .field textarea {
-  background: var(--bp-cream);
-  color: var(--bp-dark-text);
-  border: 2px solid var(--bp-dark-text);
+  background: var(--bp-charcoal);
+  color: var(--bp-off-white);
+  border: 2px solid var(--bp-charcoal);
   border-radius: 12px;
   padding: 15px 16px;
   font-size: 1rem;
 }
-.form-card .field input::placeholder { color: color-mix(in srgb, var(--bp-charcoal) 38%, transparent); }
+.form-card .field input::placeholder { color: color-mix(in srgb, var(--bp-off-white) 45%, transparent); }
 .form-card .field.is-invalid input { border-color: var(--bp-amber-text); }
 /* графит (--bp-graphite) на креме даёт всего 4.25:1 — ниже нормы
    4.5:1 для мелкого текста (ТЗ 9.3); берём тот же тон, но глубже */

@@ -120,7 +120,14 @@ window.BARPOINT_CASES = [
     id: "memo", slug: "memo", category: "bar", title: "Memo Dine & Bar + hide",
     logoImage: "assets/img/logo-memo.png",
     logoRatio: "643/202",
-    mark: { img: "assets/img/logo-memo-light.png", ar: 3.1832, k: 1.35, suffix: "+ hide" },
+    /* ПРАВКА 08.08 (слова заказчика): на плашке в ленте знак стоит БЕЗ
+       мелкой подписи (файл -plaque, подпись DINE & BAR срезана), в
+       развороте — полный (cover). k пересчитан так, что видимая высота
+       имени на плашке не изменилась: k_new = k_old × h_обрезки/H_полного;
+       ar — честная пропорция нового файла. Схема общая для Duran, Sixty,
+       Marcelo и YUMMS. */
+    mark: { img: "assets/img/logo-memo-plaque.png", ar: 4.7910, k: 0.896,
+            cover: "assets/img/logo-memo-light.png", suffix: "+ hide" },
     shortDescription: "Днём — высокая гастрономия, ночью — клуб с перформансами; два бара на этаже.",
     fullDescription: "Днём — ресторан высокой гастрономии, ночью — клуб с перформансами, танцами и концертами. Два бара на каждом этаже предлагают коктейльные карты, созданные, чтобы удивлять, провоцировать и вовлекать.",
     works: [
@@ -167,7 +174,10 @@ window.BARPOINT_CASES = [
     id: "sixty", slug: "sixty", category: "bar", title: "Sixty",
     logoImage: "assets/img/logo-sixty.png",
     logoRatio: "900/150",
-    mark: { img: "assets/img/logo-sixty-light.png", ar: 6.0, k: 1.35 },
+    /* 08.08: плашка без подписи RESTAURANT BAR MOSCOW, разворот с ней —
+       см. общий комментарий у Memo */
+    mark: { img: "assets/img/logo-sixty-plaque.png", ar: 11.5385, k: 0.702,
+            cover: "assets/img/logo-sixty-light.png" },
     shortDescription: "62-й этаж башни Москва-Сити — самый высокий ресторан премиум-класса в Восточной Европе.",
     fullDescription: "Самый высокий ресторан премиум-класса в Восточной Европе — на 62-м этаже башни Москва-Сити. Всемирно известные повара, развлекательная коктейльная карта, живая музыка с панорамным видом.",
     /* правка 02.08: externalMentions переведены в формат колонки
@@ -208,7 +218,11 @@ window.BARPOINT_CASES = [
        читается нормально. */
     logoImage: "assets/img/logo-duran.png",
     logoRatio: "1509/385",
-    mark: { img: "assets/img/logo-duran-light.png", ar: 3.9195, k: 1.8 },
+    /* 08.08: плашка без подписи MOSCOW, разворот с ней — см. Memo. Прежний
+       расчёт k=1.8 по строке DURAN BAR в полном файле остаётся верным:
+       новый k получен из него тем же правилом (1.8 × 245/385). */
+    mark: { img: "assets/img/logo-duran-plaque.png", ar: 6.1592, k: 1.145,
+            cover: "assets/img/logo-duran-light.png" },
     shortDescription: "Культовый бар с живой электронной музыкой; награды «лучший бар Москвы» 2015–2017.",
     fullDescription: "Культовый московский бар с живой электронной музыкой и концертами всемирно известных диджеев. Один из самых успешных проектов Москвы: признан лучшим баром столицы и отмечен множеством международных наград с 2015 по 2017 год.",
     externalMentions: [{ value: "2015–2017", label: "лучший бар Москвы" }],
@@ -289,7 +303,13 @@ window.BARPOINT_CASES = [
     id: "marcelo", slug: "marcelo", category: "bar", title: "Marcelo Miracles",
     logoImage: "assets/img/logo-marcelo.png",
     logoRatio: "603/39",
-    mark: { img: "assets/img/logo-marcelo-light.png", ar: 15.4615, k: 0.72 },
+    /* 08.08: в развороте — полный знак с подписью SHOP & BAR (cover).
+       Файл собран: строка MARCELO MIRACLES — прежний чёткий logo-marcelo-
+       light, подпись — вырезка по маске яркости из кадра 1 архива
+       «Часть 2» (633×212 в исходнике фото; там она единственный источник —
+       отдельным файлом заказчик знак с подписью не присылал). */
+    mark: { img: "assets/img/logo-marcelo-light.png", ar: 15.4615, k: 0.72,
+            cover: "assets/img/logo-marcelo-full.png" },
     shortDescription: "Проект дизайнера Марка Родовского: коктейльный бар, совмещённый с бутиком.",
     /* Правка 04.08: 254 → 208 знаков (см. Aina) */
     fullDescription: "Marcelo Miracles Shop & Bar — модный коктейльный бар и бутик. Проект дизайнера Марка Родовского объединяет гастрономию и фирменный магазин одежды. В основе карты — сезонные авторские коктейли и миксы на кранах.",
@@ -382,8 +402,12 @@ window.BARPOINT_CASES = [
     id: "pims", slug: "pims", category: "coffee", categoryLabel: "Чайная", title: "PIMS",
     logoText: "PIMS", logoStyle: "grotesk",
     logoImage: "assets/img/logo-pims.png",
-    logoRatio: "359/108",
-    mark: { img: "assets/img/logo-pims-light.png", ar: 3.3241, k: 0.95 },
+    /* 08.08: оба файла PIMS перегнаны из векторного «PIMS_key visual.pdf»
+       (qlmanage, 4200px): было 359×108 — вырезка из фото по маске яркости,
+       на ретине мылила; стало 838×254 с чистой кромкой. ar уточнён по
+       новому файлу. */
+    logoRatio: "838/254",
+    mark: { img: "assets/img/logo-pims-light.png", ar: 3.2992, k: 0.95 },
     shortDescription: "Международный бренд напитков: создан и вырос при участии команды BARPOINT.",
     /* Правка 04.08: 248 → 202 знака (см. Aina) */
     fullDescription: "Международный бренд напитков. Мы стояли у истоков PIMS: бренд создан при нашем участии и вырос вместе с нами — команда увеличила оборот от 2 млн до 5 млрд. В основе — тренды, виральность, технологичность.",
@@ -453,7 +477,16 @@ window.BARPOINT_CASES = [
        Кадры 1 и 3 отданы уже кадрированными: в исходниках по краям вшиты
        стрелки карусели, кроп в пропорцию галереи их срезает. */
     id: "yumms", slug: "yumms", category: "coffee", categoryLabel: "Десерт-бар", title: "YUMMS",
-    mark: { type: "antiqua" },
+    /* ПРАВКА 08.08: заказчик прислал знак (розовый, с подписью BY MARK
+       RODOVSKY) — антиква-набор снят. Знак оставлен в фирменном розовом,
+       как прислан; подпись в полной версии перекрашена в шампань — в
+       исходнике она тёмно-серая и на тёмном развороте пропадала.
+       На плашке и в трастстрипе — чистое слово без подписи (-plaque),
+       в развороте — полный (cover); правило то же, что у Memo выше. */
+    logoImage: "assets/img/logo-yumms.png",
+    logoRatio: "1400/334",
+    mark: { img: "assets/img/logo-yumms-plaque.png", ar: 5.3763, k: 0.95,
+            cover: "assets/img/logo-yumms.png" },
     shortDescription: "Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi aliquip.",
     fullDescription: "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum sed.",
     works: [

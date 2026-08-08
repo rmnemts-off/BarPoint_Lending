@@ -212,7 +212,7 @@
   <div class="marquee">
     <div class="marquee__track" data-marquee>
       <span class="marquee__item mq mq--logo">
-        <img class="mq__img mq__img--pims" src="assets/img/logo-pims-light.png" width="359" height="108" alt="PIMS" loading="lazy" decoding="async">
+        <img class="mq__img mq__img--pims" src="assets/img/logo-pims-light.png" width="838" height="254" alt="PIMS" loading="lazy" decoding="async">
       </span>
       <span class="marquee__item mq mq--duran">Duran Bar</span>
       <span class="marquee__item mq mq--logo">
@@ -237,7 +237,14 @@
            у Duran Bar здесь и на плашках кейсов (mark.type "antiqua").
            Порядок чередует знак и набор: два набранных имени подряд в
            бегущей строке читались бы как один длинный текстовый кусок. -->
-      <span class="marquee__item mq mq--type">YUMMS</span>
+      <!-- Правка 08.08: у YUMMS появился знак (см. data.js) — набор антиквой
+           заменён картинкой; в строке, как и на плашке, чистое слово без
+           подписи BY MARK RODOVSKY. Розовый фирменный — как у Invasion,
+           цветным знакам в строке можно. Poison Drop ждёт свой знак и
+           остаётся набором. -->
+      <span class="marquee__item mq mq--logo">
+        <img class="mq__img mq__img--yumms" src="assets/img/logo-yumms-plaque.png" width="1000" height="186" alt="YUMMS" loading="lazy" decoding="async">
+      </span>
       <span class="marquee__item mq mq--logo">
         <img class="mq__img mq__img--leps" src="assets/img/logo-leps-light.png" width="600" height="88" alt="LEPS.ASIA" loading="lazy" decoding="async">
       </span>
@@ -286,7 +293,7 @@
       <article class="scn__card" data-scn-card data-scn-i="0">
         <span class="scn__frame" aria-hidden="true"></span>
         <h3 class="scn__title" data-gsap-big-copy-on-scroll>Открываете<br>с нуля</h3>
-        <p class="scn__desc" data-gsap-text-on-scroll data-gsap-delay="0.1">Помогаем спроектировать концепцию, карту напитков и запустить точку без типичных ошибок старта.</p>
+        <p class="scn__desc" data-gsap-text-on-scroll data-gsap-delay="0.1">Помогаем спроектировать концепцию, меню и карту напитков и запустить точку без типичных ошибок на старте.</p>
         <figure class="scn__photo">
           <img src="assets/img/scenario-1-518.webp" width="518" height="658" alt="Молочный коктейль со взбитыми сливками и мороженое" loading="lazy" decoding="async">
         </figure>
@@ -295,7 +302,7 @@
       <article class="scn__card" data-scn-card data-scn-i="1">
         <span class="scn__frame" aria-hidden="true"></span>
         <h3 class="scn__title" data-gsap-big-copy-on-scroll>Упёрлись<br>в потолок</h3>
-        <p class="scn__desc" data-gsap-text-on-scroll data-gsap-delay="0.1">Разбираем, где теряются деньги и гости, и выстраиваем систему вместо ручного управления.</p>
+        <p class="scn__desc" data-gsap-text-on-scroll data-gsap-delay="0.1">Определяем причины, по которым бизнес перестал расти или теряет деньги, и устраняем их.</p>
         <figure class="scn__photo">
           <img src="assets/img/scenario-2-527.webp" width="527" height="669" alt="Коктейль с лаймом на золотом бархате" loading="lazy" decoding="async">
         </figure>
@@ -304,7 +311,7 @@
       <article class="scn__card" data-scn-card data-scn-i="2">
         <span class="scn__frame" aria-hidden="true"></span>
         <h3 class="scn__title" data-gsap-big-copy-on-scroll>Хотите<br>масштабироваться</h3>
-        <p class="scn__desc" data-gsap-text-on-scroll data-gsap-delay="0.1">Готовим бренд, стандарты и экономику так, чтобы формат можно было тиражировать.</p>
+        <p class="scn__desc" data-gsap-text-on-scroll data-gsap-delay="0.1">Готовим бренд, стандарты и экономику к развитию сети, запуску франшизы и выходу на новые рынки.</p>
         <figure class="scn__photo">
           <img src="assets/img/scenario-3-900.webp" width="900" height="1143" alt="Мартини с оливками и ретро-телефон на столе" loading="lazy" decoding="async">
         </figure>
@@ -384,7 +391,10 @@
       <!-- Правка 04.08: подзаголовок («От дизайна к вкусу…») снят по просьбе
            клиента, заголовок обязан стоять В ОДНУ СТРОКУ — см. кегль
            .wcards-head .h2 в style.css, он считается от ширины окна. -->
-      <h2 class="h-serif h2" data-gsap-big-copy-on-scroll>Бары, рестораны, кофейни — система одна</h2>
+      <!-- Правка 08.08 (слова заказчика): «Бары, рестораны, кофейни —
+           система одна» -> «Кофейни, бары, рестораны»; кегль поднят в
+           .wcards-head .h2 (style.css). -->
+      <h2 class="h-serif h2" data-gsap-big-copy-on-scroll>Кофейни, бары, рестораны</h2>
     </div>
   </div>
 
@@ -536,7 +546,7 @@
           <li><span><span class="wcard__lead">Точные рецептуры</span>, которые легко повторить</span></li>
           <li><span><span class="wcard__lead">Баланс</span> вкуса, скорости и себестоимости</span></li>
           <li><span><span class="wcard__lead">Авторские позиции</span>, которые становятся «героями» меню</span></li>
-          <li><span><span class="wcard__lead">Визуал</span> — язык и подача</span></li>
+          <li><span><span class="wcard__lead">Визуал</span>, язык и подача</span></li>
         </ul>
       </div>
     </article>
@@ -551,6 +561,8 @@
     <!-- Правка 31.07: пилюля «Портфолио» и фильтр «Все / Бар / Кофе» убраны;
          заголовок — капсом, прямым Roslindale, по центру. -->
     <div class="sec-head cases-head">
+      <!-- Правка 08.08: заголовок крупнее (.cases-head .h2), у лида снят
+           курсив — см. .cases-head .lead. -->
       <h2 class="h-serif h2" data-gsap-big-copy-on-scroll>Наши проекты</h2>
       <p class="lead" data-gsap-text-on-scroll data-gsap-delay="0.1">Собраны наиболее знаковые проекты, реализованные командой BARPOINT</p>
     </div>
@@ -703,6 +715,9 @@
      а короткие строки-должности: янтарным — роль в BARPOINT, светлым —
      всё остальное. Так теперь и здесь: .hstation__role — одна строка
      BARPOINT, .hstation__creds — одна-три строки через <br>.
+     Правка 08.08: светлые строки (.hstation__creds) сняты целиком по
+     просьбе заказчика — осталась только янтарная роль, и высоту трека
+     теперь задаёт она (парная правка — teamTextBottom в main.js).
      ДЛИНА ЗДЕСЬ — НЕ КОСМЕТИКА. Станции равняются по верхней кромке фото,
      трек центрируется в экране, поэтому высоту ВСЕГО трека задаёт самая
      длинная подпись: лишняя строка у одного человека опускает фотографии
@@ -761,8 +776,12 @@
         <div class="hstation__card">
           <figure class="hstation__photo"><img src="assets/img/team-artur-800.webp" width="800" height="1200" alt="Артур Шустериовас" loading="eager" decoding="async"></figure>
           <span class="plaque"><span>Артур Шустериовас</span></span>
+          <!-- Правка 08.08 (слова заказчика): строки-регалии (.hstation__creds)
+               сняты у всех четырёх станций — осталась только янтарная роль.
+               Разметка удалена, а не спрятана: display:none оставил бы мусор
+               в дереве доступности. Парная правка — селектор teamTextBottom в
+               main.js, он мерил хвост страницы по этим строкам. -->
           <p class="hstation__role" data-gsap-text-on-scroll>Co-founder BARPOINT</p>
-          <p class="hstation__creds" data-gsap-text-on-scroll data-gsap-delay="0.08">Co-founder PIMS, Origin Group<br>Креативный директор PIMS</p>
         </div>
       </div>
 
@@ -771,7 +790,6 @@
           <figure class="hstation__photo"><img src="assets/img/team-timur-800.webp" width="800" height="1200" alt="Тимур Бегляров" loading="eager" decoding="async"></figure>
           <span class="plaque"><span>Тимур Бегляров</span></span>
           <p class="hstation__role" data-gsap-text-on-scroll>Co-founder BARPOINT</p>
-          <p class="hstation__creds" data-gsap-text-on-scroll data-gsap-delay="0.08">Co-founder PIMS</p>
         </div>
       </div>
 
@@ -782,7 +800,6 @@
           <figure class="hstation__photo"><img src="assets/img/team-mayakov-800.webp" width="800" height="1067" alt="Владимир Маяков" loading="eager" decoding="async"></figure>
           <span class="plaque"><span>Владимир Маяков</span></span>
           <p class="hstation__role" data-gsap-text-on-scroll>Co-owner BARPOINT</p>
-          <p class="hstation__creds" data-gsap-text-on-scroll data-gsap-delay="0.08">Co-owner RU / MENA<br>Ex-идеолог INSADER BAR<br>Ex-директор по напиткам GT.GROUP</p>
         </div>
       </div>
 
@@ -798,7 +815,6 @@
           <figure class="hstation__photo"><img src="assets/img/team-gordyshev-800.webp" width="800" height="1200" alt="Александр Гордышев" loading="eager" decoding="async"></figure>
           <span class="plaque"><span>Александр Гордышев</span></span>
           <p class="hstation__role" data-gsap-text-on-scroll>Operational Head Bartender</p>
-          <p class="hstation__creds" data-gsap-text-on-scroll data-gsap-delay="0.08">Процессы, стандарты, качество<br>Экономика, обучение, аттестации</p>
         </div>
       </div>
 
